@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="mcp-server">
+        <h4>MCP Server</h4>
+        <div>
+          <button id="update-tool">Update Tools</button>
+          <button id="update-resource">Update Resource</button>
+          <button id="update-prompt">Update Prompt</button>
+          <button id="ping-server">Ping Server</button>
+          <button id="list-roots">List Roots</button>
+          <button id="sampling">Sampling</button>
+          <button id="send-logging-message">Send Logging Message</button>
+        </div>
+      </div>
+      <div id="mcp-client">
+        <h4>MCP Client</h4>
+        <div>
+          <button id="call-tool">call Tool</button>
+          <button id="call-long-task">Call Long Task</button>
+          <button id="abort-task">Abort Task</button>
+          <button id="subscribe-resource">Subscribe Resource</button>
+          <button id="unsubscribe-resource">Unsubscribe Resource</button>
+          <button id="read-resource">Read Resource</button>
+          <button id="get-prompt">Get Prompt</button>
+          <button id="get-complete">Get Complete</button>
+          <button id="set-logging-level">Set Logging Level</button>
+          <button id="list-resources">List Resources</button>
+          <button id="ping-client">Ping Client</button>
+        </div>
+      </div>
+      <div id="remote-client">
+        <h4>Remote Client</h4>
+        <div>
+          <button id="remote-call-tool">Remote Call Tool</button>
+          <button id="remote-call-long-task">Remote Call Long Task</button>
+          <button id="remote-abort-task">Remote Abort Task</button>
+          <button id="remote-subscribe-resource">Remote Subscribe Resource</button>
+          <button id="remote-unsubscribe-resource">Remote Unsubscribe Resource</button>
+          <button id="remote-read-resource">Remote Read Resource</button>
+          <button id="remote-get-prompt">Remote Get Prompt</button>
+          <button id="remote-get-complete">Remote Get Complete</button>
+          <button id="remote-set-logging-level">Remote Set Logging Level</button>
+          <button id="remote-list-resources">Remote List Resources</button>
+          <button id="remote-ping-client">Remote Ping Client</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

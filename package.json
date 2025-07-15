@@ -1,0 +1,19 @@
+{
+  "name": "next-sdk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenTiny NEXT MCP",
+  "scripts": {
+    "dev": "pnpm -F doc-vanilla dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=8"
+  }
+}
