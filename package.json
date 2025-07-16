@@ -5,10 +5,12 @@
   "description": "OpenTiny NEXT MCP",
   "scripts": {
     "dev": "pnpm -F doc-vanilla dev",
-    "ai": "pnpm -F doc-ai dev"
+    "ai": "pnpm -F doc-ai dev",
+    "inspect":"npx -y @modelcontextprotocol/inspector"
   },
   "devDependencies": {
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "@modelcontextprotocol/inspector":"^0.16.1"
   },
   "keywords": [],
   "author": "",
