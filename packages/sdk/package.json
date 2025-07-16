@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.15.1",
-    "@opentiny/next": "^0.2.1"
+    "@opentiny/next": "^0.2.1",
+    "openai": "^5.9.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

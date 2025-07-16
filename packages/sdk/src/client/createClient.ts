@@ -1,6 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import type { Implementation } from '@modelcontextprotocol/sdk/types.d.ts'
 import type { ClientOptions } from '@modelcontextprotocol/sdk/client/index.d.ts'
+import { serverTransport } from './createProxy'
 import {
   ToolListChangedNotificationSchema,
   ResourceUpdatedNotificationSchema,
@@ -28,7 +29,7 @@ type ClientRequestMapKey = keyof typeof requestEventMap
 type ClientRequestCallback = Parameters<Client['setRequestHandler']>[1]
 
 export class NextClient extends Client {
-  nextTransport: any
+  nextTransport: any = serverTransport
   isMessageChannel = false
 
   constructor(clientInfo: Implementation, clientOptions: ClientOptions) {

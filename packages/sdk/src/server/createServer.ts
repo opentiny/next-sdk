@@ -1,7 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { Implementation } from '@modelcontextprotocol/sdk/types.d.ts'
 import type { ServerOptions } from '@modelcontextprotocol/sdk/server/index.d.ts'
-import { serverTransport } from '../client/createProxy'
 import {
   SetLevelRequestSchema,
   PingRequestSchema,
@@ -27,7 +26,7 @@ type SeverEventMapKey = keyof typeof eventMap
 type ServerEventCallback = Parameters<McpServer['server']['setRequestHandler']>[1]
 
 export class NextServer extends McpServer {
-  nextTransport = serverTransport
+  nextTransport: any
   isMessageChannel = false
 
   constructor(serverInfo: Implementation, serverOptions: ServerOptions) {

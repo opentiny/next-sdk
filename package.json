@@ -4,7 +4,8 @@
   "private": true,
   "description": "OpenTiny NEXT MCP",
   "scripts": {
-    "dev": "pnpm -F doc-vanilla dev"
+    "dev": "pnpm -F doc-vanilla dev",
+    "ai": "pnpm -F doc-ai dev"
   },
   "devDependencies": {
     "prettier": "^3.0.3"

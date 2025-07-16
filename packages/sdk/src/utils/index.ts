@@ -1,0 +1,74 @@
+import { StreamHandler, ChatCompletionStreamResponse } from '../type'
+
+/**
+ * 处理SSE流式响应
+ * @param response fetch响应对象
+ * @param handler 流处理器
+ */
+export async function handleSSEStream(response: Response, handler: StreamHandler, signal?: AbortSignal): Promise<void> {
+  // 获取ReadableStream
+  const reader = response.body?.getReader()
+  if (!reader) {
+    throw new Error('Response body is null')
+  }
+
+  // 处理流式数据
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  if (signal) {
+    signal.addEventListener(
+      'abort',
+      () => {
+        reader.cancel().catch((err) => console.error('Error cancelling reader:', err))
+      },
+      { once: true }
+    )
+  }
+
+  try {
+    while (true) {
+      if (signal?.aborted) {
+        await reader.cancel()
+        break
+      }
+
+      const { done, value } = await reader.read()
+      if (done) break
+
+      // 解码二进制数据
+      const chunk = decoder.decode(value, { stream: true })
+      buffer += chunk
+
+      // 处理完整的SSE消息
+      const lines = buffer.split('\n\n')
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        if (line.trim() === '') continue
+        if (line.trim() === 'data: [DONE]') {
+          handler.onDone()
+          continue
+        }
+
+        try {
+          // 解析SSE消息
+          const dataMatch = line.match(/^data: (.+)$/m)
+          if (!dataMatch) continue
+
+          const data = JSON.parse(dataMatch[1]) as ChatCompletionStreamResponse
+          handler.onData(data)
+        } catch (error) {
+          console.error('Error parsing SSE message:', error)
+        }
+      }
+    }
+
+    if (buffer.trim() === 'data: [DONE]' || signal?.aborted) {
+      handler.onDone()
+    }
+  } catch (error) {
+    if (signal?.aborted) return
+    throw error
+  }
+}
