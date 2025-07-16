@@ -11,6 +11,7 @@ import {
   ListRootsRequestSchema
 } from '@modelcontextprotocol/sdk/types.js'
 import { MessageChannelServerTransport } from '@opentiny/next'
+import { serverTransport } from '../client/createProxy'
 
 const eventMap = {
   subscribe: SubscribeRequestSchema,
@@ -26,7 +27,7 @@ type SeverEventMapKey = keyof typeof eventMap
 type ServerEventCallback = Parameters<McpServer['server']['setRequestHandler']>[1]
 
 export class NextServer extends McpServer {
-  nextTransport: any
+  nextTransport: any = serverTransport
   isMessageChannel = false
 
   constructor(serverInfo: Implementation, serverOptions: ServerOptions) {
