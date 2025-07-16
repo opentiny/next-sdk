@@ -1,0 +1,21 @@
+html,
+body {
+  background-color: #f5f7fa;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
+.tiny-button + .tiny-button {
+  margin-left: 8px !important;
+}
+
+
+.tr-bubbule__body p{
+    margin: 8px 0;
+}
