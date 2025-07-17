@@ -131,17 +131,20 @@ export const createConsoleServer = async () => {
   })
 
   // 长任务工具
-  server.tool(
-    'long-task',
+  server.registerTool(
     'long-task',
     {
-      steps: z.number().describe('任务步骤')
+      title: 'long-task',
+      inputSchema: {
+        steps: z.number().describe('任务步骤')
+      }
     },
     async ({ steps }, { sendNotification, _meta, signal, requestId }) => {
       for (let i = 0; i < steps; i++) {
+        // progressToken 是一个从0开始自增的数字，每次调用工具，progressToken 都会自增1
         const progressToken = _meta?.progressToken
         console.log('progressToken', progressToken)
-        if (progressToken) {
+        if (progressToken || progressToken === 0) {
           await sendNotification({
             method: 'notifications/progress',
             params: {
