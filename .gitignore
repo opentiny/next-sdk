@@ -35,3 +35,4 @@ pnpm-lock.yaml
 # 系统文件
 .DS_Store
 Thumbs.db 
+packages/next-wiki/doc/.vitepress/cache

@@ -13,10 +13,8 @@ declare module 'vue' {
     TinyButton: typeof import('@opentiny/vue-button')['default']
     TinyGrid: typeof import('@opentiny/vue-grid')['default']
     TinyGridColumn: typeof import('@opentiny/vue-grid-column')['default']
-    TinyImage: typeof import('@opentiny/vue-image')['default']
     TinyInput: typeof import('@opentiny/vue-input')['default']
     TinyOption: typeof import('@opentiny/vue-option')['default']
-    TinyQrCode: typeof import('@opentiny/vue-qr-code')['default']
     TinyRobotChat: typeof import('./src/components/tiny-robot-chat.vue')['default']
     TinyTag: typeof import('@opentiny/vue-tag')['default']
   }
