@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm -F doc-vanilla dev",
     "ai": "pnpm -F doc-ai dev",
-    "inspect":"npx -y @modelcontextprotocol/inspector"
+    "wiki": "pnpm -F next-wiki docs:dev"
   },
   "devDependencies": {
     "prettier": "^3.0.3",
