@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "pnpm -F doc-vanilla dev",
     "ai": "pnpm -F doc-ai dev",
-    "wiki": "pnpm -F next-wiki docs:dev"
+    "wiki": "pnpm -F next-wiki docs:dev",
+    "build": "pnpm -F @opentiny/next-sdk build"
   },
   "devDependencies": {
     "prettier": "^3.0.3",
