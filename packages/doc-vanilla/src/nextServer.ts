@@ -168,6 +168,31 @@ export const createConsoleServer = async () => {
     }
   )
 
+  server.registerTool(
+    'normal-task',
+    {
+      title: '普通任务的终止，只需要加上 signal 即可',
+      inputSchema: {
+        value: z.string()
+      }
+    },
+    async ({ value }, { signal }) => {
+      for (let i = 0; i < 10; i++) {
+        console.log('普通任务正在进行中...', i);
+
+        if (signal.aborted) {
+          server.server.sendLoggingMessage({ level: 'error', data: '服务端 - 普通任务已终止' })
+          break
+        }
+
+        await sleep(1000)
+      }
+
+      await server.server.sendLoggingMessage({ level: 'info', data: '服务端 - 普通任务已结束' })
+      return { content: [{ type: 'text', text: '普通任务完成！'}] }
+    }
+  )
+
   // 更新工具
   updateToolButton?.addEventListener('click', async () => {
     tool.update({
