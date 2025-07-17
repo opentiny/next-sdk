@@ -5,7 +5,8 @@
   "description": "OpenTiny NEXT MCP",
   "scripts": {
     "dev": "pnpm -F doc-vanilla dev",
-    "ai": "pnpm -F doc-ai dev"
+    "ai": "pnpm -F doc-ai dev",
+    "build": "pnpm -F @opentiny/next-sdk build"
   },
   "devDependencies": {
     "prettier": "^3.0.3"
