@@ -16,7 +16,7 @@ export default defineConfig({
         text: '目录',
         items: [
           { text: '介绍', link: '/introduce' },
-          { text: '自动补充', link: '/complete' }
+          { text: '自动补充/通知节流', link: '/complete' }
         ]
       }
     ],

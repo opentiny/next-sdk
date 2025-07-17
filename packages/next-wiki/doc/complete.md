@@ -105,3 +105,25 @@ server.registerPrompt(
     });
 ```
 
+# 通知节流
+
+为避免批量注册、更新、删除时，带来多条通知消息，在 `new McpServer` 时，可以设置哪些通知事件可以节流。
+
+```js{7-10}
+const server = new McpServer(
+  {
+    name: "efficient-server",
+    version: "1.0.0"
+  },
+  {
+    debouncedNotificationMethods: [
+      'notifications/tools/list_changed',
+      'notifications/resources/list_changed',
+      'notifications/prompts/list_changed'
+    ]
+  }
+);
+```
+
+1. 服务即使有大批量的变动，**每个类型**的通知事件，只会触发一次。
+2. 通知节流仅限于简单通知，如果通知附带`params`， 则事件不节流。
