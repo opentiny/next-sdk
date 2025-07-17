@@ -11,6 +11,9 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'NextSDK',
       fileName: 'index'
+    },
+    rollupOptions: {
+      external: [/^@modelcontextprotocol\/sdk/, /^@opentiny\/next/, 'openai']
     }
   },
   plugins: [dts()]
