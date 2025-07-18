@@ -1,5 +1,6 @@
 <template>
   <!-- mcp-robot弹窗 -->
+
   <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreen">
     <div v-if="messages.length === 0">
       <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">

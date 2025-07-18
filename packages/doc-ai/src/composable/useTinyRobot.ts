@@ -1,42 +1,12 @@
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
-import { h, nextTick, onMounted, ref, watch, reactive } from 'vue'
+import { h, nextTick, onMounted, ref, watch } from 'vue'
 import type { SuggestionItem } from '@opentiny/tiny-robot'
-import { createMCPHost } from '@opentiny/next-sdk'
-import { createClient, createInMemoryTransport } from '@opentiny/next-sdk'
+import { AgentModelProvider } from './AgentModelProvider'
 
 export const useTinyRobot = () => {
-  // 创建nextClient
-  const nextClient = createClient(
-    {
-      name: 'next-sdk',
-      version: '1.0.0'
-    },
-    {
-      capabilities: {
-        roots: { listChanged: true },
-        sampling: { createMessage: true }
-      }
-    }
-  )
-
-  nextClient.use(createInMemoryTransport())
-
-  nextClient.connectTransport()
-
-  const mcpHost = createMCPHost({
-    llmOption: {
-      url: 'https://api.deepseek.com/v1',
-      apiKey: 'sk-85276270e75f45139cda35c2ba445b3c',
-      dangerouslyAllowBrowser: true,
-      model: 'deepseek-chat',
-      llm: 'deepseek'
-    },
-    mcpClients: [nextClient]
-  })
-
   const client = new AIClient({
-    providerImplementation: mcpHost,
+    providerImplementation: new AgentModelProvider({ provider: 'custom' }),
     provider: 'custom'
   })
 
@@ -59,8 +29,7 @@ export const useTinyRobot = () => {
   }
 
   const { messageManager } = useConversation({ client })
-  const { messageState, inputMessage, sendMessage, abortRequest } = messageManager
-  const messages = (mcpHost.messages = reactive([]))
+  const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager
 
   const roles = {
     assistant: {
