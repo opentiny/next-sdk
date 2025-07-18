@@ -17,7 +17,7 @@ export class MCPHost {
   protected llmOption: any
   protected mcpClients: Client[]
   protected llm: any
-  protected mcpClientMap: Map<string, any> = new Map()
+  protected mcpClientMap: Map<Client, any> = new Map()
   messages: any[] = []
   protected toolClientMap: Map<string, Client> = new Map<string, Client>()
   protected iteration = MAX_ITERATION // 最大迭代次数
@@ -32,7 +32,7 @@ export class MCPHost {
     for (let i = 0; i < this.mcpClients.length; i++) {
       const mcpClient = this.mcpClients[i]
       const { tools } = await mcpClient.listTools()
-      this.mcpClientMap.set(mcpClient.name, tools)
+      this.mcpClientMap.set(mcpClient, tools)
       tools.forEach((tool) => {
         this.toolClientMap.set(tool.name, mcpClient)
       })
