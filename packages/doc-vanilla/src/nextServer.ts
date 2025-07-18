@@ -172,11 +172,8 @@ export const createConsoleServer = async () => {
     'normal-task',
     {
       title: '普通任务的终止，只需要加上 signal 即可',
-      inputSchema: {
-        value: z.string()
-      }
     },
-    async ({ value }, { signal }) => {
+    async ({ signal }) => {
       for (let i = 0; i < 10; i++) {
         console.log('普通任务正在进行中...', i);
 

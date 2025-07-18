@@ -112,7 +112,7 @@ export const createConsoleClient = async () => {
   const normalTaskButton = document.getElementById('call-normal-task')
   normalTaskButton?.addEventListener('click', async () => {
     // 任务 promise
-    const promise = await client.callTool({ name: 'normal-task', arguments: { value: '一个随便的参数' } }, CallToolResultSchema, {
+    const promise = await client.callTool({ name: 'normal-task' }, CallToolResultSchema, {
       signal: controllerNormalTask.signal,
     })
     console.log('normal-task result', promise)
