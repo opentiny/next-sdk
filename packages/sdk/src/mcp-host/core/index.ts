@@ -1,7 +1,14 @@
 import OpenAI from 'openai'
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
-import type { ChatCompleteResponse, ToolCall, ToolResults, Message, ChatCompleteRequest } from '../../type'
+import type {
+  ChatCompleteResponse,
+  ToolCall,
+  ToolResults,
+  Message,
+  ChatCompleteRequest,
+  StreamHandler
+} from '../../type'
 import { Role } from '../../type'
 
 const MAX_ITERATION = 3
@@ -10,11 +17,9 @@ export class MCPHost {
   protected llmOption: any
   protected mcpClients: Client[]
   protected llm: any
-  protected mcpClientMap: Map<string, any> = new Map()
+  protected mcpClientMap: Map<Client, any> = new Map()
   messages: any[] = []
   protected toolClientMap: Map<string, Client> = new Map<string, Client>()
-  // 用于流式输出的 TransformStream
-  protected transformStream = new TransformStream()
   protected iteration = MAX_ITERATION // 最大迭代次数
 
   constructor({ llmOption, mcpClients }: { llmOption: any; mcpClients: Client[] }) {
@@ -27,7 +32,7 @@ export class MCPHost {
     for (let i = 0; i < this.mcpClients.length; i++) {
       const mcpClient = this.mcpClients[i]
       const { tools } = await mcpClient.listTools()
-      this.mcpClientMap.set(mcpClient.name, tools)
+      this.mcpClientMap.set(mcpClient, tools)
       tools.forEach((tool) => {
         this.toolClientMap.set(tool.name, mcpClient)
       })
@@ -87,7 +92,10 @@ export class MCPHost {
    * @param response LLM 回复对象
    * @returns [工具调用数组, 回复内容]
    */
-  protected async parseToolCalls(response: ChatCompleteResponse): Promise<[ToolCall[], string]> {
+  protected async parseToolCalls(
+    response: ChatCompleteResponse,
+    handler: StreamHandler
+  ): Promise<[ToolCall[], string]> {
     // 用 Map 以 id 归集每个 tool_call，支持多工具并发调用
     // 每次 chunk 到来时，增量合并 arguments，保证每个工具的参数完整
     // 最终返回所有工具调用的数组
@@ -95,12 +103,18 @@ export class MCPHost {
     let content: string = ''
     let lastToolCallId: string = ''
 
-    for await (const chunk of response) {
+    for await (const chunk of response as any) {
       const delta = chunk.choices[0].delta
       const toolResults = delta?.tool_calls
       const contentDelta = delta?.content
       if (contentDelta) {
         content += contentDelta
+        handler.onData({
+          delta: {
+            role: 'assistant',
+            content: contentDelta
+          }
+        })
       }
       if (toolResults && toolResults.length > 0) {
         const toolCallDelta = toolResults[0]
@@ -115,17 +129,49 @@ export class MCPHost {
               arguments: toolCallDelta.function?.arguments || ''
             }
           })
+
+          const functionName = toolCallDelta.function?.name || ''
+
+          handler.onData({
+            delta: {
+              role: 'assistant',
+              content: `调用工具：${functionName}`
+            }
+          })
+
+          handler.onData({
+            delta: {
+              role: 'assistant',
+              content: `\n\n参数：`
+            }
+          })
         }
 
         // 如果已存在，合并 arguments
         if (toolCallMap.has(lastToolCallId)) {
           const prev = toolCallMap.get(lastToolCallId)
-          // 拼接 arguments（增量式）
-          prev.function.arguments += toolCallDelta.function?.arguments || ''
+
+          if (prev) {
+            // 拼接 arguments（增量式）
+            prev.function.arguments += toolCallDelta.function?.arguments || ''
+            handler.onData({
+              delta: {
+                role: 'assistant',
+                content: `${toolCallDelta.function?.arguments}`
+              }
+            })
+          }
         }
       }
     }
 
+    handler.onData({
+      delta: {
+        role: 'assistant',
+        content: `\n\n`
+      }
+    })
+    handler.onDone()
     // 返回所有 tool_call 组成的数组，以及 content
     return [Array.from(toolCallMap.values()), content]
   }
@@ -188,47 +234,6 @@ export class MCPHost {
   }
 
   /**
-   * 向流式输出写入消息增量（如工具调用过程）
-   * @param messageDeltaContent 增量内容
-   * @param role 角色
-   * @param extra 附加信息
-   */
-  protected async writeMessageDelta(
-    messageDeltaContent: string,
-    role: string = 'assistant',
-    extra?: any
-  ): Promise<void> {
-    // 获取 TransformStream 的可写入流的写入器
-    const writer = this.transformStream.writable.getWriter()
-
-    try {
-      // 等待写入器准备就绪
-      await writer.ready
-
-      // 构造消息增量对象,包含角色、内容和额外信息
-      const messageDelta = {
-        choices: [
-          {
-            delta: {
-              role, // 消息角色(assistant/user等)
-              content: messageDeltaContent, // 消息内容
-              extra // 额外信息(工具调用等)
-            }
-          }
-        ]
-      }
-
-      // 将消息增量对象转换为SSE格式的数据
-      // 1. 使用 TextEncoder 将字符串转换为 UTF-8 编码的字节
-      // 2. 添加 'data: ' 前缀和换行符,符合 SSE 规范
-      await writer.write(new TextEncoder().encode('data: ' + JSON.stringify(messageDelta) + '\n\n'))
-    } finally {
-      // 释放写入器锁,允许其他代码获取写入器
-      writer.releaseLock()
-    }
-  }
-
-  /**
    * 解析工具调用结果，拼接为字符串
    * @param toolCallResult 工具调用结果
    * @returns 拼接后的字符串
@@ -253,7 +258,7 @@ export class MCPHost {
     return str
   }
 
-  async chatStream(message: string | { messages: Message[]; options: any }) {
+  async chatStream(message: string | { messages: Message[]; options: any }, handler: StreamHandler) {
     await this.generateMcpClient()
     if (typeof message === 'string') {
       this.messages.push({ role: Role.USER, content: message })
@@ -262,18 +267,15 @@ export class MCPHost {
     }
 
     this.iteration = MAX_ITERATION
-    this.processSteamToolCallsAndResponses().catch((error) => {
+    this.processSteamToolCallsAndResponses(handler).catch((error) => {
       console.error('Chat failed:', error)
-      this.transformStream.writable.abort(error)
     })
-
-    return this.transformStream.readable
   }
 
   /**
    * 聊天迭代主流程，支持多轮工具调用和最终回复
    */
-  protected async processSteamToolCallsAndResponses(): Promise<void> {
+  protected async processSteamToolCallsAndResponses(handler: StreamHandler): Promise<void> {
     try {
       const toolsCallResults: ToolResults = []
 
@@ -282,7 +284,7 @@ export class MCPHost {
         const response: Response | Error = await this.doLLMChart()
 
         // 解析工具调用和最终回复
-        const [tool_calls, content] = await this.parseToolCalls(response as ChatCompleteResponse)
+        const [tool_calls, content] = await this.parseToolCalls(response as any, handler)
 
         if (tool_calls.length) {
           // 构造带 tool_calls 的 assistant 消息，符合 OpenAI Function Calling 协议

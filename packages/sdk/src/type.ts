@@ -287,23 +287,10 @@ export interface ChatCompletionStreamResponseDelta {
 }
 
 /**
- * 流式聊天完成响应选择
- */
-export interface ChatCompletionStreamResponseChoice {
-  index: number
-  delta: ChatCompletionStreamResponseDelta
-  finish_reason: string | null
-}
-
-/**
  * 流式聊天完成响应
  */
 export interface ChatCompletionStreamResponse {
-  id: string
-  object: string
-  created: number
-  model: string
-  choices: ChatCompletionStreamResponseChoice[]
+  delta: ChatCompletionStreamResponseDelta
 }
 
 /**
