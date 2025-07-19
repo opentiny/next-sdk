@@ -2,26 +2,24 @@
   <!-- mcp-robot弹窗 -->
 
   <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreen">
-    <div v-if="messages.length === 0">
-      <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
-        <template #footer>
-          <div class="welcome-footer"></div>
-        </template>
-      </tr-welcome>
-      <tr-prompts
-        :items="promptItems"
-        :wrap="true"
-        item-class="prompt-item"
-        class="tiny-prompts"
-        @item-click="handlePromptItemClick"
-      ></tr-prompts>
-    </div>
-    <tr-bubble-list
-      v-else
-      :items="messages.filter((item: any) => item.role !== 'system' && item.role !== 'tool')"
-      :roles="roles"
-      auto-scroll
-    ></tr-bubble-list>
+    <tr-bubble-provider :message-renderers="messageRenderers">
+      <div v-if="showMessages.length === 0">
+        <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
+          <template #footer>
+            <div class="welcome-footer"></div>
+          </template>
+        </tr-welcome>
+        <tr-prompts
+          :items="promptItems"
+          :wrap="true"
+          item-class="prompt-item"
+          class="tiny-prompts"
+          @item-click="handlePromptItemClick"
+        ></tr-prompts>
+      </div>
+      <tr-bubble-list v-else :items="showMessages" :roles="roles" auto-scroll> </tr-bubble-list>
+    </tr-bubble-provider>
+
     <template #footer>
       <div class="chat-input">
         <TrSuggestionPills :items="suggestionPillItems" @item-click="handleSuggestionPillItemClick" /><br />
@@ -30,7 +28,7 @@
           mode="single"
           v-model="inputMessage"
           :placeholder="GeneratingStatus.includes(messageState.status) ? '正在思考中...' : '请输入您的问题'"
-          :clearable="true"
+          :clearable="!!inputMessage"
           :loading="GeneratingStatus.includes(messageState.status)"
           :showWordLimit="true"
           :maxLength="1000"
@@ -46,10 +44,33 @@
 </template>
 
 <script setup lang="ts">
-import { TrBubbleList, TrContainer, TrPrompts, TrSender, TrWelcome, TrSuggestionPills } from '@opentiny/tiny-robot'
-import { GeneratingStatus } from '@opentiny/tiny-robot-kit'
+import {
+  TrBubbleList,
+  TrContainer,
+  TrPrompts,
+  TrSender,
+  TrWelcome,
+  TrSuggestionPills,
+  TrBubbleProvider,
+  BubbleMarkdownMessageRenderer,
+  BubbleChainMessageRenderer
+} from '@opentiny/tiny-robot'
+import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import { showTinyRobot } from '../composable/utils'
+import ReactiveMarkdown from './ReactiveMarkdown.vue'
+import { computed, nextTick, watch } from 'vue'
+
+const mdRenderer = new BubbleMarkdownMessageRenderer()
+const messageRenderers = {
+  markdown: ReactiveMarkdown,
+  chain: {
+    component: BubbleChainMessageRenderer,
+    defaultProps: {
+      contentRenderer: (content: string) => mdRenderer.md.render(content)
+    }
+  }
+}
 
 const {
   fullscreen,
@@ -69,6 +90,36 @@ const {
   suggestionPillItems,
   handleSuggestionPillItemClick
 } = useTinyRobot()
+
+const showMessages = computed(() => {
+  if (messageState.status === STATUS.PROCESSING) {
+    return [
+      ...messages.value,
+      {
+        role: 'assistant',
+        content: '正在思考中...',
+        loading: true
+      }
+    ]
+  }
+
+  return messages.value
+})
+
+const scrollToBottom = () => {
+  const containerBody = document.querySelector('div.ai-console-content-wrap')
+  if (containerBody) {
+    nextTick(() => {
+      containerBody.scrollTo({
+        top: containerBody.scrollHeight,
+        behavior: 'smooth'
+      })
+    })
+  }
+}
+
+// 最新消息滚动到底部
+watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 </script>
 
 <style scoped lang="less">
@@ -120,5 +171,11 @@ const {
   width: 300px;
   height: 600px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+</style>
+
+<style>
+.tr-chain-item__body .tr-chain-item__content {
+  word-break: break-all;
 }
 </style>

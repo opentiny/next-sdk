@@ -121,28 +121,21 @@ export class MCPHost {
         if (toolCallDelta.id) {
           lastToolCallId = toolCallDelta.id
           // 新的 tool_call
-          toolCallMap.set(lastToolCallId, {
+
+          const toolCall = {
             id: toolCallDelta.id,
             type: toolCallDelta.type,
             function: {
               name: toolCallDelta.function?.name || '',
               arguments: toolCallDelta.function?.arguments || ''
             }
-          })
-
-          const functionName = toolCallDelta.function?.name || ''
-
-          handler.onData({
-            delta: {
-              role: 'assistant',
-              content: `调用工具：${functionName}`
-            }
-          })
+          }
+          toolCallMap.set(lastToolCallId, toolCall)
 
           handler.onData({
             delta: {
-              role: 'assistant',
-              content: `\n\n参数：`
+              role: Role.ASSISTANT,
+              content: `\n\n正在调用工具：${toolCall.function.name}\n\n参数：`
             }
           })
         }
@@ -156,7 +149,7 @@ export class MCPHost {
             prev.function.arguments += toolCallDelta.function?.arguments || ''
             handler.onData({
               delta: {
-                role: 'assistant',
+                role: Role.ASSISTANT,
                 content: `${toolCallDelta.function?.arguments}`
               }
             })
@@ -171,7 +164,6 @@ export class MCPHost {
         content: `\n\n`
       }
     })
-    handler.onDone()
     // 返回所有 tool_call 组成的数组，以及 content
     return [Array.from(toolCallMap.values()), content]
   }
@@ -181,7 +173,10 @@ export class MCPHost {
    * @param toolCalls 工具调用请求列表
    * @returns 工具调用结果和消息
    */
-  protected async callTools(toolCalls: ToolCall[]): Promise<{ toolResults: ToolResults; toolCallMessages: Message[] }> {
+  protected async callTools(
+    toolCalls: ToolCall[],
+    handler: StreamHandler
+  ): Promise<{ toolResults: ToolResults; toolCallMessages: Message[] }> {
     try {
       const toolResults: ToolResults = []
       const toolCallMessages: Message[] = []
@@ -206,6 +201,21 @@ export class MCPHost {
           console.error(`Failed to parse tool arguments for ${toolName}:`, _error)
           toolArgs = {}
         }
+        const beforeToolCall = {
+          id: toolCall.id,
+          type: toolCall.type,
+          function: {
+            name: toolCall.function?.name || '',
+            arguments: toolCall.function?.arguments || ''
+          }
+        }
+
+        handler.onData({
+          delta: {
+            role: Role.TOOL,
+            toolCall: beforeToolCall
+          }
+        })
 
         // 真正调用工具
         const callToolResult = (await client.callTool({
@@ -218,6 +228,23 @@ export class MCPHost {
           tool_call_id: toolCall.id,
           content: callToolContent
         }
+
+        const toolCallMessage = {
+          id: toolCall.id,
+          type: toolCall.type,
+          callToolContent: callToolContent,
+          function: {
+            name: toolCall.function?.name || '',
+            arguments: toolCall.function?.arguments || ''
+          }
+        }
+
+        handler.onData({
+          delta: {
+            role: Role.TOOL,
+            toolCall: toolCallMessage
+          }
+        })
 
         toolCallMessages.push(message)
         toolResults.push({
@@ -267,9 +294,11 @@ export class MCPHost {
     }
 
     this.iteration = MAX_ITERATION
-    this.processSteamToolCallsAndResponses(handler).catch((error) => {
+    await this.processSteamToolCallsAndResponses(handler).catch((error) => {
       console.error('Chat failed:', error)
     })
+
+    return 'ok'
   }
 
   /**
@@ -286,6 +315,7 @@ export class MCPHost {
         // 解析工具调用和最终回复
         const [tool_calls, content] = await this.parseToolCalls(response as any, handler)
 
+        // 如果有工具调用
         if (tool_calls.length) {
           // 构造带 tool_calls 的 assistant 消息，符合 OpenAI Function Calling 协议
           const assistantMsg = {
@@ -300,7 +330,7 @@ export class MCPHost {
           // 1. 先把带 tool_calls 的 assistant 消息 push 进去
           this.messages.push(assistantMsg)
           // 2. 再 push tool 消息
-          const { toolResults, toolCallMessages } = await this.callTools(tool_calls)
+          const { toolResults, toolCallMessages } = await this.callTools(tool_calls, handler)
           toolsCallResults.push(...toolResults)
           toolCallMessages.forEach((m) => this.messages.push(m))
           this.iteration--
@@ -310,6 +340,7 @@ export class MCPHost {
           this.iteration = 0
         }
       }
+      handler.onDone()
     } catch (error) {
       console.error('Chat iteration failed:', error)
       throw error

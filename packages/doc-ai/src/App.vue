@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <div class="keep-icon-and-hideme">
+      <IconAi />
+      <IconUser />
+    </div>
     <!-- 主体内容区域 -->
     <div class="main-content">
       <router-view />
@@ -16,7 +20,7 @@
 import '@opentiny/icons/style/all.css'
 import TinyRobotChat from './components/tiny-robot-chat.vue'
 import { showTinyRobot } from './composable/utils'
-import { IconAi } from '@opentiny/tiny-robot-svgs'
+import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 </script>
 
 <style scoped>
@@ -27,6 +31,13 @@ import { IconAi } from '@opentiny/tiny-robot-svgs'
   align-items: center;
   padding: 10px 20px;
   background-color: #f5f5f5;
+}
+
+/* 隐藏区域，保留svg永远可见 */
+.keep-icon-and-hideme,
+.keep-icon-and-hideme svg {
+  width: 0;
+  height: 0;
 }
 
 .qr-code {

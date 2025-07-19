@@ -4,6 +4,7 @@ import type { ChatCompletionRequest } from '@opentiny/tiny-robot-kit'
 import type { StreamHandler } from '@opentiny/tiny-robot-kit'
 import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
+import { reactive, ref } from 'vue'
 
 // 创建nextClient
 const nextClient = createClient(
@@ -24,6 +25,35 @@ nextClient.use(createInMemoryTransport())
 nextClient.connectTransport()
 
 let messageIndex = 0
+let lastContent: any
+let lastToolCall: any
+
+const onToolCallChain = (extra: any, handler: StreamHandler) => {
+  lastContent = null
+  const { delta } = extra
+  const infoItem = reactive({
+    id: delta.toolCall.id,
+    title: delta.toolCall.function.name,
+    content: delta.toolCall.callToolContent
+      ? '工具调用结果：' + delta.toolCall.callToolContent
+      : `\n正在调用工具${delta.toolCall.function.name}`
+  })
+  if (!lastToolCall || lastToolCall.items?.[0]?.id !== infoItem.id) {
+    lastToolCall = {
+      type: 'chain',
+      items: [infoItem]
+    }
+
+    handler.onMessage(lastToolCall)
+  } else {
+    const find = lastToolCall.items.find((item: any) => item.id === infoItem.id)
+    if (find) {
+      find.content = infoItem.content
+    } else {
+      lastToolCall.items.push(infoItem)
+    }
+  }
+}
 
 const mcpHost = createMCPHost({
   llmOption: {
@@ -49,7 +79,8 @@ export class AgentModelProvider extends BaseModelProvider {
   async chatStream(request: ChatCompletionRequest, handler: StreamHandler): Promise<void> {
     // 验证请求的messages属性，必须是数组，且每个消息必须有role\content属性
     const lastMessage = request.messages[request.messages.length - 1].content
-    mcpHost.chatStream(lastMessage, {
+    lastToolCall = null
+    await mcpHost.chatStream(lastMessage, {
       onData: (data: any) => {
         const resData = {
           id: '',
@@ -64,10 +95,31 @@ export class AgentModelProvider extends BaseModelProvider {
           object: '',
           model: ''
         }
-        handler.onData(resData)
+        if (data.delta.role === 'tool') {
+          onToolCallChain(data, handler)
+        } else {
+          if (!lastContent) {
+            lastContent = reactive({
+              type: 'markdown',
+              content: data.delta.content
+            })
+            handler.onMessage(lastContent)
+          } else {
+            lastContent.content += data.delta.content
+          }
+
+          // handler.onData(resData)
+        }
       },
       onDone: () => {
+        lastContent = null
+        lastToolCall = null
         handler.onDone()
+      },
+      onError: (error: any) => {
+        lastContent = null
+        lastToolCall = null
+        handler.onError(error)
       }
     })
   }

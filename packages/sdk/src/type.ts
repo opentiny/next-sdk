@@ -284,6 +284,7 @@ export interface ChatCreatePromptArgs {
 export interface ChatCompletionStreamResponseDelta {
   content?: string
   role?: MessageRole
+  toolCall?: ToolCall
 }
 
 /**
@@ -322,5 +323,6 @@ export interface AIAdapterError {
 export interface StreamHandler {
   onData: (data: ChatCompletionStreamResponse) => void
   onError: (error: AIAdapterError) => void
+  onMessage?: (msgObj: { type: string; [extra: string]: unknown }) => void
   onDone: () => void
 }
