@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.0",
-    "@opentiny/tiny-robot": "0.3.0-alpha.2",
-    "@opentiny/tiny-robot-kit": "0.3.0-alpha.2",
-    "@opentiny/tiny-robot-svgs": "0.3.0-alpha.2",
+    "@opentiny/tiny-robot": "0.3.0-alpha.3",
+    "@opentiny/tiny-robot-kit": "0.3.0-alpha.3",
+    "@opentiny/tiny-robot-svgs": "0.3.0-alpha.3",
     "@opentiny/icons": "^0.1.3",
     "@opentiny/next": "^0.2.1",
     "@opentiny/tiny-vue-mcp": "^0.0.2",

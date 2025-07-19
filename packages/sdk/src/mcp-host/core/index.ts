@@ -135,7 +135,7 @@ export class MCPHost {
           handler.onData({
             delta: {
               role: Role.ASSISTANT,
-              content: `\n正在调用工具：${toolCall.function.name}\n参数：`
+              content: `\n\n正在调用工具：${toolCall.function.name}\n\n参数：`
             }
           })
         }
@@ -161,7 +161,7 @@ export class MCPHost {
     handler.onData({
       delta: {
         role: 'assistant',
-        content: `\n`
+        content: `\n\n`
       }
     })
     // 返回所有 tool_call 组成的数组，以及 content
@@ -294,9 +294,11 @@ export class MCPHost {
     }
 
     this.iteration = MAX_ITERATION
-    this.processSteamToolCallsAndResponses(handler).catch((error) => {
+    await this.processSteamToolCallsAndResponses(handler).catch((error) => {
       console.error('Chat failed:', error)
     })
+
+    return 'ok'
   }
 
   /**
@@ -338,7 +340,6 @@ export class MCPHost {
           this.iteration = 0
         }
       }
-
       handler.onDone()
     } catch (error) {
       console.error('Chat iteration failed:', error)

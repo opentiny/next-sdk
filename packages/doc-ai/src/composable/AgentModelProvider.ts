@@ -80,7 +80,7 @@ export class AgentModelProvider extends BaseModelProvider {
     // 验证请求的messages属性，必须是数组，且每个消息必须有role\content属性
     const lastMessage = request.messages[request.messages.length - 1].content
     lastToolCall = null
-    mcpHost.chatStream(lastMessage, {
+    await mcpHost.chatStream(lastMessage, {
       onData: (data: any) => {
         const resData = {
           id: '',
@@ -99,20 +99,27 @@ export class AgentModelProvider extends BaseModelProvider {
           onToolCallChain(data, handler)
         } else {
           if (!lastContent) {
-            lastContent = {
-              type: 'text',
-              content: ref(data.delta.content)
-            }
+            lastContent = reactive({
+              type: 'markdown',
+              content: data.delta.content
+            })
             handler.onMessage(lastContent)
           } else {
-            lastContent.content.value += data.delta.content
+            lastContent.content += data.delta.content
           }
 
-          handler.onData(resData)
+          // handler.onData(resData)
         }
       },
       onDone: () => {
+        lastContent = null
+        lastToolCall = null
         handler.onDone()
+      },
+      onError: (error: any) => {
+        lastContent = null
+        lastToolCall = null
+        handler.onError(error)
       }
     })
   }

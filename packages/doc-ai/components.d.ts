@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ReactiveMarkdown: typeof import('./src/components/ReactiveMarkdown.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TinyBaseSelect: typeof import('@opentiny/vue-base-select')['default']

@@ -32,7 +32,6 @@ export const useTinyRobot = () => {
 
   const { messageManager } = useConversation({ client })
   const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager
-  window.zzc = messageManager
 
   const roles = {
     assistant: {
