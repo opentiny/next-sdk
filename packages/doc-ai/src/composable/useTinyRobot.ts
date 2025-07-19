@@ -3,6 +3,8 @@ import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, nextTick, onMounted, ref, watch } from 'vue'
 import type { SuggestionItem } from '@opentiny/tiny-robot'
 import { AgentModelProvider } from './AgentModelProvider'
+import { BubbleMarkdownMessageRenderer } from '@opentiny/tiny-robot'
+const mdRenderer = new BubbleMarkdownMessageRenderer()
 
 export const useTinyRobot = () => {
   const client = new AIClient({
@@ -30,18 +32,21 @@ export const useTinyRobot = () => {
 
   const { messageManager } = useConversation({ client })
   const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager
+  window.zzc = messageManager
 
   const roles = {
     assistant: {
       type: 'markdown',
       placement: 'start',
       avatar: aiAvatar,
-      maxWidth: '80%'
+      maxWidth: '80%',
+      contentRenderer: mdRenderer
     },
     user: {
       placement: 'end',
       avatar: userAvatar,
-      maxWidth: '80%'
+      maxWidth: '80%',
+      contentRenderer: mdRenderer
     }
   }
 
