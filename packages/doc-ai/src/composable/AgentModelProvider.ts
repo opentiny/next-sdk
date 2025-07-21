@@ -5,6 +5,7 @@ import type { StreamHandler } from '@opentiny/tiny-robot-kit'
 import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive, ref } from 'vue'
+import { TinyModal } from '@opentiny/vue'
 
 // 创建nextClient
 const nextClient = createClient(
@@ -15,7 +16,8 @@ const nextClient = createClient(
   {
     capabilities: {
       roots: { listChanged: true },
-      sampling: { createMessage: true }
+      sampling: { createMessage: true },
+      elicitation: { elicit: true }
     }
   }
 )
@@ -54,6 +56,33 @@ const onToolCallChain = (extra: any, handler: StreamHandler) => {
     }
   }
 }
+
+const getInputFromUser = async (message: string, requestedSchema: any) => {
+  const res = await TinyModal.confirm(message)
+
+  if (res === 'confirm') {
+    return {
+      action: 'accept',
+      content: {
+        checkAlternatives: true,
+        flexibleDates: 'next_day'
+      }
+    }
+  } else {
+    return {
+      action: 'reject'
+    }
+  }
+}
+
+nextClient.on('elicit', async (request) => {
+  const userResponse = await getInputFromUser(request.params.message, request.params.requestedSchema)
+
+  return {
+    action: userResponse.action,
+    content: userResponse.action === 'accept' ? userResponse.content : undefined
+  }
+})
 
 const mcpHost = createMCPHost({
   llmOption: {

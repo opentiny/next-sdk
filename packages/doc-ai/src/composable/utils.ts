@@ -11,9 +11,6 @@ export { $local, $session } from './storage'
 
 export const showTinyRobot = ref(true)
 
-export const globalClient = {
-  value: null
-}
 /**
  * 处理SSE流式响应
  * @param response fetch响应对象

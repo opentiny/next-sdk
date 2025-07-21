@@ -7,7 +7,8 @@ import {
   PromptListChangedNotificationSchema,
   LoggingMessageNotificationSchema,
   CreateMessageRequestSchema,
-  ListRootsRequestSchema
+  ListRootsRequestSchema,
+  ElicitRequestSchema
 } from '@modelcontextprotocol/sdk/types.js'
 
 const notificationEventMap = {
@@ -19,7 +20,8 @@ const notificationEventMap = {
 
 const requestEventMap = {
   createMessage: CreateMessageRequestSchema,
-  listRoots: ListRootsRequestSchema
+  listRoots: ListRootsRequestSchema,
+  elicit: ElicitRequestSchema
 }
 
 type ClientEventMapKey = keyof typeof notificationEventMap
