@@ -124,6 +124,7 @@ import productsData from './products.json'
 import { $local } from '../../composable/utils'
 import { createServer } from '@opentiny/next-sdk'
 import { createInMemoryTransport } from '@opentiny/next-sdk'
+import { z } from 'zod'
 
 if (!$local.products) {
   $local.products = productsData
@@ -202,6 +203,94 @@ const server = createServer(
 )
 
 server.use(createInMemoryTransport())
+
+const validates = ['2025-07-22', '2025-07-23']
+
+const checkAvailability = async (restaurant: string, date: string, partySize: number) => {
+  return validates.some((item) => date.includes(item))
+}
+
+const findAlternatives = async (restaurant: string, date: string, partySize: number) => {
+  return validates
+}
+
+const makeBooking = async (restaurant: string, date: string, partySize: number) => {
+  return true
+}
+// 帮我预定79号渔船餐厅今天晚上7点的桌子，可以容纳10个人
+// 订阅餐厅的工具
+server.registerTool(
+  'book-restaurant',
+  {
+    title: 'book-restaurant',
+    description: '预定一个餐厅的桌子',
+    inputSchema: {
+      restaurant: z.string(),
+      date: z.string(),
+      partySize: z.number()
+    }
+  },
+  async ({ restaurant, date, partySize }) => {
+    // 检查有没有可以预定的餐厅
+    const available = await checkAvailability(restaurant, date, partySize)
+
+    if (!available) {
+      // 询问用户的意见
+      const result = await server.server.elicitInput({
+        message: `在${restaurant}的${date}没有桌子了。您是否想检查其他日期？`,
+        requestedSchema: {
+          type: 'object',
+          properties: {
+            checkAlternatives: {
+              type: 'boolean',
+              title: '检查替代日期',
+              description: '您是否想检查其他日期？'
+            },
+            flexibleDates: {
+              type: 'string',
+              title: '日期灵活性',
+              description: '您想检查其他日期吗？',
+              enum: ['next_day', 'same_week', 'next_week'],
+              enumNames: ['明天', '本周', '下周']
+            }
+          },
+          required: ['checkAlternatives']
+        }
+      })
+      if (result.action === 'accept' && result.content?.checkAlternatives) {
+        const alternatives = await findAlternatives(restaurant, date, partySize)
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `找到这些替代日期: ${alternatives.join(', ')}`
+            }
+          ]
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: '没有预定。原日期没有可以预定的桌子。'
+          }
+        ]
+      }
+    }
+
+    // 预定桌子
+    await makeBooking(restaurant, date, partySize)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `预定了一个${partySize}人的桌子在${restaurant}的${date}`
+        }
+      ]
+    }
+  }
+)
 
 onMounted(() => {
   server.connectTransport()
