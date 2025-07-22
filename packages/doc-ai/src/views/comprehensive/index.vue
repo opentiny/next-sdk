@@ -292,6 +292,80 @@ server.registerTool(
   }
 )
 
+
+server.registerTool(
+  "summarize",
+  {
+    description: "Summarize any text using an LLM",
+    inputSchema: {
+      text: z.string().describe("Text to summarize"),
+    },
+  },
+  async ({ text }) => {
+    // Call the LLM through MCP sampling
+    const response = await server.$createMessage(
+      'summarize',
+      {
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: `Please summarize the following text concisely:\n\n${text}`,
+            },
+          },
+        ],
+        maxTokens: 500,
+      });
+
+    
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: response.content.type === "text" ? response.content.text : "Unable to generate summary",
+        },
+      ],
+    };
+  }
+);
+
+server.registerTool(
+  "expand",
+  {
+    description: "Expand any text using an LLM",
+    inputSchema: {
+      text: z.string().describe("Text to expand"),
+    },
+  },
+  async ({ text }) => {
+    // Call the LLM through MCP sampling
+    const response = await server.server.createMessage({
+      $id: 'expand',
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Please expand the following text concisely:\n\n${text}`,
+          },
+        },
+      ],
+      maxTokens: 500,
+    });
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: response.content.type === "text" ? response.content.text : "Unable to generate summary",
+        },
+      ],
+    };
+  }
+);
+
 onMounted(() => {
   server.connectTransport()
 })

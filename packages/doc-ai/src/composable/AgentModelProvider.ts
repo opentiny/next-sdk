@@ -6,6 +6,7 @@ import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive, ref } from 'vue'
 import { TinyModal } from '@opentiny/vue'
+import { useSampling } from './useSampling'
 
 // 创建nextClient
 const nextClient = createClient(
@@ -83,6 +84,9 @@ nextClient.on('elicit', async (request) => {
     content: userResponse.action === 'accept' ? userResponse.content : undefined
   }
 })
+
+
+useSampling(nextClient)
 
 const mcpHost = createMCPHost({
   llmOption: {
