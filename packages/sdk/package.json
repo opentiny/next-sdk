@@ -11,8 +11,14 @@
     "types": "dist/index.d.ts"
   },
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "prepublishOnly": "npm run build && npm run prepare-readme",
+    "prepare-readme": "cp ../../README.md ./README.md"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
