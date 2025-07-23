@@ -1,13 +1,21 @@
-import { NextClient } from './createClient'
+import { NextClient } from '../client/createClient'
 import { createStreamProxy, createSseProxy, createTransportPair } from '@opentiny/next'
 import { createCloseTransport } from '../utils/dom'
 import { INextClientProxyOption } from '../type'
+import { NextServer } from '../server/createServer'
 
 const [clientTransport, serverTransport] = createTransportPair()
 
 export { serverTransport }
 
-export const createProxy = (proxyOptions: INextClientProxyOption) => {
+export const createServerProxy = () => {
+  return (nextServer: NextServer) => {
+    nextServer.nextTransport = serverTransport
+    return serverTransport
+  }
+}
+
+export const createClientProxy = (proxyOptions: INextClientProxyOption) => {
   return async (nextClient: NextClient): Promise<{ sessionId: string; transport: any }> => {
     let sessionId = ''
     let transport = null

@@ -1,4 +1,4 @@
-import { createClient, messageChannel, createProxy } from '@opentiny/next-sdk'
+import { createClient, createMessageChannelTransport, createClientProxy } from '@opentiny/next-sdk'
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 
 export const createConsoleClient = async () => {
@@ -16,12 +16,12 @@ export const createConsoleClient = async () => {
     }
   )
 
-  // 使用messageChannel插件建立messageChannel连接
-  // await nextClient.use(messageChannel({ endpoint: 'endpoint', globalObject: window }))
+  // 使用createMessageChannelTransport插件建立messageChannel连接
+  // await nextClient.use(createMessageChannelTransport({ endpoint: 'endpoint', globalObject: window }))
 
   // 使用createProxy插件建立sse连接
   const { sessionId, transport } = await client.use(
-    createProxy({
+    createClientProxy({
       type: 'sse',
       url: 'https://www.opentiny.xyz/sse',
       token: '123',
@@ -113,7 +113,7 @@ export const createConsoleClient = async () => {
   normalTaskButton?.addEventListener('click', async () => {
     // 任务 promise
     const promise = await client.callTool({ name: 'normal-task' }, CallToolResultSchema, {
-      signal: controllerNormalTask.signal,
+      signal: controllerNormalTask.signal
     })
     console.log('normal-task result', promise)
   })

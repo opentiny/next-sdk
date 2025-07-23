@@ -1,5 +1,4 @@
-import { createServer, messageChannel } from '@opentiny/next-sdk'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { createServer, createMessageChannelTransport, createServerProxy } from '@opentiny/next-sdk'
 import { z } from 'zod'
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { completable } from '@modelcontextprotocol/sdk/server/completable.js'
@@ -23,7 +22,9 @@ export const createConsoleServer = async () => {
     }
   )
 
-  // await server.use(messageChannel({ endpoint: 'endpoint', globalObject: window }))
+  server.use(createServerProxy())
+
+  // await server.use(createMessageChannelTransport({ endpoint: 'endpoint', globalObject: window }))
 
   // 监听订阅资源
   server.on('subscribe', (request) => {
@@ -171,11 +172,11 @@ export const createConsoleServer = async () => {
   server.registerTool(
     'normal-task',
     {
-      title: '普通任务的终止，只需要加上 signal 即可',
+      title: '普通任务的终止，只需要加上 signal 即可'
     },
     async ({ signal }) => {
       for (let i = 0; i < 10; i++) {
-        console.log('普通任务正在进行中...', i);
+        console.log('普通任务正在进行中...', i)
 
         if (signal.aborted) {
           server.server.sendLoggingMessage({ level: 'error', data: '服务端 - 普通任务已终止' })
@@ -186,7 +187,7 @@ export const createConsoleServer = async () => {
       }
 
       await server.server.sendLoggingMessage({ level: 'info', data: '服务端 - 普通任务已结束' })
-      return { content: [{ type: 'text', text: '普通任务完成！'}] }
+      return { content: [{ type: 'text', text: '普通任务完成！' }] }
     }
   )
 

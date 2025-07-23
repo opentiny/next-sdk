@@ -2,7 +2,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { streamOptions, sseOptions } from '@opentiny/next'
 import type { McpServerInfo } from '../type'
-import type { NextClient } from './createClient'
+import type { NextClient } from '../client/createClient'
 
 export const connectMcpServer = (options: McpServerInfo) => {
   return (nextClient: NextClient) => {
