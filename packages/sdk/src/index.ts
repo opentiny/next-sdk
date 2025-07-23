@@ -1,3 +1,7 @@
 export * from './client'
 export * from './server'
 export * from './mcp-host'
+export * from './plugins/createMessageChannelTransport'
+export * from './plugins/createProxy'
+export * from './plugins/connectMcpServer'
+export * from './plugins/createInMemoryTransport'

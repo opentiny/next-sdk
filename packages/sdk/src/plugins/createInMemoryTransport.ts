@@ -1,5 +1,5 @@
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
-import { NextClient } from './createClient'
+import { NextClient } from '../client/createClient'
 import { NextServer } from '../server/createServer'
 
 const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()

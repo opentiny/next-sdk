@@ -1,8 +1,8 @@
 import { MessageChannelClientTransport, MessageChannelServerTransport } from '@opentiny/next'
-import { NextClient } from './createClient'
+import { NextClient } from '../client/createClient'
 import { NextServer } from '../server/createServer'
 
-export const messageChannel = (options: Record<string, any>) => {
+export const createMessageChannelTransport = (options: Record<string, any>) => {
   return (nextClientOrServer: NextClient | NextServer) => {
     // 创建本地或者跨iframe的client
     if ((nextClientOrServer as NextClient).nextTransport) {

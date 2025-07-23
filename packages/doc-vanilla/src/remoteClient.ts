@@ -1,4 +1,4 @@
-import { createClient, createProxy, connectMcpServer } from '@opentiny/next-sdk'
+import { createClient, connectMcpServer } from '@opentiny/next-sdk'
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 
 export const createRemoteClient = async () => {

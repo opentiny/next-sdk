@@ -8,22 +8,32 @@
 
 ## 目录结构与主要模块
 
-- `client/`: 客户端相关能力
-  - `createClient.ts`: 创建客户端实例，提供事件注册、插件机制等核心功能
-  - `connectMcpServer.ts`: 遥控端连接服务端的插件，支持 stream/sse 两种传输方式
-  - `messageChannel.ts`: 基于 MessageChannel 的多窗口 iframe通信实现
-  - `createProxy.ts`: 创建代理对象和孪生Client，支持 stream/sse 两种传输方式
-  - `index.ts`: 导出所有客户端模块
+- `client/`：客户端相关能力
+  - `createClient.ts`：创建客户端实例，提供事件注册、插件机制等核心功能
+  - `connectMcpServer.ts`：遥控端连接服务端的插件，支持 stream/sse 两种传输方式
+  - `createInMemoryTransport.ts`：内存传输实现，便于本地调试和测试
+  - `createMessageChannelTransport.ts`：基于 MessageChannel 的多窗口 iframe 通信的 transport 实现
+  - `createProxy.ts`：创建代理对象和孪生 Transport，支持 stream/sse 两种传输方式
+  - `index.ts`：导出所有客户端模块
 
-- `server/`: 服务端相关能力
-  - `createServer.ts`: 创建服务端实例，提供事件监听和处理能力
-  - `index.ts`: 导出所有服务端模块
+- `server/`：服务端相关能力
+  - `createServer.ts`：创建服务端实例，提供事件监听和处理能力
+  - `index.ts`：导出所有服务端模块
 
-- `type.ts`: 类型定义文件
+- `mcp-host/`：多模型能力平台（MCP）相关实现
+  - `core/`：核心能力实现
+  - `deepseek/`：DeepSeek LLM 接入实现
+  - `index.ts`：统一导出 MCP 相关能力
+
+- `utils/`：工具方法
+  - `dom.ts`：DOM 相关工具方法
+  - `index.ts`：导出所有工具方法
+
+- `type.ts`：类型定义文件
   - 包含客户端、服务端、传输方式等相关类型定义
   - 提供完整的 TypeScript 类型支持
 
-- `index.ts`: 根入口文件
+- `index.ts`：根入口文件
   - 统一导出客户端和服务端模块
   - 方便用户引入使用
 
@@ -48,30 +58,41 @@ const client = createClient({name: 'next-sdk',version: '1.0.0'})
 ### 1.2 注册插件
 
 ```ts
-// 通过插件机制扩展 client 能力，plugin 是一个接收 client 实例的函数。
-await client.use(plugin)
+// 通过插件机制扩展 client 能力，plugin函数执行返回的是一个接收 client 实例的函数。
+await client.use(plugin({options}))
 ```
 
-#### 1.2.1 messageChannel
+#### 1.2.1 createInMemoryTransport
 
 此插件用于本地或跨 iframe 的消息通道通信。
 
 ```ts
-import { messageChannel } from '@opentiny/next-sdk'
+import { createInMemoryTransport } from '@opentiny/next-sdk'
 
-// 设置为 MessageChannel 通信，适合前端多窗口/iframe 场景。
-await client.use(messageChannel({ endpoint, globalObject }))
+// 设置为 InMemory 通信，适合前端多窗口/iframe 场景。
+await client.use(createInMemoryTransport())
 ```
 
-#### 1.2.2 createProxy
+#### 1.2.2 createMessageChannelTransport
+
+此插件用于本地或跨 iframe 的消息通道通信。
+
+```ts
+import { createMessageChannelTransport } from '@opentiny/next-sdk'
+
+// 设置为 MessageChannel 通信，适合前端多窗口/iframe 场景。
+await client.use(createMessageChannelTransport({ endpoint, globalObject }))
+```
+
+#### 1.2.3 createClientProxy
 
 此插件用于通过 stream 或 sse 代理方式与服务端通信。
 
 ```ts
-import { createProxy } from '@opentiny/next-sdk'
+import { createClientProxy } from '@opentiny/next-sdk'
 
 // 根据 type 选择 stream 或 sse 方式，自动管理 session 和连接关闭。
-await client.use(createProxy({
+await client.use(createClientProxy({
   type: 'stream', // 或 'sse'
   url: 'https://agent-server.com/mcp',
   token: 'your-token',
@@ -79,7 +100,7 @@ await client.use(createProxy({
 }))
 ```
 
-#### 1.2.3 connectMcpServer
+#### 1.2.4 connectMcpServer
 
 此插件用于遥控器端或者业界通用的 `MCP HOST` 直接连接 MCP 服务端，支持 stream/sse。
 
@@ -138,19 +159,41 @@ const server = createServer({name: 'next-sdk', version: '1.0.0'})
 ### 2.2 注册插件
 
 ```ts
-// 通过插件机制扩展 server 能力，plugin 是一个接收 server 实例的函数。
-await server.use(plugin)
+// 通过插件机制扩展 server 能力，plugin函数执行返回的是一个接收 server 实例的函数。
+await server.use(plugin({options}))
 ```
 
-#### 2.2.1 messageChannel
+#### 2.2.1 createInMemoryTransport
 
 此插件用于本地或跨 iframe 的消息通道通信。
 
 ```ts
-import { messageChannel } from '@opentiny/next-sdk'
+import { createInMemoryTransport } from '@opentiny/next-sdk'
+
+// 设置为 InMemory 通信，适合前端多窗口/iframe 场景。
+await server.use(createInMemoryTransport())
+```
+
+#### 2.2.2 createMessageChannelTransport
+
+此插件用于本地或跨 iframe 的消息通道通信。
+
+```ts
+import { createMessageChannelTransport } from '@opentiny/next-sdk'
 
 // 设置为 MessageChannel 通信，适合前端多窗口/iframe 场景。
-await server.use(messageChannel({ endpoint, globalObject }))
+await server.use(createMessageChannelTransport({ endpoint, globalObject }))
+```
+
+#### 2.2.3 createServerProxy
+
+此插件用于通过 stream 或 sse 代理方式与客户端通信。
+
+```ts
+import { createServerProxy } from '@opentiny/next-sdk'
+
+// 根据 type 选择 stream 或 sse 方式，自动管理 session 和连接关闭。
+await server.use(createServerProxy()) 
 ```
 
 ### 2.3 事件注册
@@ -182,11 +225,11 @@ await server.connectTransport()
 ### 3.1 前端工程（App.vue）通过 createProxy 代理 stream 方式连接agent-server代理服务器
 
 ```ts
-import { createClient, createProxy } from '@opentiny/next-sdk'
+import { createClient, createClientProxy } from '@opentiny/next-sdk'
 
 const nextClient = createClient({name: 'next-sdk',version: '1.0.0'})
 
-const { sessionId, transport } = await nextClient.use(createProxy({
+const { sessionId, transport } = await nextClient.use(createClientProxy({
   type: 'stream',
   url: 'https://agent-server.com/mcp',
   sessionId: 'xxx',
@@ -199,9 +242,11 @@ await client.connectTransport()
 ### 3.2 MCP 服务端（子路由页面）定义工具或者监听请求
 
 ```ts
-import { createServer } from '@opentiny/next-sdk'
+import { createServer,createServerProxy } from '@opentiny/next-sdk'
 
 const server = createServer({name: 'next-sdk',version: '1.0.0'})
+
+server.use(createServerProxy())
 
 server.tool('get-weather', 'Get the weather of a city', { value: z.string() }, async ({ value }) => {
     return { content: [{ type: 'text', text: `The weather of ${value} is sunny` }] }
@@ -233,11 +278,11 @@ await client.connectTransport()
 ### 4.1 iframe 帮助文档遥控端通过 messageChannel 连接前端工程
 
 ```ts
-import { createClient, messageChannel } from '@opentiny/next-sdk'
+import { createClient, createMessageChannelTransport } from '@opentiny/next-sdk'
 
 const client = createClient({name: 'next-sdk',version: '1.0.0'})
 
-client.use(messageChannel({
+client.use(createMessageChannelTransport({
   endpoint: 'endpoint',
   globalObject: window.parent
 }))
@@ -248,11 +293,11 @@ await client.connectTransport()
 ### 4.2 前端工程通过 messageChannel 连接 iframe 帮助文档遥控端，并定义工具或者监听请求
 
 ```ts
-import { createServer, messageChannel } from '@opentiny/next-sdk'
+import { createServer, createMessageChannelTransport } from '@opentiny/next-sdk'
 
 const server = createServer({name: 'next-sdk',version: '1.0.0'})
 
-server.use(messageChannel({
+server.use(createMessageChannelTransport({
   endpoint: 'endpoint',
   globalObject: window
 }))
@@ -263,7 +308,7 @@ server.tool('get-weather', 'Get the weather of a city', { value: z.string() }, a
 
 server.on('subscribe', callback)
 
-await server.connect()
+await server.connectTransport()
 ```
 
 ---
