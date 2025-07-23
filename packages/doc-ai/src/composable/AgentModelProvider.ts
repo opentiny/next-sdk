@@ -86,7 +86,6 @@ nextClient.on('elicit', async (request) => {
 })
 
 
-useSampling(nextClient)
 
 const mcpHost = createMCPHost({
   llmOption: {
@@ -98,6 +97,18 @@ const mcpHost = createMCPHost({
   },
   mcpClients: [nextClient]
 })
+
+const samplingHost = createMCPHost({
+  llmOption: {
+    url: 'https://api.deepseek.com/v1',
+    apiKey: 'sk-85276270e75f45139cda35c2ba445b3c',
+    dangerouslyAllowBrowser: true,
+    model: 'deepseek-chat',
+    llm: 'deepseek'
+  },
+  mcpClients: []
+})
+useSampling(nextClient, samplingHost)
 
 export class AgentModelProvider extends BaseModelProvider {
   constructor(config: AIModelConfig) {

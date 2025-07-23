@@ -1,7 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import type { Implementation, Request, Notification } from '@modelcontextprotocol/sdk/types.d.ts'
+import type { Implementation } from '@modelcontextprotocol/sdk/types.d.ts'
 import type { ClientOptions } from '@modelcontextprotocol/sdk/client/index.d.ts'
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.d.ts'
 import {
   ToolListChangedNotificationSchema,
   ResourceUpdatedNotificationSchema,
