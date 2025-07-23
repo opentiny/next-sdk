@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "OpenTiny NEXT MCP",
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm -F doc-vanilla dev",
     "ai": "pnpm -F doc-ai dev",
@@ -11,7 +12,7 @@
   },
   "devDependencies": {
     "prettier": "^3.0.3",
-    "@modelcontextprotocol/inspector":"^0.16.1"
+    "@modelcontextprotocol/inspector": "^0.16.1"
   },
   "keywords": [],
   "author": "",
