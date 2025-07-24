@@ -32,9 +32,12 @@ type ClientRequestCallback = Parameters<Client['setRequestHandler']>[1]
 export class NextClient extends Client {
   nextTransport: any = null
   isMessageChannel = false
+  samplingMap: Map<string, ClientEventCallback | ClientRequestCallback>
 
   constructor(clientInfo: Implementation, clientOptions: ClientOptions) {
     super(clientInfo, clientOptions)
+    this.samplingMap = new Map()
+    this.initSamplingListen()
   }
 
   // 注册插件
@@ -52,6 +55,20 @@ export class NextClient extends Client {
     } else {
       this.setRequestHandler(requestEventMap[event as ClientRequestMapKey], callback as ClientRequestCallback)
     }
+  }
+
+  initSamplingListen() {
+    this.setRequestHandler(CreateMessageRequestSchema, (request, extra) => {
+      const { $id: id } = request?.params || {}
+      const cb = this.samplingMap.get(id as string) as any
+
+      return cb(request, extra)
+
+    })
+  }
+
+  onSampling(id: string, callback: ClientEventCallback | ClientRequestCallback) {
+    this.samplingMap.set(id, callback)
   }
 
   async connectTransport() {

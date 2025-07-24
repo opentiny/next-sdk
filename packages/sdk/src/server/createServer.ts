@@ -1,5 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type { Implementation } from '@modelcontextprotocol/sdk/types.d.ts'
+import type { CreateMessageRequest, Implementation } from '@modelcontextprotocol/sdk/types.d.ts'
+import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.d.ts'
 import type { ServerOptions } from '@modelcontextprotocol/sdk/server/index.d.ts'
 import {
   SetLevelRequestSchema,
@@ -48,6 +49,13 @@ export class NextServer extends McpServer {
 
   on(event: SeverEventMapKey, callback: ServerEventCallback) {
     this.server.setRequestHandler(eventMap[event], callback)
+  }
+
+  $createMessage(id: string, params: CreateMessageRequest["params"], options?: RequestOptions) {
+    return this.server.createMessage({
+      $id: id,
+      ...params,
+    }, options)
   }
 }
 

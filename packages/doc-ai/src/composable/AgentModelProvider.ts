@@ -6,6 +6,7 @@ import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive, ref } from 'vue'
 import { TinyModal } from '@opentiny/vue'
+import { useSampling } from './useSampling'
 
 // 创建nextClient
 const nextClient = createClient(
@@ -84,6 +85,8 @@ nextClient.on('elicit', async (request) => {
   }
 })
 
+
+
 const mcpHost = createMCPHost({
   llmOption: {
     url: 'https://api.deepseek.com/v1',
@@ -94,6 +97,18 @@ const mcpHost = createMCPHost({
   },
   mcpClients: [nextClient]
 })
+
+const samplingHost = createMCPHost({
+  llmOption: {
+    url: 'https://api.deepseek.com/v1',
+    apiKey: 'sk-85276270e75f45139cda35c2ba445b3c',
+    dangerouslyAllowBrowser: true,
+    model: 'deepseek-chat',
+    llm: 'deepseek'
+  },
+  mcpClients: []
+})
+useSampling(nextClient, samplingHost)
 
 export class AgentModelProvider extends BaseModelProvider {
   constructor(config: AIModelConfig) {

@@ -78,12 +78,20 @@ export class MCPHost {
 
   async doLLMChart() {
     const openAITools = await this.getMcpTools()
-    const completion = await this.llm.chat.completions.create({
+    const params: {
+      messages: any[];
+      model: any;
+      stream: boolean;
+      tools?: any[]
+    } = {
       messages: this.messages,
       model: this.llmOption.model,
-      tools: openAITools,
       stream: true
-    })
+    }
+    if (openAITools.length > 0) {
+      params.tools = openAITools
+    }
+    const completion = await this.llm.chat.completions.create(params)
     return completion
   }
 
@@ -299,6 +307,10 @@ export class MCPHost {
     })
 
     return 'ok'
+  }
+
+  public clearMessages() {
+    this.messages = []
   }
 
   /**
