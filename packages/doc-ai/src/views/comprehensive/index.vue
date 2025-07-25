@@ -204,6 +204,27 @@ const server = createServer(
 
 server.use(createInMemoryTransport())
 
+// 长任务示例
+server.registerTool(
+  'long-task',
+  {
+    title: 'long-task',
+    description: '可以帮用户订机票'
+  },
+  async ({}) => {
+    // 执行一个长任务
+    await new Promise((resolve) => setTimeout(resolve, 10000))
+    return {
+      content: [
+        {
+          type: 'text',
+          text: '执行一个长任务，执行完成'
+        }
+      ]
+    }
+  }
+)
+
 const validates = ['2025-07-22', '2025-07-23']
 
 const checkAvailability = async (restaurant: string, date: string, partySize: number) => {
@@ -292,52 +313,47 @@ server.registerTool(
   }
 )
 
-
 server.registerTool(
-  "summarize",
+  'summarize',
   {
-    description: "Summarize any text using an LLM",
+    description: 'Summarize any text using an LLM',
     inputSchema: {
-      text: z.string().describe("Text to summarize"),
-    },
+      text: z.string().describe('Text to summarize')
+    }
   },
   async ({ text }) => {
     // Call the LLM through MCP sampling
-    const response = await server.$createMessage(
-      'summarize',
-      {
-        messages: [
-          {
-            role: "user",
-            content: {
-              type: "text",
-              text: `Please summarize the following text concisely:\n\n${text}`,
-            },
-          },
-        ],
-        maxTokens: 500,
-      });
-
-    
+    const response = await server.$createMessage('summarize', {
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `Please summarize the following text concisely:\n\n${text}`
+          }
+        }
+      ],
+      maxTokens: 500
+    })
 
     return {
       content: [
         {
-          type: "text",
-          text: response.content.type === "text" ? response.content.text : "Unable to generate summary",
-        },
-      ],
-    };
+          type: 'text',
+          text: response.content.type === 'text' ? response.content.text : 'Unable to generate summary'
+        }
+      ]
+    }
   }
-);
+)
 
 server.registerTool(
-  "expand",
+  'expand',
   {
-    description: "Expand any text using an LLM",
+    description: 'Expand any text using an LLM',
     inputSchema: {
-      text: z.string().describe("Text to expand"),
-    },
+      text: z.string().describe('Text to expand')
+    }
   },
   async ({ text }) => {
     // Call the LLM through MCP sampling
@@ -345,26 +361,26 @@ server.registerTool(
       $id: 'expand',
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: {
-            type: "text",
-            text: `Please expand the following text concisely:\n\n${text}`,
-          },
-        },
+            type: 'text',
+            text: `Please expand the following text concisely:\n\n${text}`
+          }
+        }
       ],
-      maxTokens: 500,
-    });
+      maxTokens: 500
+    })
 
     return {
       content: [
         {
-          type: "text",
-          text: response.content.type === "text" ? response.content.text : "Unable to generate summary",
-        },
-      ],
-    };
+          type: 'text',
+          text: response.content.type === 'text' ? response.content.text : 'Unable to generate summary'
+        }
+      ]
+    }
   }
-);
+)
 
 onMounted(() => {
   server.connectTransport()

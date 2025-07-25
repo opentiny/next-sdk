@@ -45,6 +45,20 @@ export class NextClient extends Client {
     return plugin(this)
   }
 
+  // 获取OpenAI协议格式的工具列表（FunctionCall）
+  async getOpenAITools() {
+    const { tools } = await this.listTools()
+    const openAITools = tools.map((tool: any) => ({
+      type: 'function',
+      function: {
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.inputSchema
+      }
+    }))
+    return openAITools
+  }
+
   on(event: ClientEventMapKey, callback: ClientEventCallback): void
   on(event: ClientRequestMapKey, callback: ClientRequestCallback): void
 
@@ -63,7 +77,6 @@ export class NextClient extends Client {
       const cb = this.samplingMap.get(id as string) as any
 
       return cb(request, extra)
-
     })
   }
 
