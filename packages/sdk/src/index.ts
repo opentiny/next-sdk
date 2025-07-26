@@ -1,5 +1,5 @@
-export * from './client'
-export * from './server'
+export * from './next-client'
+export * from './next-server'
 export * from './mcp-host'
 export * from './plugins/createMessageChannelTransport'
 export * from './plugins/createProxy'
