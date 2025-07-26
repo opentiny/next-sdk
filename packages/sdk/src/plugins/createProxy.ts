@@ -1,8 +1,8 @@
-import { NextClient } from '../client/createClient'
+import { NextClient } from '../next-client'
 import { createStreamProxy, createSseProxy, createTransportPair } from '@opentiny/next'
 import { createCloseTransport } from '../utils/dom'
 import { INextClientProxyOption } from '../type'
-import { NextServer } from '../server/createServer'
+import { NextServer } from '../next-server'
 
 const [clientTransport, serverTransport] = createTransportPair()
 

@@ -1,6 +1,6 @@
 import { MessageChannelClientTransport, MessageChannelServerTransport } from '@opentiny/next'
-import { NextClient } from '../client/createClient'
-import { NextServer } from '../server/createServer'
+import { NextClient } from '../next-client'
+import { NextServer } from '../next-server'
 
 export const createMessageChannelTransport = (options: Record<string, any>) => {
   return (nextClientOrServer: NextClient | NextServer) => {
