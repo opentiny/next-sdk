@@ -125,6 +125,7 @@ import { $local } from '../../composable/utils'
 import { createServer } from '@opentiny/next-sdk'
 import { createInMemoryTransport } from '@opentiny/next-sdk'
 import { z } from 'zod'
+import { cmpMenus } from '../../mock/menu'
 
 if (!$local.products) {
   $local.products = productsData
@@ -203,6 +204,24 @@ const server = createServer(
 )
 
 server.use(createInMemoryTransport())
+
+server.registerResource(
+  'site-menus',
+  'site-menus://app',
+  {
+    title: 'TinyVue官网的菜单数据',
+    description: 'TinyVue官网的菜单数据，其中"key"为路由路径，"name"为菜单名称，"children"为子菜单',
+    mimeType: 'text/plain'
+  },
+  async (uri) => ({
+    contents: [
+      {
+        uri: uri.href,
+        text: JSON.stringify(cmpMenus)
+      }
+    ]
+  })
+)
 
 // 长任务示例
 server.registerTool(

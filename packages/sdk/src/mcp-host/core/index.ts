@@ -21,6 +21,7 @@ export class MCPHost {
   messages: any[] = []
   protected toolClientMap: Map<string, Client> = new Map<string, Client>()
   protected iteration = MAX_ITERATION // 最大迭代次数
+  protected resourcesMap: Map<string, any> = new Map() // 缓存资源防止资源读取频繁触发
 
   constructor({ llmOption, mcpClients }: { llmOption: any; mcpClients: Client[] }) {
     this.llmOption = llmOption
@@ -32,10 +33,25 @@ export class MCPHost {
     for (let i = 0; i < this.mcpClients.length; i++) {
       const mcpClient = this.mcpClients[i]
       const { tools } = await mcpClient.listTools()
+
       this.mcpClientMap.set(mcpClient, tools)
       tools.forEach((tool) => {
         this.toolClientMap.set(tool.name, mcpClient)
       })
+
+      const { resources } = await mcpClient.listResources()
+
+      for (const resource of resources) {
+        if (!this.resourcesMap.has(resource.uri)) {
+          // 读取资源
+          const resourceText = await mcpClient.readResource({ uri: resource.uri })
+
+          const result = { ...resource, content: resourceText.contents }
+          this.resourcesMap.set(resource.uri, result)
+          // 将资源信息添加到大模型系统提示词中
+          this.messages.push({ role: Role.SYSTEM, content: JSON.stringify(result) })
+        }
+      }
     }
   }
 
@@ -79,9 +95,9 @@ export class MCPHost {
   async doLLMChart() {
     const openAITools = await this.getMcpTools()
     const params: {
-      messages: any[];
-      model: any;
-      stream: boolean;
+      messages: any[]
+      model: any
+      stream: boolean
       tools?: any[]
     } = {
       messages: this.messages,
