@@ -8,12 +8,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'NextSDK',
-      fileName: 'index'
+      entry: resolve(__dirname, 'src/index.ts')
     },
     rollupOptions: {
-      external: [/^@modelcontextprotocol\/sdk/, /^@opentiny\/next/, 'openai']
+      external: [/^@modelcontextprotocol\/sdk/, /^@opentiny\/next/, 'openai'],
+      input: ['./src/index.ts'],
+      output: [
+        {
+          format: 'es',
+          entryFileNames: '[name].mjs',
+          preserveModules: true
+        }
+      ]
     }
   },
   plugins: [dts()]
