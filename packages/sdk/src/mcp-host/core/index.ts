@@ -39,7 +39,14 @@ export class MCPHost {
         this.toolClientMap.set(tool.name, mcpClient)
       })
 
-      const { resources } = await mcpClient.listResources()
+      let resources: any[] = []
+
+      try {
+        const { resources: mcpResources } = await mcpClient.listResources()
+        resources = mcpResources
+      } catch (error) {
+        // 如果没有注册资源就直接忽略
+      }
 
       for (const resource of resources) {
         if (!this.resourcesMap.has(resource.uri)) {
