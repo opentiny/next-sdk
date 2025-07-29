@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.11.0",
+    "@modelcontextprotocol/sdk": "^1.17.0",
     "@opentiny/tiny-robot": "0.3.0-alpha.3",
     "@opentiny/tiny-robot-kit": "0.3.0-alpha.3",
     "@opentiny/tiny-robot-svgs": "0.3.0-alpha.3",
