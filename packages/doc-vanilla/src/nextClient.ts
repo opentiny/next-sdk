@@ -81,46 +81,35 @@ export const createConsoleClient = async () => {
     }
   })
 
-  // 调用长任务，并且可以随时取消长任务
-  const controller = new AbortController() // 每次调用生成独立 controller
-
-  // abort 方法，取消本次任务
-  const abort = async (reason?: string) => {
-    return controller.abort(reason)
-  }
-
   const longTaskButton = document.getElementById('call-long-task')
-  longTaskButton?.addEventListener('click', async () => {
-    // 任务 promise
-    const promise = await client.callTool({ name: 'long-task', arguments: { steps: 10 } }, CallToolResultSchema, {
-      signal: controller.signal,
-      onprogress: (progress) => {
-        console.log('progress', progress)
-      }
-    })
-    console.log('result', promise)
-  })
-
   const abortButton = document.getElementById('abort-task')
-  abortButton?.addEventListener('click', async () => {
-    await abort('用户取消')
-  })
+  longTaskButton?.addEventListener('click', () => {
+    const { toolResultPromise, controller } = client.$callTool(
+      { name: 'long-task', arguments: { steps: 10 } },
+      undefined,
+      {
+        onprogress: (progress) => {
+          console.log('progress', progress)
+        }
+      }
+    )
+    console.log('result', toolResultPromise)
 
-  // 普通任务的终止只需要初始化浏览器原生的 AbortController，传给 signal 参数即可
-  const controllerNormalTask = new AbortController()
+    abortButton?.addEventListener('click', () => {
+      controller.abort('用户取消')
+    })
+  })
 
   const normalTaskButton = document.getElementById('call-normal-task')
+  const abortNormalButton = document.getElementById('abort-normal-task')
+
   normalTaskButton?.addEventListener('click', async () => {
     // 任务 promise
-    const promise = await client.callTool({ name: 'normal-task' }, CallToolResultSchema, {
-      signal: controllerNormalTask.signal
+    const { toolResultPromise, controller } = client.$callTool({ name: 'normal-task' })
+    console.log('normal-task result', toolResultPromise)
+    abortNormalButton?.addEventListener('click', async () => {
+      await controller.abort('用户取消普通任务')
     })
-    console.log('normal-task result', promise)
-  })
-
-  const abortNormalButton = document.getElementById('abort-normal-task')
-  abortNormalButton?.addEventListener('click', async () => {
-    await controllerNormalTask.abort('用户取消普通任务')
   })
 
   const subscribeResourceButton = document.getElementById('subscribe-resource')
