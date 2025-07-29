@@ -158,9 +158,16 @@ export class NextClient extends Client {
       signal: controller.signal
     })
 
+    const abort = (reason: string) => {
+      controller.abort(reason)
+      this.notification({
+        method: 'notifications/cancelled',
+        params: { requestId: this._requestMessageId, reason, forward: true } // forward: true 告诉代理需要转发这条终止消息
+      })
+    }
     return {
       toolResultPromise,
-      controller
+      abort
     }
   }
 

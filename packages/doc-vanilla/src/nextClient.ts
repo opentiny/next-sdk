@@ -1,5 +1,4 @@
-import { createClient, createMessageChannelTransport, createClientProxy } from '@opentiny/next-sdk'
-import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
+import { createClient, createClientProxy } from '@opentiny/next-sdk'
 
 export const createConsoleClient = async () => {
   // 创建nextClient
@@ -83,20 +82,17 @@ export const createConsoleClient = async () => {
 
   const longTaskButton = document.getElementById('call-long-task')
   const abortButton = document.getElementById('abort-task')
+
   longTaskButton?.addEventListener('click', () => {
-    const { toolResultPromise, controller } = client.$callTool(
-      { name: 'long-task', arguments: { steps: 10 } },
-      undefined,
-      {
-        onprogress: (progress) => {
-          console.log('progress', progress)
-        }
+    const { toolResultPromise, abort } = client.$callTool({ name: 'long-task', arguments: { steps: 10 } }, undefined, {
+      onprogress: (progress) => {
+        console.log('progress', progress)
       }
-    )
+    })
     console.log('result', toolResultPromise)
 
     abortButton?.addEventListener('click', () => {
-      controller.abort('用户取消')
+      abort('用户取消')
     })
   })
 
@@ -105,10 +101,10 @@ export const createConsoleClient = async () => {
 
   normalTaskButton?.addEventListener('click', async () => {
     // 任务 promise
-    const { toolResultPromise, controller } = client.$callTool({ name: 'normal-task' })
+    const { toolResultPromise, abort } = client.$callTool({ name: 'normal-task' })
     console.log('normal-task result', toolResultPromise)
     abortNormalButton?.addEventListener('click', async () => {
-      await controller.abort('用户取消普通任务')
+      abort('用户取消普通任务')
     })
   })
 
