@@ -27,7 +27,6 @@ nextClient.use(createInMemoryTransport())
 
 nextClient.connectTransport()
 
-let messageIndex = 0
 let lastContent: any
 let lastToolCall: any
 
@@ -85,8 +84,6 @@ nextClient.on('elicit', async (request) => {
   }
 })
 
-
-
 const mcpHost = createMCPHost({
   llmOption: {
     url: 'https://api.deepseek.com/v1',
@@ -126,19 +123,6 @@ export class AgentModelProvider extends BaseModelProvider {
     lastToolCall = null
     await mcpHost.chatStream(lastMessage, {
       onData: (data: any) => {
-        const resData = {
-          id: '',
-          created: Date.now(),
-          choices: [
-            {
-              index: messageIndex++,
-              delta: data.delta,
-              finish_reason: null
-            }
-          ],
-          object: '',
-          model: ''
-        }
         if (data.delta.role === 'tool') {
           onToolCallChain(data, handler)
         } else {
@@ -151,8 +135,6 @@ export class AgentModelProvider extends BaseModelProvider {
           } else {
             lastContent.content += data.delta.content
           }
-
-          // handler.onData(resData)
         }
       },
       onDone: () => {
