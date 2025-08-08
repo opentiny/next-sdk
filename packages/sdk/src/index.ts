@@ -1,6 +1,7 @@
 export * from './next-client'
 export * from './next-server'
 export * from './mcp-host'
+export * from './chat'
 export * from './plugins/createMessageChannelTransport'
 export * from './plugins/createProxy'
 export * from './plugins/connectMcpServer'
