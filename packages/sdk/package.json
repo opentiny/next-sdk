@@ -13,7 +13,9 @@
     "types": "dist/index.d.ts"
   },
   "scripts": {
-    "build": "vite build",
+    "build:es": "vite build --config vite.config.ts",
+    "build:umd": "vite build --config vite.umd.config.ts",
+    "build": "npm run build:es && npm run build:umd",
     "prepublishOnly": "npm run build && npm run prepare-readme",
     "prepare-readme": "cp ../../README.md ./README.md"
   },
@@ -27,10 +29,18 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",
     "@opentiny/next": "^0.2.1",
-    "zod": "^3.25.10",
-    "openai": "^5.9.0"
+    "@opentiny/tiny-robot": "0.3.0-alpha.3",
+    "@opentiny/tiny-robot-kit": "0.3.0-alpha.3",
+    "@opentiny/tiny-robot-svgs": "0.3.0-alpha.3",
+    "@opentiny/vue": "^3.25.0",
+    "crypto-js": "^4.2.0",
+    "openai": "^5.9.0",
+    "qrcode": "^1.5.4",
+    "vue": "^3.5.13",
+    "zod": "^3.25.10"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.2",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.4"
