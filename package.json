@@ -8,11 +8,20 @@
     "dev": "pnpm -F doc-vanilla dev",
     "ai": "pnpm -F doc-ai dev",
     "wiki": "pnpm -F next-wiki docs:dev",
-    "build": "pnpm -F @opentiny/next-sdk build"
+    "build": "pnpm -F @opentiny/next-sdk build",
+    "build:remoter": "pnpm -F @opentiny/next-remoter build",
+    "build:site": "pnpm -F @opentiny/next-remoter build:site",
+    "dev:remoter": "pnpm -F @opentiny/next-remoter dev",
+    "pub:remoter": "pnpm -F @opentiny/next-remoter publish --no-git-checks"
   },
   "devDependencies": {
     "prettier": "^3.0.3",
     "@modelcontextprotocol/inspector": "^0.16.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "4.43.0"
+    }
   },
   "keywords": [],
   "author": "",
