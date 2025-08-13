@@ -1,7 +1,7 @@
 <template>
   <!-- mcp-robot弹窗 -->
 
-  <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreen">
+  <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreenValue">
     <tr-bubble-provider :message-renderers="messageRenderers">
       <div v-if="showMessages.length === 0">
         <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
@@ -59,7 +59,16 @@ import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import { showTinyRobot } from '../composable/utils'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
-import { computed, nextTick, watch } from 'vue'
+import { computed, nextTick, watch, defineProps ,ref } from 'vue'
+
+const props = defineProps({
+  isFullscreen: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const fullscreenValue = ref(false)
 
 const mdRenderer = new BubbleMarkdownMessageRenderer()
 const messageRenderers = {
@@ -106,6 +115,7 @@ const showMessages = computed(() => {
   return messages.value
 })
 
+
 const scrollToBottom = () => {
   const containerBody = document.querySelector('div.ai-console-content-wrap')
   if (containerBody) {
@@ -120,6 +130,14 @@ const scrollToBottom = () => {
 
 // 最新消息滚动到底部
 watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
+
+watch(
+  () => props.isFullscreen,
+  (value) => {
+    fullscreenValue.value = value
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped lang="less">
