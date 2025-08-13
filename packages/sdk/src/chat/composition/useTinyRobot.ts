@@ -178,7 +178,6 @@ export function useTinyRobot() {
     abortRequest,
     roles,
     handlePromptItemClick,
-
     senderRef,
     currentTemplate,
     suggestionOpen,

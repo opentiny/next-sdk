@@ -7,13 +7,13 @@
       <template #dropdown>
         <tiny-dropdown-menu>
           <tiny-dropdown-item @click="showTinyRobot = true">弹出 AI对话框</tiny-dropdown-item>
-          <tiny-dropdown-item @click="boxVisibility = true">弹出 二维码</tiny-dropdown-item>
+          <tiny-dropdown-item @click="QrcodeEl.open(params.value)">弹出 二维码</tiny-dropdown-item>
         </tiny-dropdown-menu>
       </template>
     </tiny-dropdown>
     <div class="next-sdk-ai-panel" v-show="showTinyRobot">
       <!-- mcp-robot弹窗 -->
-      <slot name="chat">
+      <slot name="chat" :sendMessage="sendMessage">
         <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreen">
           <div v-if="messages.length === 0">
             <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
@@ -53,22 +53,20 @@
         </tr-container>
       </slot>
     </div>
-    <tiny-dialog-box v-model:visible="boxVisibility" center title="扫描二维码进入控制器" width="30%">
-      <div class="next-sdk-qr-code-content"><tiny-qr-code v-bind="params"></tiny-qr-code></div>
-    </tiny-dialog-box>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import CryptoJS from 'crypto-js'
-import { TinyButton, TinyDialogBox, TinyQrCode, TinyDropdown, TinyDropdownMenu, TinyDropdownItem } from '@opentiny/vue'
+import { TinyButton, TinyDialogBox, TinyDropdown, TinyDropdownMenu, TinyDropdownItem } from '@opentiny/vue'
 import { IconAi } from '@opentiny/tiny-robot-svgs'
 import { TrBubbleList, TrContainer, TrPrompts, TrSender, TrWelcome, TrSuggestionPills } from '@opentiny/tiny-robot'
 import { GeneratingStatus } from '@opentiny/tiny-robot-kit'
 import { globalConversation } from './composition/utils'
 import { useTinyRobot } from './composition/useTinyRobot'
 import { showTinyRobot } from './composition/utils'
+import { QrCodeModal } from '../qr-code'
 
 const {
   fullscreen,
@@ -84,6 +82,7 @@ const {
   currentTemplate,
   clearTemplate,
   handleSendMessage,
+  sendMessage,
   handleMessageKeydown,
   suggestionPillItems,
   handleSuggestionPillItemClick
@@ -97,10 +96,10 @@ const props = defineProps({
 })
 
 const params = reactive({
-  value: 'null',
-  size: 250
+  value: 'null'
 })
-const boxVisibility = ref(false)
+
+const QrcodeEl = new QrCodeModal()
 
 watch(
   () => props.sessionId,
