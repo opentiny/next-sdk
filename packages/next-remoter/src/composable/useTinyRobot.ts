@@ -1,20 +1,15 @@
-import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, nextTick, onMounted, ref, watch } from 'vue'
-import { DifyModelProvider } from './DifyModelProvider.js'
 import type { SuggestionItem } from '@opentiny/tiny-robot'
+import { AgentModelProvider } from './AgentModelProvider'
+import { BubbleMarkdownMessageRenderer } from '@opentiny/tiny-robot'
+const mdRenderer = new BubbleMarkdownMessageRenderer()
 
-const difyConfig: AIModelConfig = {
-  provider: 'custom',
-  apiUrl: 'https://api.dify.ai/v1',
-  apiKey: 'app-H0VJI4LqZ4KskdcA5a07pjXf'
-}
-export function useTinyRobot() {
-  const difyModelProvider = new DifyModelProvider(difyConfig)
+export const useTinyRobot = () => {
   const client = new AIClient({
-    providerImplementation: difyModelProvider,
-    ...difyConfig
+    providerImplementation: new AgentModelProvider({ provider: 'custom' }),
+    provider: 'custom'
   })
 
   const fullscreen = ref(false)
@@ -26,18 +21,8 @@ export function useTinyRobot() {
 
   const promptItems = [
     {
-      label: '识别网页的内容',
-      description: '帮我在商品列表中查询最贵的手机和最便宜的笔记本',
-      icon: h('span', { style: { fontSize: '18px' } }, '💡')
-    },
-    {
       label: '智能操作网页',
-      description: '帮我在商品列表中删除最贵的且分类为手机的商品',
-      icon: h('span', { style: { fontSize: '18px' } }, '🕹')
-    },
-    {
-      label: '智能操作网页',
-      description: '帮我在商品列表中添加一个华为p60品牌的手机商品',
+      description: '帮我选中最贵的手机商品',
       icon: h('span', { style: { fontSize: '18px' } }, '🕹')
     }
   ]
@@ -46,20 +31,21 @@ export function useTinyRobot() {
   }
 
   const { messageManager } = useConversation({ client })
-  const { messages, messageState, inputMessage, sendMessage, abortRequest } = messageManager
-  difyModelProvider._messages = messages
+  const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager
 
   const roles = {
     assistant: {
       type: 'markdown',
       placement: 'start',
       avatar: aiAvatar,
-      maxWidth: '80%'
+      maxWidth: '80%',
+      contentRenderer: mdRenderer
     },
     user: {
       placement: 'end',
       avatar: userAvatar,
-      maxWidth: '80%'
+      maxWidth: '80%',
+      contentRenderer: mdRenderer
     }
   }
 
@@ -67,22 +53,7 @@ export function useTinyRobot() {
   const suggestionPillItems = [
     {
       id: '1',
-      text: '商品列表',
-      icon: h('span', { style: { fontSize: '18px' } }, '🏢')
-    },
-    {
-      id: '2',
-      text: '帮我在商品列表中删除最贵的且分类为手机的商品',
-      icon: h('span', { style: { fontSize: '18px' } }, '🕹')
-    },
-    {
-      id: '3',
-      text: '帮我在商品列表中添加一个华为p60品牌的手机商品',
-      icon: h('span', { style: { fontSize: '18px' } }, '🕹')
-    },
-    {
-      id: '4',
-      text: '帮我将商品列表中的iPhone 16价格修改为8000元',
+      text: '帮我选中最贵的手机商品',
       icon: h('span', { style: { fontSize: '18px' } }, '🕹')
     }
   ]

@@ -14,43 +14,7 @@
     <div class="next-sdk-ai-panel" v-show="showTinyRobot">
       <!-- mcp-robot弹窗 -->
       <slot name="chat">
-        <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreen">
-          <div v-if="messages.length === 0">
-            <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
-              <template #footer>
-                <div class="welcome-footer"></div>
-              </template>
-            </tr-welcome>
-            <tr-prompts
-              :items="promptItems"
-              :wrap="true"
-              item-class="prompt-item"
-              class="tiny-prompts"
-              @item-click="handlePromptItemClick"
-            ></tr-prompts>
-          </div>
-          <tr-bubble-list v-else :items="messages" :roles="roles" auto-scroll></tr-bubble-list>
-          <template #footer>
-            <div class="chat-input">
-              <TrSuggestionPills :items="suggestionPillItems" @item-click="handleSuggestionPillItemClick" /><br />
-              <tr-sender
-                ref="senderRef"
-                mode="single"
-                v-model="inputMessage"
-                :placeholder="GeneratingStatus.includes(messageState.status) ? '正在思考中...' : '请输入您的问题'"
-                :clearable="true"
-                :loading="GeneratingStatus.includes(messageState.status)"
-                :showWordLimit="true"
-                :maxLength="1000"
-                :template="currentTemplate"
-                @submit="handleSendMessage"
-                @cancel="abortRequest"
-                @keydown="handleMessageKeydown($event, onTrigger, onKeyDown)"
-                @reset-template="clearTemplate"
-              ></tr-sender>
-            </div>
-          </template>
-        </tr-container>
+        <tiny-robot-chat></tiny-robot-chat>
       </slot>
     </div>
     <tiny-dialog-box v-model:visible="boxVisibility" center title="扫描二维码进入控制器" width="30%">
@@ -61,33 +25,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import CryptoJS from 'crypto-js'
-import { TinyButton, TinyDialogBox, TinyQrCode, TinyDropdown, TinyDropdownMenu, TinyDropdownItem } from '@opentiny/vue'
+import { TinyDialogBox, TinyQrCode, TinyDropdown, TinyDropdownMenu, TinyDropdownItem } from '@opentiny/vue'
 import { IconAi } from '@opentiny/tiny-robot-svgs'
-import { TrBubbleList, TrContainer, TrPrompts, TrSender, TrWelcome, TrSuggestionPills } from '@opentiny/tiny-robot'
-import { GeneratingStatus } from '@opentiny/tiny-robot-kit'
-import { globalConversation } from './composition/utils'
-import { useTinyRobot } from './composition/useTinyRobot'
-import { showTinyRobot } from './composition/utils'
-
-const {
-  fullscreen,
-  welcomeIcon,
-  promptItems,
-  messages,
-  messageState,
-  inputMessage,
-  abortRequest,
-  roles,
-  handlePromptItemClick,
-  senderRef,
-  currentTemplate,
-  clearTemplate,
-  handleSendMessage,
-  handleMessageKeydown,
-  suggestionPillItems,
-  handleSuggestionPillItemClick
-} = useTinyRobot()
+import { globalConversation } from './composable/utils'
+import { showTinyRobot } from './composable/utils'
+import TinyRobotChat from './components/tiny-robot-chat.vue'
 
 const props = defineProps({
   sessionId: {
@@ -107,9 +49,7 @@ watch(
   (newVal) => {
     if (newVal) {
       globalConversation.sessionId = props.sessionId
-      const encryptedId = CryptoJS.AES.encrypt(props.sessionId, 'secret-session-id').toString()
-      const secretId = encodeURIComponent(encryptedId)
-      params.value = `https://ai.opentiny.design/remoter?id=${secretId}`
+      params.value = `https://ai.opentiny.design/next-remoter?sessionId=${props.sessionId}`
     }
   },
   {

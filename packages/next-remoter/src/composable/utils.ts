@@ -1,11 +1,10 @@
-/**
- * 工具函数模块
- * 提供一些实用的辅助函数
- */
-
 import type { ChatMessage, ChatCompletionResponse, StreamHandler } from '@opentiny/tiny-robot-kit'
 import type { ChatCompletionRequest } from '@opentiny/tiny-robot-kit'
 import { ref, type Ref } from 'vue'
+
+import { $local, $session } from './storage'
+
+export { $local, $session }
 
 export const showTinyRobot = ref(false)
 
@@ -13,6 +12,11 @@ export const globalConversation = {
   id: '',
   sessionId: ''
 }
+
+// 如果环境变量和本地变量都未定义，则提示用户填写
+export const isEnvLLMDefined = Boolean(import.meta.env.VITE_LLM_API_KEY && import.meta.env.VITE_LLM_URL)
+export const isLocalLLMDefined = Boolean($local.llmUrl && $local.llmApiKey)
+
 /**
  * 处理SSE流式响应
  * @param response fetch响应对象
@@ -24,28 +28,16 @@ export async function handleSSEStream(
   message: Ref<ChatCompletionRequest['messages']>,
   signal?: AbortSignal
 ): Promise<void> {
+  // 获取ReadableStream
   const reader = response.body?.getReader()
   if (!reader) {
     throw new Error('Response body is null')
   }
 
+  // 处理流式数据
   const decoder = new TextDecoder()
   let buffer = ''
 
-  setupAbortListener(reader, signal)
-
-  let messageIndex = 0
-  const printMessage = createMessagePrinter(handler, messageIndex)
-
-  try {
-    await processStream(reader, decoder, buffer, handler, printMessage, signal)
-  } catch (error) {
-    if (signal?.aborted) return
-    throw error
-  }
-}
-
-function setupAbortListener(reader: ReadableStreamDefaultReader, signal?: AbortSignal) {
   if (signal) {
     signal.addEventListener(
       'abort',
@@ -55,10 +47,10 @@ function setupAbortListener(reader: ReadableStreamDefaultReader, signal?: AbortS
       { once: true }
     )
   }
-}
 
-function createMessagePrinter(handler: StreamHandler, messageIndex: number) {
-  return (data: any, str: string, endln: boolean = false) => {
+  let messageIndex = 0
+
+  function printMessage(data, str: string, endln?: boolean = false) {
     handler.onData({
       id: '',
       created: data.created_at,
@@ -76,70 +68,65 @@ function createMessagePrinter(handler: StreamHandler, messageIndex: number) {
       model: ''
     })
   }
-}
 
-async function processStream(
-  reader: ReadableStreamDefaultReader,
-  decoder: TextDecoder,
-  buffer: string,
-  handler: StreamHandler,
-  printMessage: (data: any, str: string, endln?: boolean) => void,
-  signal?: AbortSignal
-) {
-  while (true) {
-    if (signal?.aborted) {
-      await reader.cancel()
-      break
-    }
-
-    const { done, value } = await reader.read()
-    if (done) break
-
-    buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n\n')
-    buffer = lines.pop() || ''
-
-    for (const line of lines) {
-      if (line.trim() === '') continue
-      if (line.trim() === 'data: [DONE]') {
-        handler.onDone()
-        continue
+  try {
+    while (true) {
+      if (signal?.aborted) {
+        await reader.cancel()
+        break
       }
 
-      processSSELine(line, handler, printMessage)
+      const { done, value } = await reader.read()
+      if (done) break
+
+      // 解码二进制数据
+      const chunk = decoder.decode(value, { stream: true })
+      buffer += chunk
+
+      // 处理完整的SSE消息
+      const lines = buffer.split('\n\n')
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        if (line.trim() === '') continue
+        if (line.trim() === 'data: [DONE]') {
+          handler.onDone()
+          continue
+        }
+
+        try {
+          // 解析SSE消息
+          const dataMatch = line.match(/^data: (.+)$/m)
+          if (!dataMatch) continue
+
+          const data = JSON.parse(dataMatch[1])
+          console.log('SSE data:', data)
+
+          if (data?.event === 'node_started') {
+            printMessage(data, `${data.data.title} 节点运行...`, true)
+          }
+          if (data?.event === 'node_finished') {
+            printMessage(
+              data,
+              `${data.data.title} 节点结束\n\n` +
+                (data.data.node_type === 'answer' ? `**${data.data.outputs.answer}**` : '')
+            )
+          }
+          if (data?.event === 'agent_log' && data.data.status === 'success' && data.data.label.startsWith('CALL')) {
+            printMessage(data, `--${data.data.label}(${JSON.stringify(data.data.data.output.tool_call_input)})`, true)
+          }
+        } catch (error) {
+          console.error('Error parsing SSE message:', error)
+        }
+      }
     }
-  }
 
-  if (buffer.trim() === 'data: [DONE]' || signal?.aborted) {
-    handler.onDone()
-  }
-}
-
-function processSSELine(
-  line: string,
-  handler: StreamHandler,
-  printMessage: (data: any, str: string, endln?: boolean) => void
-) {
-  try {
-    const dataMatch = line.match(/^data: (.+)$/m)
-    if (!dataMatch) return
-
-    const data = JSON.parse(dataMatch[1])
-
-    if (data?.event === 'node_started') {
-      printMessage(data, `${data.data.title} 节点运行...`, true)
-    }
-    if (data?.event === 'node_finished') {
-      printMessage(
-        data,
-        `${data.data.title} 节点结束\n\n` + (data.data.node_type === 'answer' ? `**${data.data.outputs.answer}**` : '')
-      )
-    }
-    if (data?.event === 'agent_log' && data.data.status === 'success' && data.data.label.startsWith('CALL')) {
-      printMessage(data, `--${data.data.label}(${JSON.stringify(data.data.data.output.tool_call_input)})`, true)
+    if (buffer.trim() === 'data: [DONE]' || signal?.aborted) {
+      handler.onDone()
     }
   } catch (error) {
-    console.error('Error parsing SSE message:', error)
+    if (signal?.aborted) return
+    throw error
   }
 }
 
