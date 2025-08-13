@@ -98,29 +98,36 @@ globalConversation.sessionId = query.get('sessionId') as string
 
 /* 400px 以下*/
 @media (max-width: 399px) {
-  :deep(.tiny-sender){
-    margin-top: 60%;
+  :deep(.tr-container__footer){
+    margin-top: 50%;
   }
 }
 
 /* 400px ~ 679px */
 @media (min-width: 400px) and (max-width: 679px) {
-  :deep(.tiny-sender){
-    margin-top: 50%;
+  :deep(.tr-container__footer){
+    margin-top: 60%;
   }
 }
 
 
 /* 680px ~ 899px */
 @media (min-width: 680px) and (max-width: 899px) {
-  :deep(.tiny-sender){
+  :deep(.tr-container__footer){
    margin-top: 250px;
   }
 }
 
 /* 900px 以上 */
-@media (min-width: 900px) {
-  :deep(.tiny-sender){
+@media (min-width: 900px) and (max-width: 1280px) {
+  :deep(.tr-container__footer){
+    margin-top: 260px;
+  }
+}
+
+/* 900px 以上 */
+@media (min-width: 1281px) {
+  :deep(.tr-container__footer){
     margin-top: 330px;
   }
 }
