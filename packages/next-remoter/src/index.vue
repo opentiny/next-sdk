@@ -14,7 +14,7 @@
     <div class="next-sdk-ai-panel" v-show="showTinyRobot">
       <!-- mcp-robot弹窗 -->
       <slot name="chat">
-        <tiny-robot-chat></tiny-robot-chat>
+        <tiny-robot-chat :is-fullscreen="false"></tiny-robot-chat>
       </slot>
     </div>
     <tiny-dialog-box v-model:visible="boxVisibility" center title="扫描二维码进入控制器" width="30%">
@@ -131,5 +131,9 @@ watch(
   width: 300px;
   height: 600px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+:deep(.tiny-sender){
+  margin-top: 330px;
 }
 </style>
