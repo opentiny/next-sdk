@@ -4,9 +4,9 @@
   "type": "module",
   "license": "MIT",
   "author": "Chunhui Mo",
-  "main": "index.js",
-  "module": "index.js",
-  "types": "index.d.ts",
+  "main": "index.ts",
+  "module": "index.ts",
+  "types": "index.ts",
   "description": "OpenTiny NEXT SDK",
   "scripts": {
     "build": "tsc"
@@ -21,6 +21,9 @@
     "typescript": "^5.2.2"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "module": "dist/index.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts"
   }
 }

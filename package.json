@@ -5,8 +5,7 @@
   "description": "OpenTiny NEXT MCP",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "pnpm -F doc-vanilla dev",
-    "ai": "pnpm -F doc-ai dev",
+    "dev": "pnpm -F doc-ai dev",
     "wiki": "pnpm -F next-wiki docs:dev",
     "build": "pnpm -F @opentiny/next-sdk build",
     "build:remoter": "pnpm -F @opentiny/next-remoter build",
