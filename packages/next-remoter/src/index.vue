@@ -42,6 +42,7 @@ const params = reactive({
   value: 'null',
   size: 250
 })
+
 const boxVisibility = ref(false)
 
 watch(

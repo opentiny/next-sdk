@@ -11,10 +11,30 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
 
+let mcpClient: any
+
 const deepseek = createDeepSeek({
   apiKey: 'sk-trial',
   baseURL: 'https://agent.opentiny.design/api/v1/ai'
 })
+
+// 创建nextClient
+const createMcpClient = async (sessionId: string) => {
+  if (!sessionId) {
+    console.error('sessionId is required when create mcpClient')
+    return
+  }
+
+  const url = new URL(AGENT_ROOT + 'mcp?sessionId=' + sessionId)
+
+  try {
+    mcpClient = await createMCPClient({
+      transport: new StreamableHTTPClientTransport(url)
+    })
+  } catch (error) {
+    console.error('create mcpClient error', error)
+  }
+}
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
   if (part.type == 'tool-input-start') {
@@ -58,20 +78,19 @@ export class AgentModelProvider extends BaseModelProvider {
   async chatStream(request: ChatCompletionRequest, handler: StreamHandler): Promise<void> {
     // 验证请求的messages属性，必须是数组，且每个消息必须有role\content属性
     const lastMessage = request.messages[request.messages.length - 1].content
-    // 创建nextClient
-    const sessionId = globalConversation.sessionId
-    if (!sessionId) {
-      throw new Error('sessionId is required')
+
+    if (!mcpClient) {
+      await createMcpClient(globalConversation.sessionId)
     }
-    const url = new URL(AGENT_ROOT + 'mcp?sessionId=' + sessionId)
-    const mcpClient = await createMCPClient({
-      transport: new StreamableHTTPClientTransport(url)
-    })
-    const tools = await mcpClient.tools()
+
+    // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
+    const tools = (await mcpClient?.tools?.()) || []
+
     const lastToolCall = {
       type: 'chain',
       items: []
     }
+
     const result = streamText({
       model: deepseek('deepseek-ai/DeepSeek-V3'),
       tools,
