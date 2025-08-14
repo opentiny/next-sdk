@@ -7,7 +7,6 @@ import { reactive } from 'vue'
 import { createDeepSeek } from '@ai-sdk/deepseek'
 import { streamText } from 'ai'
 import { experimental_createMCPClient as createMCPClient, stepCountIs } from 'ai'
-import { createMessageChannelClientTransport } from '@opentiny/next-sdk'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
@@ -49,7 +48,6 @@ export class AgentModelProvider extends BaseModelProvider {
   transport: any
   constructor(config: AIModelConfig) {
     super(config)
-    this.transport = createMessageChannelClientTransport('endpoint')
   }
 
   /** 同步请示不需要实现 */
