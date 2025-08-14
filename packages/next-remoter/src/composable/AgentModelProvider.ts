@@ -95,7 +95,8 @@ export class AgentModelProvider extends BaseModelProvider {
       model: deepseek('deepseek-ai/DeepSeek-V3'),
       tools,
       prompt: lastMessage,
-      stopWhen: stepCountIs(5)
+      stopWhen: stepCountIs(5),
+      abortSignal: request.options?.signal
     })
 
     const content = reactive({
