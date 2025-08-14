@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "dist",
+    "target": "ES2015",
+    "lib": ["ES2015", "DOM"],
+    "moduleResolution": "node",
+    "module": "es6",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["index.ts"]
+}
