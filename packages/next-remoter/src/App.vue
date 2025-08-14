@@ -91,38 +91,7 @@ globalConversation.sessionId = query.get('sessionId') as string
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
-:deep(.tr-container__header-operations button.tr-icon-button:first-child){
+:deep(.tr-container__header-operations button.tr-icon-button:first-child) {
   display: none;
 }
-
-
-/* 400px 以下*/
-@media (max-width: 399px) {
-  :deep(.tiny-sender){
-    margin-top: 60%;
-  }
-}
-
-/* 400px ~ 679px */
-@media (min-width: 400px) and (max-width: 679px) {
-  :deep(.tiny-sender){
-    margin-top: 50%;
-  }
-}
-
-
-/* 680px ~ 899px */
-@media (min-width: 680px) and (max-width: 899px) {
-  :deep(.tiny-sender){
-   margin-top: 250px;
-  }
-}
-
-/* 900px 以上 */
-@media (min-width: 900px) {
-  :deep(.tiny-sender){
-    margin-top: 330px;
-  }
-}
 </style>
-

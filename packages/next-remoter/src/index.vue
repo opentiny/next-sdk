@@ -132,8 +132,4 @@ watch(
   height: 600px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
-
-:deep(.tiny-sender){
-  margin-top: 330px;
-}
 </style>

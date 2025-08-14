@@ -1,15 +1,16 @@
 {
   "name": "@opentiny/next-remoter",
-  "version": "0.0.1-alpha.4",
+  "version": "0.0.1-alpha.7",
   "type": "module",
   "files": [
     "dist"
   ],
+  "module": "./src/index.ts",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "module": "dist/next-remoter.es.js",
+    "main": "dist/next-remoter.cjs.js"
   },
-  "module": "dist/next-remoter.es.js",
-  "main": "dist/next-remoter.cjs.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -25,6 +26,7 @@
     "ai": "^5.0.9",
     "@ai-sdk/deepseek": "^1.0.4",
     "@opentiny/vue": "^3.25.0",
+    "markdown-it": "14.1.0",
     "vue": "^3.3.11"
   },
   "devDependencies": {
