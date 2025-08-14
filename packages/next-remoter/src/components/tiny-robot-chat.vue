@@ -3,7 +3,7 @@
 
   <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreenValue">
     <tr-bubble-provider :message-renderers="messageRenderers">
-      <div v-if="showMessages.length === 0">
+      <div style="flex: 1" v-if="showMessages.length === 0">
         <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
           <template #footer>
             <div class="welcome-footer"></div>
@@ -17,7 +17,7 @@
           @item-click="handlePromptItemClick"
         ></tr-prompts>
       </div>
-      <tr-bubble-list v-else :items="showMessages" :roles="roles" auto-scroll> </tr-bubble-list>
+      <tr-bubble-list style="flex: 1" v-else :items="showMessages" :roles="roles" auto-scroll> </tr-bubble-list>
     </tr-bubble-provider>
 
     <template #footer>
@@ -59,7 +59,7 @@ import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import { showTinyRobot } from '../composable/utils'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
-import { computed, nextTick, watch, defineProps ,ref } from 'vue'
+import { computed, nextTick, watch, defineProps, ref } from 'vue'
 
 const props = defineProps({
   isFullscreen: {
@@ -114,7 +114,6 @@ const showMessages = computed(() => {
 
   return messages.value
 })
-
 
 const scrollToBottom = () => {
   const containerBody = document.querySelector('div.ai-console-content-wrap')
