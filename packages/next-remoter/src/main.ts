@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import App from './index.vue'
+import App from './App.vue'
 // tiny-robot 对话框
 import '@opentiny/tiny-robot/dist/style.css'
 
