@@ -6,8 +6,8 @@
       </slot>
       <template #dropdown>
         <tiny-dropdown-menu>
-          <tiny-dropdown-item @click="showTinyRobot = true">弹出 AI对话框</tiny-dropdown-item>
-          <tiny-dropdown-item @click="QrcodeEl.open(params.value)">弹出 二维码</tiny-dropdown-item>
+          <tiny-dropdown-item @click="showTinyRobot = true">弹出 AI 对话框</tiny-dropdown-item>
+          <tiny-dropdown-item @click="QrcodeEl.open(params.value)">弹出二维码</tiny-dropdown-item>
         </tiny-dropdown-menu>
       </template>
     </tiny-dropdown>
