@@ -82,7 +82,6 @@ const messageRenderers = {
 }
 
 const {
-  fullscreen,
   welcomeIcon,
   promptItems,
   messages,
@@ -116,7 +115,7 @@ const showMessages = computed(() => {
 })
 
 const scrollToBottom = () => {
-  const containerBody = document.querySelector('div.ai-console-content-wrap')
+  const containerBody = document.querySelector('div.tr-bubble-list')
   if (containerBody) {
     nextTick(() => {
       containerBody.scrollTo({
