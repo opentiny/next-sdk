@@ -1,8 +1,8 @@
-name: Auto Deploy NEXT SDK Docs
+name: Auto Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [dev, main]
     paths:
       - 'docs/**/*.md'
 
