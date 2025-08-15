@@ -7,6 +7,7 @@ node_modules
 dist
 build
 *.tsbuildinfo
+cache
 
 # 编辑器
 .vscode/*
