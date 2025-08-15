@@ -25,7 +25,6 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import { TinyDialogBox, TinyQrCode, TinyDropdown, TinyDropdownMenu, TinyDropdownItem } from '@opentiny/vue'
 import { IconAi } from '@opentiny/tiny-robot-svgs'
 import { globalConversation } from './composable/utils'
 import { showTinyRobot } from './composable/utils'
