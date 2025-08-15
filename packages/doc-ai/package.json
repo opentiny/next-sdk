@@ -22,7 +22,6 @@
     "vue-i18n": "^9.1.7"
   },
   "devDependencies": {
-    "@opentiny/unplugin-tiny-vue": "^1.0.0",
     "@types/node": "^22.15.16",
     "@types/vue": "^2.0.0",
     "@vitejs/plugin-vue": "^5.2.2",
@@ -30,6 +29,7 @@
     "dotenv": "^16.5.0",
     "dotenv-cli": "^8.0.0",
     "typescript": "~5.7.2",
+    "@opentiny/unplugin-tiny-vue": "^1.0.0",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "^0.26.0",
     "vite": "^6.3.1",
