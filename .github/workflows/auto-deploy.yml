@@ -32,7 +32,7 @@ jobs:
         with:
           version: 9
       - name: Install deps
-        run: pnpm -F docs i --no-frozen-lockfile
+        run: pnpm i --no-frozen-lockfile
       - name: Build site
         run: pnpm -F docs build
       - name: Setup Pages
