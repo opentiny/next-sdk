@@ -19,6 +19,8 @@ export class AgentModelProvider {
       })
     } else if (llm) {
       this.llm = llm
+    } else {
+      throw new Error('Either llmConfig or llm must be provided')
     }
   }
 
