@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import { TinyVueSingleResolver } from '@opentiny/unplugin-tiny-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 // https://vite.dev/config/
 export default defineConfig(() => {
@@ -19,6 +20,7 @@ export default defineConfig(() => {
     },
     plugins: [
       vue(),
+      vueJsx(),
       Components({
         resolvers: [TinyVueSingleResolver]
       }),

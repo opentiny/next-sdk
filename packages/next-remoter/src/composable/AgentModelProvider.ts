@@ -80,7 +80,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
     })
 
     for await (const part of result.fullStream) {
-      // console.log(part, part.type)
+      console.log(part, part.type)
 
       // 节点开始
       if (part.type === 'text-start') {

@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AntDesignX: typeof import('./src/components/ant-design-x.vue')['default']
     ReactiveMarkdown: typeof import('./src/components/ReactiveMarkdown.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
