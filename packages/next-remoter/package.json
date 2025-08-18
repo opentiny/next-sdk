@@ -18,15 +18,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@opentiny/next-sdk": "^0.1.0",
+    "@opentiny/next-sdk": "workspace:*",
     "@opentiny/tiny-robot": "0.3.0-alpha.3",
     "@opentiny/tiny-robot-kit": "0.3.0-alpha.3",
     "@opentiny/tiny-robot-svgs": "0.3.0-alpha.3",
     "@modelcontextprotocol/sdk": "^1.16.0",
-    "ai": "^5.0.9",
-    "@ai-sdk/deepseek": "^1.0.4",
     "@opentiny/vue": "^3.25.0",
-    "markdown-it": "14.1.0",
     "vue": "^3.3.11"
   },
   "devDependencies": {

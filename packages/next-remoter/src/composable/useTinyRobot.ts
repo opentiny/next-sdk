@@ -2,13 +2,13 @@ import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, nextTick, onMounted, ref, watch } from 'vue'
 import type { SuggestionItem } from '@opentiny/tiny-robot'
-import { AgentModelProvider } from './AgentModelProvider'
+import { CustomAgentModelProvider } from './AgentModelProvider'
 import { BubbleMarkdownMessageRenderer } from '@opentiny/tiny-robot'
 const mdRenderer = new BubbleMarkdownMessageRenderer()
 
 export const useTinyRobot = () => {
   const client = new AIClient({
-    providerImplementation: new AgentModelProvider({ provider: 'custom' }),
+    providerImplementation: new CustomAgentModelProvider({ provider: 'custom' }),
     provider: 'custom'
   })
 
