@@ -1,6 +1,9 @@
+export type { experimental_MCPClient as MCPClient } from 'ai'
+
 export interface IAgentModelProviderLlmConfig {
   apiKey: string
   baseURL: string
+  providerType: string
 }
 
 export interface McpServerConfig {
@@ -11,11 +14,10 @@ export interface McpServerConfig {
 export interface IAgentModelProviderConfig {
   llmConfig?: IAgentModelProviderLlmConfig
   mcpServer?: McpServerConfig[]
-  model?: any
+  llm?: any
 }
 
-export interface ChatStreamRequest {
-  messages: any[]
-  model: string | any
-  signal: AbortSignal
+export const AIProviderType = {
+  OPENAI: 'openai',
+  DEEPSEEK: 'deepseek'
 }

@@ -6,7 +6,7 @@ import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive } from 'vue'
 import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
-import { AgentModelProvider } from '@opentiny/next-sdk'
+import { AgentModelProvider, AIProviderType } from '@opentiny/next-sdk'
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
   if (part.type == 'tool-input-start') {
@@ -38,13 +38,14 @@ const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, i
 
 export class CustomAgentModelProvider extends BaseModelProvider {
   transport: any
-  agent: any
+  agent: AgentModelProvider
   constructor(config: AIModelConfig) {
     super(config)
     this.agent = new AgentModelProvider({
       llmConfig: {
         apiKey: 'sk-trial',
-        baseURL: 'https://agent.opentiny.design/api/v1/ai'
+        baseURL: 'https://agent.opentiny.design/api/v1/ai',
+        providerType: AIProviderType.DEEPSEEK
       },
       mcpServer: [
         {
@@ -61,12 +62,6 @@ export class CustomAgentModelProvider extends BaseModelProvider {
   }
 
   async chatStream(request: ChatCompletionRequest, handler: StreamHandler): Promise<void> {
-    const result = await this.agent.chatStream({
-      messages: request.messages,
-      model: 'deepseek-ai/DeepSeek-V3',
-      signal: request.options?.signal
-    })
-
     const content = reactive({
       type: 'markdown',
       content: ''
@@ -78,8 +73,14 @@ export class CustomAgentModelProvider extends BaseModelProvider {
       items: []
     }
 
+    const result = await this.agent.chatStream({
+      messages: request.messages,
+      model: 'deepseek-ai/DeepSeek-V3',
+      abortSignal: request.options?.signal
+    })
+
     for await (const part of result.fullStream) {
-      console.log(part, part.type)
+      // console.log(part, part.type)
 
       // 节点开始
       if (part.type === 'text-start') {

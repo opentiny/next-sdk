@@ -1,42 +1,48 @@
-import { createDeepSeek } from '@ai-sdk/deepseek'
-import { streamText, ToolSet } from 'ai'
-import { stepCountIs, generateText } from 'ai'
+import { streamText, stepCountIs, generateText } from 'ai'
+import type { ToolSet } from 'ai'
 import { getMcpClients, getMcpTools } from './utils'
-import { IAgentModelProviderConfig, ChatStreamRequest } from './type'
+import type { IAgentModelProviderConfig, McpServerConfig } from './type'
+import { AIProviderFactories } from './utils/aiProviderFactories'
 
 export class AgentModelProvider {
-  messages: any[] = []
-  mcpServer: any
+  mcpServer: McpServerConfig[]
   llm: any
   initialized: boolean = false
   mcpClients: any[] = []
 
-  constructor({ llmConfig, mcpServer, model }: IAgentModelProviderConfig) {
-    this.mcpServer = mcpServer
+  constructor({ llmConfig, mcpServer, llm }: IAgentModelProviderConfig) {
+    this.mcpServer = mcpServer || []
     if (llmConfig) {
-      this.llm = createDeepSeek({
+      this.llm = AIProviderFactories[llmConfig.providerType]({
         apiKey: llmConfig.apiKey,
         baseURL: llmConfig.baseURL
       })
-    } else if (model) {
-      this.llm = model
+    } else if (llm) {
+      this.llm = llm
     }
   }
 
-  async chat({ messages, model, signal }: ChatStreamRequest): Promise<any> {
+  async chat({
+    model,
+    maxSteps = 5,
+    ...options
+  }: Parameters<typeof generateText>[0] & { maxSteps?: number }): Promise<any> {
     if (!this.llm) {
       throw new Error('LLM is not initialized')
     }
     const { text } = await generateText({
       model: this.llm(model),
-      messages,
-      stopWhen: stepCountIs(5),
-      abortSignal: signal
+      stopWhen: stepCountIs(maxSteps),
+      ...options
     })
     return text
   }
 
-  async chatStream({ messages, model, signal }: ChatStreamRequest): Promise<any> {
+  async chatStream({
+    model,
+    maxSteps = 5,
+    ...options
+  }: Parameters<typeof streamText>[0] & { maxSteps?: number }): Promise<any> {
     if (!this.llm) {
       throw new Error('LLM is not initialized')
     }
@@ -49,12 +55,13 @@ export class AgentModelProvider {
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
     const tools = await getMcpTools(this.mcpClients)
 
-    return streamText({
+    const result = streamText({
       model: this.llm(model),
-      tools: tools as unknown as ToolSet,
-      messages,
-      stopWhen: stepCountIs(5),
-      abortSignal: signal
+      tools: tools as ToolSet,
+      stopWhen: stepCountIs(maxSteps),
+      ...options
     })
+
+    return result
   }
 }
