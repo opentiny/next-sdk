@@ -96,8 +96,34 @@ import '@opentiny/next-remoter/dist/style.css'
   </head>
   <body>
     <script>
-      // SDK 使用方式如上
-      const { WebMcpClient, WebMcpServer } = WebMCP;
+      (async () => {
+        const { WebMcpServer, createMessageChannelPairTransport, z, WebMcpClient } = WebMCP;
+        const [serverTransport, clientTransport] = createMessageChannelPairTransport();
+
+        const client = new WebMcpClient();
+        await client.connect(clientTransport);
+        const { sessionId } = await client.connect({
+          agent: true,
+          url: "https://agent.opentiny.design/api/v1/webmcp-trial/mcp",
+          sessionId: "5f8edea7-e3ae-4852-a334-1bb6b3a1cfa9",
+        });
+
+        const server = new WebMcpServer();
+        server.registerTool(
+          "demo-tool",
+          {
+            title: "演示工具",
+            description: "一个简单工具",
+            inputSchema: { foo: z.string() },
+          },
+          async (params) => {
+            console.log("params:", params);
+            return { content: [{ type: "text", text: `收到: ${params.foo}` }] };
+          }
+        );
+
+        await server.connect(serverTransport);
+      })();
     </script>
   </body>
 </html>
