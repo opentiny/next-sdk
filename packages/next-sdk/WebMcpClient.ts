@@ -326,8 +326,7 @@ export class WebMcpClient {
 
         const execute = async (args: any, options: ToolCallOptions): Promise<any> => {
           options?.abortSignal?.throwIfAborted()
-          debugger
-          return self.callTool({ name, args, options })
+          return self.callTool({ name, arguments: args }, { signal: options?.abortSignal })
         }
 
         tools[name] = dynamicTool({
