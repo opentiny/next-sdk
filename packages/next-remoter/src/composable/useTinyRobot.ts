@@ -1,9 +1,9 @@
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, nextTick, onMounted, ref, watch } from 'vue'
-import type { SuggestionItem } from '@opentiny/tiny-robot'
+import type { PromptProps, SuggestionItem } from '@opentiny/tiny-robot'
 import { CustomAgentModelProvider } from './AgentModelProvider'
-import { BubbleMarkdownMessageRenderer } from '@opentiny/tiny-robot'
+import { BubbleMarkdownMessageRenderer,TrSender } from '@opentiny/tiny-robot'
 const mdRenderer = new BubbleMarkdownMessageRenderer()
 
 export const useTinyRobot = () => {
@@ -19,6 +19,7 @@ export const useTinyRobot = () => {
   const userAvatar = h(IconUser, { style: { fontSize: '32px' } })
   const welcomeIcon = h(IconAi, { style: { fontSize: '48px' } })
 
+  // TODO: 以后用参数传入这些默认的提示。
   const promptItems = [
     {
       label: '智能操作网页',
@@ -26,7 +27,7 @@ export const useTinyRobot = () => {
       icon: h('span', { style: { fontSize: '18px' } }, '🕹')
     }
   ]
-  const handlePromptItemClick = (ev, item) => {
+  const handlePromptItemClick = (_ev:MouseEvent, item: PromptProps) => {
     sendMessage(item.description)
   }
 
@@ -50,6 +51,7 @@ export const useTinyRobot = () => {
   }
 
   // 建议按钮组，设置对话的模板
+   // TODO: 以后用参数传入这些默认的提示。
   const suggestionPillItems = [
     {
       id: '1',
@@ -58,6 +60,7 @@ export const useTinyRobot = () => {
     }
   ]
 
+   // TODO: 以后用参数传入这些默认的模板 
   function handleSuggestionPillItemClick(item: SuggestionItem) {
     if (item.id === '1') {
       let templateText = `请对 [目标组件] ,执行 [操作]`
@@ -71,7 +74,7 @@ export const useTinyRobot = () => {
     }
   }
 
-  const senderRef = ref(null)
+  const senderRef = ref<InstanceType<typeof TrSender> >()
   const currentTemplate = ref('')
   const suggestionOpen = ref(false)
 
@@ -93,20 +96,21 @@ export const useTinyRobot = () => {
     clearTemplate()
   }
 
-  const handleMessageKeydown = (event, triggerFn, suggestionKeyDown) => {
+  const handleMessageKeydown = (event:KeyboardEvent) => {
+    // TODO 待恢复如下功能
     // 如果指令面板已打开，交给 suggestion 组件处理键盘事件
-    if (suggestionOpen.value) {
-      suggestionKeyDown(event)
-      return
-    }
+    // if (suggestionOpen.value) {
+    //   suggestionKeyDown(event)
+    //   return
+    // }
 
     // 如果按下斜杠键并且不在指令编辑模式，触发指令面板
-    if (event.key === '/' && !currentTemplate.value) {
-      triggerFn({
-        text: '',
-        position: 0
-      })
-    }
+    // if (event.key === '/' && !currentTemplate.value) {
+    //   triggerFn({
+    //     text: '',
+    //     position: 0
+    //   })
+    // }
 
     // ESC 键清除当前指令
     if (event.key === 'Escape' && currentTemplate.value) {

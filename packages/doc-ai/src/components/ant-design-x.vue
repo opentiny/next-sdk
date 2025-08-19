@@ -14,7 +14,6 @@ import { computed, h, ref } from 'vue'
 import { Attachments, Bubble, Prompts, Sender, useXAgent, useXChat, Welcome } from 'ant-design-x-vue'
 import markdownit from 'markdown-it'
 import { AgentModelProvider } from '@opentiny/next-sdk'
-import { AIProviderType } from '@opentiny/next-sdk'
 import { AGENT_ROOT, SSEION_ID } from '../const'
 
 const md = markdownit({ html: true, breaks: true })
@@ -132,9 +131,9 @@ const webAgent = new AgentModelProvider({
   llmConfig: {
     apiKey: 'sk-trial',
     baseURL: 'https://agent.opentiny.design/api/v1/ai',
-    providerType: AIProviderType.DEEPSEEK
+    providerType: 'deepseek'
   },
-  mcpServer: [
+  mcpServers: [
     {
       type: 'streamableHttp',
       url: `${AGENT_ROOT}mcp?sessionId=${SSEION_ID}`

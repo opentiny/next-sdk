@@ -35,7 +35,7 @@
           :template="currentTemplate"
           @submit="handleSendMessage"
           @cancel="abortRequest"
-          @keydown="handleMessageKeydown($event, onTrigger, onKeyDown)"
+          @keydown="handleMessageKeydown($event)"
           @reset-template="clearTemplate"
         ></tr-sender>
       </div>
