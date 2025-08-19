@@ -2,9 +2,10 @@
 title: "连接 WebAgent 服务器"
 ---
 
-WebAgent 是 OpenTiny 推出的统一管理受控端应用和遥控端应用的服务平台，提供智能应用与 AI 的连接通讯、OAuth 鉴权等丰富的特性。
-
+**WebAgent** 是 [OpenTiny](https://opentiny.design/) 推出的统一管理受控端应用和遥控端应用的服务平台，提供智能应用与 AI 的连接通讯、OAuth 鉴权等丰富的特性。
+<Info>
 我们以 Vue 应用为例，为大家介绍如何使用 NEXT SDK 将现有应用连接到 WebAgent 服务器，转变成智能应用，被 AI 操控。
+</Info>
 
 ## 在 WebAgent 平台注册应用
 
@@ -12,33 +13,33 @@ WebAgent 是 OpenTiny 推出的统一管理受控端应用和遥控端应用的�
 
 ![alt text](../assets/images/webAgent/WebAgent1.png)
 
-a. 打开： https://agent.opentiny.design/
+* 打开： https://agent.opentiny.design/
 
-b. 点击去注册，输入账号名、邮箱、密码，完成注册
+* 点击去注册，输入账号名、邮箱、密码，完成注册
 
-c. 返回来登录界面
+* 返回来登录界面
 
-d. 输入注册的账号密码，完成登录。
+* 输入注册的账号密码，完成登录。
 
 **2. 创建应用**
 
-a. 点击顶部菜单项：应用管理，跳转到应用管理页面
+* 点击顶部菜单项：应用管理，跳转到应用管理页面
 
-b. 点击创建应用，进入创建应用流程。
+* 点击创建应用，进入创建应用流程。
 
 ![alt text](../assets/images/webAgent/WebAgent2.png)
 
-c. 选择桌面应用
+* 选择**桌面应用**
 
 ![alt text](../assets/images/webAgent/WebAgent3.png)
 
-d. 输入应用名称，点击下一步
+* 输入**应用名称**，点击**下一步**
 
 ![alt text](../assets/images/webAgent/WebAgent4.png)
 
 
 
-e. 输入三个重定向 uri。
+* 输入三个重定向 **URL**。
 
 ![alt text](../assets/images/webAgent/WebAgent5.png)
 
@@ -48,31 +49,30 @@ e. 输入三个重定向 uri。
 - `http://localhost:8089`  该地址为受控制端前端的地址，需要加上，不然会有跨域错误。
 - `http://localhost:8088`  该地址为控制端前端的地址，需要加上，不然会有跨域错误。
 
-f. 输入操控端回调 uri (选填)。
+* 输入操控端回调 **uri** (选填)。
 
 ![alt text](../assets/images/webAgent/WebAgent6.png)
 
 `http://localhost:6274/oauth/callback` 表示我们的应用允许被 `http://localhost:6274` 的操控端操控。
 
-g. 输入 scope，然后点击下一步
+* 输入**scope**为 **mcp:web**，然后点击**下一步**。
 
 ![alt text](../assets/images/webAgent/WebAgent7.png)
 
-scope 输入为 `mcp:web`
 
-h. 点击下一步
+*  点击**下一步**
 
 ![alt text](../assets/images/webAgent/WebAgent8.png)
 
-i. 勾选 我已仔细检查 xxxx，点击创建应用
+*  **勾选** 我已仔细检查上述配置，确认创建此OAuth应用
 
 ![alt text](../assets/images/webAgent/WebAgent9.png)
 
-j. 复制 clientId
+*   **复制 clientId**
 
 ![alt text](../assets/images/webAgent/WebAgent10.png)
 
-k. 修改项目中的相关配置, 详情参考 创建 WebMcpClient，并与 WebAgent 连接
+*  修改项目中的相关配置, 详情参考 创建 WebMcpClient，并与 WebAgent 连接
 
 ## 安装 NEXT SDK
 
@@ -82,7 +82,7 @@ npm i @opentiny/next-sdk
 
 ## 创建 WebMcpClient，并与 WebAgent 连接
 
-在 App.vue 文件中加入以下代码：
+在 **App.vue** 文件中加入以下代码：
 
 ```typescript
 import { onMounted } from 'vue'
@@ -132,7 +132,7 @@ onMounted(async () => {
 
 ## 创建 WebMcpServer，并与 ServerTransport 连接
 
-在 App.vue 文件中加入以下代码：
+在 **App.vue** 文件中加入以下代码：
 
 ```typescript
 import { onMounted } from 'vue'
@@ -154,4 +154,4 @@ onMounted(async () => {
 })
 ```
 
-完成以上步骤，你的 Web 应用就升级为智能应用了，你可以通过各种接入了 AI 的 MCP Host 对智能应用进行操控，具体配置方式参考：[通过各类 MCP Host 操控智能应用](./mcp-host.md)
+完成以上步骤，你的 Web 应用就升级为智能应用了，你可以通过各种接入了 AI 的 MCP Host 对智能应用进行操控，具体配置方式参考：[通过各类 MCP Host 操控智能应用](/guide/mcp-host)

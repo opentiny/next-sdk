@@ -43,7 +43,7 @@
         "tab": "资源",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "opentiny",
             "pages": [
               "api-reference/introduction"
             ]
@@ -61,7 +61,12 @@
   },
   "navbar": {
     "links": [
-    ]
+    ],
+    "primary": {
+      "type": "button",
+      "label": "OpenTiny",
+      "href": "https://opentiny.design/"
+    }
   },
   "contextual": {
     "options": [
@@ -78,8 +83,8 @@
   "footer": {
     "socials": {
       "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/opentiny/next-sdk/tree/dev/docs",
+      "linkedin": "https://www.linkedin.com/company/langgenius"
     }
   }
 }
