@@ -322,11 +322,9 @@ export class WebMcpClient {
       const listToolsResult = await this.listTools()
 
       for (const { name, description, inputSchema } of listToolsResult.tools) {
-        const self = this
-
         const execute = async (args: any, options: ToolCallOptions): Promise<any> => {
           options?.abortSignal?.throwIfAborted()
-          return self.callTool({ name, arguments: args }, { signal: options?.abortSignal })
+          return this.callTool({ name, arguments: args }, { signal: options?.abortSignal })
         }
 
         tools[name] = dynamicTool({
