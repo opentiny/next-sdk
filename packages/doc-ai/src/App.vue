@@ -4,18 +4,28 @@
     <div class="main-content">
       <router-view />
     </div>
-    <tiny-remoter sessionId="78b66563-95c0-4839-8007-e8af634dd658"></tiny-remoter>
+    <tiny-remoter :sessionId="SSEION_ID">
+      <template #chat v-if="isAntDesignX">
+        <ant-design-x></ant-design-x>
+      </template>
+    </tiny-remoter>
   </div>
 </template>
 
 <script setup lang="ts">
 import { TinyRemoter } from '@opentiny/next-remoter'
+import antDesignX from './components/ant-design-x.vue'
 import { WebMcpClient, createMessageChannelPairTransport } from '@opentiny/next-sdk'
 import type { Transport } from '@opentiny/next-sdk'
-import { AGENT_ROOT } from './const'
+import { AGENT_ROOT, SSEION_ID } from './const'
 import { provide } from 'vue'
 
 const [serverTransport, clientTransport] = createMessageChannelPairTransport()
+
+const query = new URLSearchParams(window.location.search)
+const dialogId = query.get('dialog')
+
+const isAntDesignX = dialogId === 'ant'
 
 // 定义 MCP Server 的能力
 const capabilities = {
@@ -51,7 +61,7 @@ const createProxyTransport = async () => {
 
   const { sessionId } = await client.connect({
     url: AGENT_ROOT + 'mcp',
-    sessionId: '78b66563-95c0-4839-8007-e8af634dd658',
+    sessionId: SSEION_ID,
     agent: true,
     onError: (error: Error) => {
       console.error('Connect proxy error:', error)

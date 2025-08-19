@@ -4,37 +4,9 @@ import type { StreamHandler } from '@opentiny/tiny-robot-kit'
 import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive } from 'vue'
-import { createDeepSeek } from '@ai-sdk/deepseek'
-import { streamText } from 'ai'
-import { experimental_createMCPClient as createMCPClient, stepCountIs } from 'ai'
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
-
-let mcpClient: any
-
-const deepseek = createDeepSeek({
-  apiKey: 'sk-trial',
-  baseURL: 'https://agent.opentiny.design/api/v1/ai'
-})
-
-// 创建nextClient
-const createMcpClient = async (sessionId: string) => {
-  if (!sessionId) {
-    console.error('sessionId is required when create mcpClient')
-    return
-  }
-
-  const url = new URL(AGENT_ROOT + 'mcp?sessionId=' + sessionId)
-
-  try {
-    mcpClient = await createMCPClient({
-      transport: new StreamableHTTPClientTransport(url)
-    })
-  } catch (error) {
-    console.error('create mcpClient error', error)
-  }
-}
+import { AgentModelProvider } from '@opentiny/next-sdk'
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
   if (part.type == 'tool-input-start') {
@@ -45,7 +17,7 @@ const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, i
     })
     lastToolCall.items.push(infoItem)
     if (isFirstToolCall) {
-      handler.onMessage(lastToolCall)
+      handler.onMessage && handler.onMessage(lastToolCall)
     }
   }
 
@@ -64,47 +36,48 @@ const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, i
   }
 }
 
-export class AgentModelProvider extends BaseModelProvider {
+export class CustomAgentModelProvider extends BaseModelProvider {
   transport: any
+  agent: AgentModelProvider
   constructor(config: AIModelConfig) {
     super(config)
+    this.agent = new AgentModelProvider({
+      llmConfig: {
+        apiKey: 'sk-trial',
+        baseURL: 'https://agent.opentiny.design/api/v1/ai',
+        providerType: 'deepseek'
+      },
+      mcpServers: [
+        {
+          type: 'streamableHttp',
+          url: `${AGENT_ROOT}mcp?sessionId=${globalConversation.sessionId}`
+        }
+      ]
+    })
   }
 
-  /** 同步请示不需要实现 */
+  /** 同步请求不需要实现 */
   chat(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
     throw new Error('Method not implemented.')
   }
 
   async chatStream(request: ChatCompletionRequest, handler: StreamHandler): Promise<void> {
-    // 验证请求的messages属性，必须是数组，且每个消息必须有role\content属性
-    const lastMessage = request.messages[request.messages.length - 1].content
-
-    if (!mcpClient) {
-      await createMcpClient(globalConversation.sessionId)
-    }
-
-    // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
-    const tools = (await mcpClient?.tools?.()) || []
-
-    const lastToolCall = {
-      type: 'chain',
-      items: []
-    }
-
-    const result = streamText({
-      model: deepseek('deepseek-ai/DeepSeek-V3'),
-      tools,
-      prompt: lastMessage,
-      stopWhen: stepCountIs(5),
-      abortSignal: request.options?.signal
-    })
-
     const content = reactive({
       type: 'markdown',
       content: ''
     })
 
     let isFirstToolCall = true
+    const lastToolCall = {
+      type: 'chain',
+      items: []
+    }
+
+    const result = await this.agent.chatStream({
+      messages: request.messages,
+      model: 'deepseek-ai/DeepSeek-V3',
+      abortSignal: request.options?.signal
+    })
 
     for await (const part of result.fullStream) {
       console.log(part, part.type)

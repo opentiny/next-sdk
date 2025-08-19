@@ -7,16 +7,16 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ReactiveMarkdown: typeof import('./src/components/ReactiveMarkdown.vue')['default']
+    AntDesignX: typeof import('./src/components/ant-design-x.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TinyBaseSelect: typeof import('@opentiny/vue-base-select')['default']
-    TinyButton: typeof import('@opentiny/vue-button')['default']
+    TinyDialogBox: typeof import('@opentiny/vue-dialog-box')['default']
+    TinyDropdown: typeof import('@opentiny/vue-dropdown')['default']
+    TinyDropdownItem: typeof import('@opentiny/vue-dropdown-item')['default']
+    TinyDropdownMenu: typeof import('@opentiny/vue-dropdown-menu')['default']
     TinyGrid: typeof import('@opentiny/vue-grid')['default']
     TinyGridColumn: typeof import('@opentiny/vue-grid-column')['default']
-    TinyInput: typeof import('@opentiny/vue-input')['default']
-    TinyOption: typeof import('@opentiny/vue-option')['default']
-    TinyRobotChat: typeof import('./src/components/tiny-robot-chat.vue')['default']
+    TinyQrCode: typeof import('@opentiny/vue-qr-code')['default']
     TinyTag: typeof import('@opentiny/vue-tag')['default']
   }
 }
