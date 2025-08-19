@@ -7,6 +7,7 @@ export default defineConfig({
   base: '/next-sdk/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: 'logo.png',
     nav: [
       { text: '指引', link: '/guide/', activeMatch: '/guide/' },
     ],
@@ -36,6 +37,7 @@ export default defineConfig({
           items: [
             { text: 'WebMcpClient 类', link: '/guide/api-client' },
             { text: 'WebMcpServer 类', link: '/guide/api-server' },
+            { text: 'AgentModelProvider 类', link: '/guide/api-agentModelProvider' },
             { text: '工具函数', link: '/guide/api-tools' },
           ]
         }
