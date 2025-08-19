@@ -4,7 +4,7 @@
 
 ## 1、 项目准备
 
-首先，确保你的环境安装正确，比如 `Nodejs,npm, HBuilder X `等均能正常使用。
+首先，确保你的环境安装正确，比如 `Nodejs,npm, HBuilder X`等均能正常使用。
 打开 `HBuilder X` 开发环境，通过`文件` -> `新建` -> `项目` 菜单，创建一个标准的 `Uniapp x` 的应用，并确保能正常运行该项目。
 
 ## 2、 开发应用页面
@@ -20,15 +20,15 @@
         "navigationBarTitleText": "电商商城--商品列表"
       }
     },
-	{
-	  "path": "pages/cart/index",
-	  "style": {
-	    "navigationBarTitleText": "电商商城--购物车"
-	  }
-	},
-	{
-	  "path": "pages/qr"
-	}
+ {
+   "path": "pages/cart/index",
+   "style": {
+     "navigationBarTitleText": "电商商城--购物车"
+   }
+ },
+ {
+   "path": "pages/qr"
+ }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
@@ -48,12 +48,12 @@
 ```json
 {
   "dependencies": {
-	"@opentiny/next": "^0.3.0",
+ "@opentiny/next": "^0.3.0",
     "@opentiny/next-sdk": "^0.1.0",
     "@modelcontextprotocol/sdk": "^1.16.0",
     "ajv": "^8.17.1",
-	"qrcode":"1.5.1",
-	"zod": "^3.23.8"
+ "qrcode":"1.5.1",
+ "zod": "^3.23.8"
   }
 }
 ```
@@ -62,7 +62,7 @@
 
 ```typescript
 
-export const AGENT_ROOT = 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/'
+export const AGENT_ROOT = 'https://agent.opentiny.design/api/v1/webmcp-trial/'
 export const ROMOTER_ROOT = 'https://ai.opentiny.design/'
 export const webMcpServer = { value: null as any }  // 页面引入该对象，即引用了server
 export const webMcpClient = { value: null as any }   
@@ -72,46 +72,46 @@ const [serverTransport, clientTransport] = createMessageChannelPairTransport()
 
 // 定义 MCP Server 的能力
 const capabilities = {
-	prompts: { listChanged: true },
-	resources: { subscribe: true, listChanged: true },
-	tools: { listChanged: true },
-	completions: {},
-	logging: {}
+ prompts: { listChanged: true },
+ resources: { subscribe: true, listChanged: true },
+ tools: { listChanged: true },
+ completions: {},
+ logging: {}
 }
 
 export async function initMcpClient() {
-	const client = new WebMcpClient(
-		{ name: 'mcp-web-client', version: '1.0.0' },
-		{ capabilities: { roots: { listChanged: true }, sampling: {}, elicitation: {} } }
-	)
-	webMcpClient.value = client
-	await client.connect(clientTransport)
+ const client = new WebMcpClient(
+  { name: 'mcp-web-client', version: '1.0.0' },
+  { capabilities: { roots: { listChanged: true }, sampling: {}, elicitation: {} } }
+ )
+ webMcpClient.value = client
+ await client.connect(clientTransport)
 
-	const { sessionId } = await client.connect({
-		url: AGENT_ROOT + 'mcp',
-		sessionId: 'stream06-1921-4f09-af63-uniappx',
-		agent: true,
-		onError: (error : Error) => {
-			console.error('Connect proxy error:', error)
-		}
-	})
+ const { sessionId } = await client.connect({
+  url: AGENT_ROOT + 'mcp',
+  sessionId: 'stream06-1921-4f09-af63-uniappx',
+  agent: true,
+  onError: (error : Error) => {
+   console.error('Connect proxy error:', error)
+  }
+ })
 
-	webSessionId.value = sessionId
+ webSessionId.value = sessionId
 }
 
 export async function initMcpServer() {
-	const server = new WebMcpServer({ name: 'base-config', version: '1.0.0' },
-		{ capabilities: capabilities })
+ const server = new WebMcpServer({ name: 'base-config', version: '1.0.0' },
+  { capabilities: capabilities })
 
-	webMcpServer.value = server
+ webMcpServer.value = server
     // ------- 在此可以注册业务的tools
 
-	serverTransport.onerror = (error) => {
-		console.error(`ServerTransport error:`, error)
-	}
-	await server.connect(serverTransport)
+ serverTransport.onerror = (error) => {
+  console.error(`ServerTransport error:`, error)
+ }
+ await server.connect(serverTransport)
 
-	return server
+ return server
 }
 
 
@@ -122,27 +122,27 @@ export async function initMcpServer() {
  在 `App.uvue`文件是管理项目app 的生命周期的文件，我们可以在这里引入上面2个函数来接入`next-sdk` ：
 
  ```javascript
-	import { initMcpClient, initMcpServer } from './next-sdk-store'
+ import { initMcpClient, initMcpServer } from './next-sdk-store'
 
-	let firstBackTime = 0
-	export default {
-		onLaunch: function () {
+ let firstBackTime = 0
+ export default {
+  onLaunch: function () {
             // 在此接入
-			initMcpServer()
-			initMcpClient()
-		},
-		onShow: function () {
-		},
-		onHide: function () {
-		},
-		onLastPageBackPress: function () {
-		},
-		onExit: function () { },
-	}
+   initMcpServer()
+   initMcpClient()
+  },
+  onShow: function () {
+  },
+  onHide: function () {
+  },
+  onLastPageBackPress: function () {
+  },
+  onExit: function () { },
+ }
 
  ```
 
- ## 4、为应用编写工具
+## 4、为应用编写工具
 
  项目还需要编写一些业务相关的工具(Mcp Tool) 来实现智能化操作，这些工具可以写在 `initMcpServer` 函数内部，也可以写在任意模块中，比如 创建新模块`register-tools.uts`，并添加一组电商类的Tool:
 
@@ -153,75 +153,75 @@ export function registerTools(){
     const server = webMcpServer.value;
 
      server.registerTool(
-		'get-products',
-		{
-			description: '查询所有的商品列表信息',
-			inputSchema: {}
-		},
-		async () => {
-			return {
-				content: [{ type: 'text', text: JSON.stringify(appData.products) }]
-			}
-		}
-	)
+  'get-products',
+  {
+   description: '查询所有的商品列表信息',
+   inputSchema: {}
+  },
+  async () => {
+   return {
+    content: [{ type: 'text', text: JSON.stringify(appData.products) }]
+   }
+  }
+ )
 
-	server.registerTool(
-		'get-carts',
-		{
-			description: '查询购物车中商品信息，包含商品对象和数量',
-			inputSchema: {}
-		},
-		async () => {
-			return {
-				content: [{ type: 'text', text: JSON.stringify(appData.cart) }]
-			}
-		}
-	)
+ server.registerTool(
+  'get-carts',
+  {
+   description: '查询购物车中商品信息，包含商品对象和数量',
+   inputSchema: {}
+  },
+  async () => {
+   return {
+    content: [{ type: 'text', text: JSON.stringify(appData.cart) }]
+   }
+  }
+ )
 
     
-	server.registerTool(
-		'get-totalCost',
-		{
-			description: '查询购物车中商品信息的总价',
-			inputSchema: {}
-		},
-		async () => {
-			return {
-				content: [{ type: 'text', text: JSON.stringify(cartTotal()) }]
-			}
-		}
-	)
+ server.registerTool(
+  'get-totalCost',
+  {
+   description: '查询购物车中商品信息的总价',
+   inputSchema: {}
+  },
+  async () => {
+   return {
+    content: [{ type: 'text', text: JSON.stringify(cartTotal()) }]
+   }
+  }
+ )
 
-	server.registerTool(
-		'pay-for-cart',
-		{
-			description: '购买购物车中商品',
-			inputSchema: {}
-		},
-		async () => {
-			payCart()
-			return {
-				content: [{ type: 'text', text: 'success' }]
-			}
-		}
-	)
-	
-	server.registerTool(
-		'add-product-to-cart',
-		{
-			description: '往购物车中添加商品,参数为商品的id和商品的数量',
-			inputSchema: {
-				productId:z.number().describe("商品ID"),
-				quantity:z.number().default(1).describe("商品数量"),
-			}
-		},
-		async ({productId, quantity=1}) => {
-			addToCartById(productId,quantity)
-			return {
-				content: [{ type: 'text', text: 'success' }]
-			}
-		}
-	)
+ server.registerTool(
+  'pay-for-cart',
+  {
+   description: '购买购物车中商品',
+   inputSchema: {}
+  },
+  async () => {
+   payCart()
+   return {
+    content: [{ type: 'text', text: 'success' }]
+   }
+  }
+ )
+ 
+ server.registerTool(
+  'add-product-to-cart',
+  {
+   description: '往购物车中添加商品,参数为商品的id和商品的数量',
+   inputSchema: {
+    productId:z.number().describe("商品ID"),
+    quantity:z.number().default(1).describe("商品数量"),
+   }
+  },
+  async ({productId, quantity=1}) => {
+   addToCartById(productId,quantity)
+   return {
+    content: [{ type: 'text', text: 'success' }]
+   }
+  }
+ )
 }
 
 
@@ -229,7 +229,7 @@ export function registerTools(){
 
  至此，当前应用已经支持智能化遥控了。
 
- ## 5、添加远端遥控工具
+## 5、添加远端遥控工具
 
  远端遥控工具的原理是：在创建 `WebMcpClient` 时，会生成一个 `sessionId`, 它对应一个固定的远端访问地址用于遥控网页，该地址为： `https://ai.opentiny.design/next-remoter?sessionId=${sessionId}`。 如果在其它电脑或手机浏览器上访问该地址，就能看到一个可以通过文字来遥控当前应用的管理页面。
 
@@ -243,32 +243,32 @@ uni.openDialogPage({
 
 ```html
 <template>
-	<view class="qr-page">
-		<view class="qr-wrapper">
-			<text>请扫码控制页面</text>
-			<canvas id="qr-canvas"></canvas>
-			<button @click="closeDialog">关闭</button>
-		</view>
-	</view>
+ <view class="qr-page">
+  <view class="qr-wrapper">
+   <text>请扫码控制页面</text>
+   <canvas id="qr-canvas"></canvas>
+   <button @click="closeDialog">关闭</button>
+  </view>
+ </view>
 </template>
 
 <script>
-	import { webSessionId } from 'next-sdk-store';
+ import { webSessionId } from 'next-sdk-store';
     import QRCode from "qrcode"
 
-	export default {
-		data() {
-			return {
-				url: getQrUrl()
-			}
-		},
-		methods: {
-			closeDialog() {
-				uni.closeDialogPage()
-			}
-		},
-		onReady() {
-			const canvas = this.$page.getElementById("qr-canvas") as UniCanvasElement
+ export default {
+  data() {
+   return {
+    url: getQrUrl()
+   }
+  },
+  methods: {
+   closeDialog() {
+    uni.closeDialogPage()
+   }
+  },
+  onReady() {
+   const canvas = this.$page.getElementById("qr-canvas") as UniCanvasElement
             const url = `https://ai.opentiny.design/next-remoter?sessionId=${webSessionId.value}`
             
             QRCode.toCanvas(canvasDom, url, {
@@ -281,22 +281,22 @@ uni.openDialogPage({
                     light: "#ffffff00"
                 }
             })
-		}
-	}
+  }
+ }
 </script>
 
 <style>
-	.qr-page{
-		background-color: #0000006c;
-		height: 100%;
-	}
-	.qr-wrapper {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin: 40px;
-		padding: 24px;
-		background-color: #fff;
-	}
+ .qr-page{
+  background-color: #0000006c;
+  height: 100%;
+ }
+ .qr-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px;
+  padding: 24px;
+  background-color: #fff;
+ }
 </style>
 ```
