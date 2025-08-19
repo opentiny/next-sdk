@@ -52,7 +52,7 @@ export class AgentModelProvider {
     }
 
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
-    await this.initClients();
+    await this.initClients()
     const tools = await getMcpTools(this.mcpClients)
 
     return generateText({
@@ -74,7 +74,7 @@ export class AgentModelProvider {
     }
 
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
-    await this.initClients();
+    await this.initClients()
     const tools = await getMcpTools(this.mcpClients)
 
     return streamText({
