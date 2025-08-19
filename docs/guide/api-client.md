@@ -79,7 +79,7 @@ client.connect(clientTransport)
 ```typescript
 client.connect({
   agent: true,
-  url: 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/mcp'
+  url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp'
 })
 ```
 
@@ -88,7 +88,7 @@ client.connect({
 ```typescript
 client.connect({
   agent: true,
-  url: 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/mcp',
+  url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
   sessionId: 'stream06-1921-4f09-af63-51de410e9e09'
 })
 ```
@@ -99,7 +99,7 @@ client.connect({
 client.connect({
   agent: true,
   type: 'sse',
-  url: 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/sse',
+  url: 'https://agent.opentiny.design/api/v1/webmcp-trial/sse',
   sessionId: 'stream06-1921-4f09-af63-51de410e9e09'
 })
 ```
@@ -138,7 +138,7 @@ authProvider.saveClientInformation({
 client.connect({
   agent: true,
   authProvider,
-  url: 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/mcp',
+  url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
   sessionId: 'stream06-1921-4f09-af63-51de410e9e09'
 })
 ```
@@ -148,7 +148,7 @@ client.connect({
 ```typescript
 client.connect({
   agent: true,
-  url: 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/mcp',
+  url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
   sessionId: 'stream06-1921-4f09-af63-51de410e9e09',
   onError: (error) => {
     // 自定义错误处理逻辑

@@ -47,7 +47,7 @@ const client = new WebMcpClient()
 await client.connect(clientTransport)
 const { sessionId } = await client.connect({
   agent: true,
-  url: 'https://agent.opentiny.design/api/v1/mcp-proxy-trial/mcp',
+  url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
   sessionId: '5f8edea7-e3ae-4852-a334-1bb6b3a1cfa9'
 })
 ```
@@ -78,6 +78,7 @@ import '@opentiny/next-remoter/dist/style.css'
 ```
 
 这时你的 Web 应用右下角会出现一个图标，这就是遥控器的入口，你可以将鼠标悬浮到这个图标上，选择：
+
 - 弹出 AI 对话框，你的 Web 应用侧边会打开一个 AI 对话框
 - 弹出二维码，手机扫码之后会打开手机端的遥控器
 
@@ -85,19 +86,18 @@ import '@opentiny/next-remoter/dist/style.css'
 
 ## 浏览器直接引入
 
-你也可以直接通过浏览器 HTML 标签导入 NEXT SDK，这样就可以使用全局变量 `NextSdk` 了。
+你也可以直接通过浏览器 HTML 标签导入 NEXT SDK，这样就可以使用全局变量 `WebMCP` 了。
 
 ```html
 <html>
   <head>
-    <!-- 导入 MCP SDK -->
-    <script src="https://unpkg.com/@modelcontextptotocol/sdk"></script>
     <!-- 导入 NEXT SDK -->
-    <script src="https://unpkg.com/@opentiny/next-sdk"></script>
+    <script src="https://unpkg.com/@opentiny/next-sdk@0.1/dist/index.umd.js"></script>
   </head>
   <body>
     <script>
-      // NEXT SDK 使用示例代码
+      // SDK 使用方式如上
+      const { WebMcpClient, WebMcpServer } = WebMCP;
     </script>
   </body>
 </html>
