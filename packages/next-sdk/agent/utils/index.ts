@@ -1,8 +1,7 @@
 import {
   experimental_createMCPClient as createMCPClient,
   ToolSet,
-  experimental_MCPClientConfig as MCPClientConfig,
-  MCPTransport
+  experimental_MCPClientConfig as MCPClientConfig
 } from 'ai'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { McpServerConfig, MCPClient } from '../type'
@@ -16,17 +15,17 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
   }
   // 使用 Promise.all 并行处理所有 mcpServer 项
   const allMcpClients = await Promise.all(
-    mcpServers.map(async (item) => {
+    mcpServers.map(async (item: McpServerConfig) => {
       try {
         let transport: MCPClientConfig['transport']
         // FIXME
-        if (item.type==='streamableHttp') {
-           transport = new StreamableHTTPClientTransport(new URL(item.url))
+        if ('type' in item && item.type === 'streamableHttp') {
+          transport = new StreamableHTTPClientTransport(new URL(item.url))
         } else {
           transport = item as MCPClientConfig['transport'] // sse 或 自定义的 MCPTranport
         }
 
-        return createMCPClient({ transport: transport as MCPClientConfig['transport']})
+        return createMCPClient({ transport: transport as MCPClientConfig['transport'] })
       } catch (error) {
         console.error(`Failed to create MCP client`, item, error)
         return []
@@ -40,8 +39,6 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
 /** 合并所有的Mcp Tools */
 export const getMcpTools = async (mcpClients: MCPClient[]): Promise<ToolSet> => {
   const tools = await Promise.all(mcpClients.map((client) => client?.tools?.()))
-  
-  return tools.reduce((acc, curr) => {
-    return { ...acc, ...curr }
-  }, {})
+
+  return tools.reduce((acc, curr) => ({ ...acc, ...curr }), {})
 }

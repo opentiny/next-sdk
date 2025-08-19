@@ -1,7 +1,7 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { z, ZodObject, ZodLiteral, ZodType } from 'zod';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import { z, ZodObject, ZodLiteral, ZodType } from 'zod'
 import {
   ElicitRequestSchema,
   CallToolResultSchema,
@@ -12,7 +12,7 @@ import {
   ResourceUpdatedNotificationSchema,
   PromptListChangedNotificationSchema,
   ResourceListChangedNotificationSchema
-} from '@modelcontextprotocol/sdk/types.js';
+} from '@modelcontextprotocol/sdk/types.js'
 import {
   MessageChannelClientTransport,
   sseOptions,
@@ -21,7 +21,7 @@ import {
   createStreamProxy,
   createSseProxy,
   AuthClientProvider
-} from '@opentiny/next';
+} from '@opentiny/next'
 import type {
   Result,
   Request,
@@ -40,62 +40,66 @@ import type {
   ReadResourceRequest,
   ListResourcesRequest,
   ListResourceTemplatesRequest
-} from '@modelcontextprotocol/sdk/types.js';
-import type { ProxyOptions } from '@opentiny/next';
-import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
-import type { ClientOptions } from '@modelcontextprotocol/sdk/client/index.js';
-import type { SSEClientTransportOptions } from '@modelcontextprotocol/sdk/client/sse.js';
-import type { StreamableHTTPClientTransportOptions } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import type { RequestOptions, NotificationOptions, RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
+} from '@modelcontextprotocol/sdk/types.js'
+import type { ProxyOptions } from '@opentiny/next'
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
+import type { ClientOptions } from '@modelcontextprotocol/sdk/client/index.js'
+import type { SSEClientTransportOptions } from '@modelcontextprotocol/sdk/client/sse.js'
+import type { StreamableHTTPClientTransportOptions } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import type {
+  RequestOptions,
+  NotificationOptions,
+  RequestHandlerExtra
+} from '@modelcontextprotocol/sdk/shared/protocol.js'
 
 /**
  * Options for configuring the server transport.
  */
 export interface ClientConnectOptions {
-  url: string;
-  token?: string;
-  sessionId?: string;
-  authProvider?: AuthClientProvider;
-  type?: 'channel' | 'sse';
-  agent?: boolean;
-  onError?: (error: Error) => void;
-  onUnauthorized?: (connect: () => Promise<void>) => Promise<void>;
-  onReconnect?: () => Promise<void>;
+  url: string
+  token?: string
+  sessionId?: string
+  authProvider?: AuthClientProvider
+  type?: 'channel' | 'sse'
+  agent?: boolean
+  onError?: (error: Error) => void
+  onUnauthorized?: (connect: () => Promise<void>) => Promise<void>
+  onReconnect?: () => Promise<void>
 }
 
-type SendRequestT = Request;
-type SendNotificationT = Notification;
-type SendResultT = Result;
+type SendRequestT = Request
+type SendNotificationT = Notification
+type SendResultT = Result
 
 /**
  * An MCP client on top of a pluggable transport.
  * The client will automatically begin the initialization flow with the server when connect() is called.
  */
 export class WebMcpClient {
-  public readonly client: Client;
-  public transport: Transport | undefined;
+  public readonly client: Client
+  public transport: Transport | undefined
 
   constructor(clientInfo: Implementation, options?: ClientOptions) {
     const info: Implementation = {
       name: 'web-mcp-client',
       version: '1.0.0'
-    };
+    }
 
     const capabilities: ClientCapabilities = {
       roots: { listChanged: true },
       sampling: {},
       elicitation: {}
-    };
+    }
 
-    this.client = new Client(clientInfo || info, options || { capabilities });
+    this.client = new Client(clientInfo || info, options || { capabilities })
 
     this.client.onclose = () => {
-      this.onclose?.();
-    };
+      this.onclose?.()
+    }
 
     this.client.onerror = (error: Error) => {
-      this.onerror?.(error);
-    };
+      this.onerror?.(error)
+    }
   }
 
   /**
@@ -103,79 +107,81 @@ export class WebMcpClient {
    */
   async connect(options: Transport | ClientConnectOptions): Promise<{ transport: Transport; sessionId: string }> {
     if (typeof (options as Transport)['start'] === 'function') {
-      this.transport = options as Transport;
-      this.transport.onclose = undefined;
-      this.transport.onerror = undefined;
-      this.transport.onmessage = undefined;
-      await this.client.connect(this.transport);
-      return { transport: this.transport, sessionId: this.transport.sessionId as string };
+      this.transport = options as Transport
+      this.transport.onclose = undefined
+      this.transport.onerror = undefined
+      this.transport.onmessage = undefined
+      await this.client.connect(this.transport)
+      return { transport: this.transport, sessionId: this.transport.sessionId as string }
     }
 
-    const { url, token, sessionId, authProvider, type, agent, onError, onUnauthorized, onReconnect } = options as ClientConnectOptions;
+    const { url, token, sessionId, authProvider, type, agent, onError, onUnauthorized, onReconnect } =
+      options as ClientConnectOptions
 
     if (agent === true) {
-      const proxyOptions: ProxyOptions = { client: this.client, url, token, sessionId, authProvider };
+      const proxyOptions: ProxyOptions = { client: this.client, url, token, sessionId, authProvider }
 
-      let reconnect = false;
-      let response;
+      let reconnect = false
+      let response
 
       const connectProxy = async () => {
-        const { transport, sessionId } = type === 'sse' ? await createSseProxy(proxyOptions) : await createStreamProxy(proxyOptions);
+        const { transport, sessionId } =
+          type === 'sse' ? await createSseProxy(proxyOptions) : await createStreamProxy(proxyOptions)
 
         transport.onerror = async (error: Error) => {
-          onError?.(error);
+          onError?.(error)
 
           if (error.message === 'Unauthorized' && !reconnect) {
             if (typeof onUnauthorized === 'function') {
-              await onUnauthorized(connectProxy);
+              await onUnauthorized(connectProxy)
             } else {
-              reconnect = true;
-              await connectProxy();
-              reconnect = false;
-              await onReconnect?.();
+              reconnect = true
+              await connectProxy()
+              reconnect = false
+              await onReconnect?.()
             }
           }
-        };
+        }
 
-        response = { transport, sessionId };
-      };
+        response = { transport, sessionId }
+      }
 
-      await connectProxy();
-      return response as unknown as { transport: Transport; sessionId: string };
+      await connectProxy()
+      return response as unknown as { transport: Transport; sessionId: string }
     }
 
-    const endpoint = new URL(url);
-    let transport: Transport | undefined;
+    const endpoint = new URL(url)
+    let transport: Transport | undefined
 
     if (type === 'channel') {
-      transport = new MessageChannelClientTransport(url);
-      await this.client.connect(transport);
+      transport = new MessageChannelClientTransport(url)
+      await this.client.connect(transport)
     }
 
     if (type === 'sse') {
       if (authProvider) {
-        const createTransport = () => new SSEClientTransport(endpoint, { authProvider });
-        transport = await attemptConnection(this.client, authProvider.waitForOAuthCode, createTransport);
+        const createTransport = () => new SSEClientTransport(endpoint, { authProvider })
+        transport = await attemptConnection(this.client, authProvider.waitForOAuthCode, createTransport)
       } else {
-        const opts = sseOptions(token, sessionId) as SSEClientTransportOptions;
-        transport = new SSEClientTransport(endpoint, opts);
-        await this.client.connect(transport);
+        const opts = sseOptions(token, sessionId) as SSEClientTransportOptions
+        transport = new SSEClientTransport(endpoint, opts)
+        await this.client.connect(transport)
       }
     }
 
     if (typeof transport === 'undefined') {
       if (authProvider) {
-        const createTransport = () => new StreamableHTTPClientTransport(endpoint, { authProvider });
-        transport = await attemptConnection(this.client, authProvider.waitForOAuthCode, createTransport);
+        const createTransport = () => new StreamableHTTPClientTransport(endpoint, { authProvider })
+        transport = await attemptConnection(this.client, authProvider.waitForOAuthCode, createTransport)
       } else {
-        const opts = streamOptions(token, sessionId) as StreamableHTTPClientTransportOptions;
-        transport = new StreamableHTTPClientTransport(endpoint, opts);
-        await this.client.connect(transport);
+        const opts = streamOptions(token, sessionId) as StreamableHTTPClientTransportOptions
+        transport = new StreamableHTTPClientTransport(endpoint, opts)
+        await this.client.connect(transport)
       }
     }
 
-    this.transport = transport;
-    return { transport: this.transport, sessionId: this.transport.sessionId as string };
+    this.transport = transport
+    return { transport: this.transport, sessionId: this.transport.sessionId as string }
   }
 
   /**
@@ -183,132 +189,132 @@ export class WebMcpClient {
    *
    * This is invoked when close() is called as well.
    */
-  onclose?: () => void;
+  onclose?: () => void
 
   /**
    * Callback for when an error occurs.
    *
    * Note that errors are not necessarily fatal; they are used for reporting any kind of exceptional condition out of band.
    */
-  onerror?: (error: Error) => void;
+  onerror?: (error: Error) => void
 
   /**
    * Closes the connection.
    */
   async close(): Promise<void> {
-    await this.client.close();
+    await this.client.close()
   }
 
   /**
    * After initialization has completed, this will be populated with the server's reported capabilities.
    */
   getServerCapabilities(): ServerCapabilities | undefined {
-    return this.client.getServerCapabilities();
+    return this.client.getServerCapabilities()
   }
 
   /**
    * After initialization has completed, this will be populated with information about the server's name and version.
    */
   getServerVersion(): Implementation | undefined {
-    return this.client.getServerVersion();
+    return this.client.getServerVersion()
   }
 
   /**
    * After initialization has completed, this may be populated with information about the server's instructions.
    */
   getInstructions(): string | undefined {
-    return this.client.getInstructions();
+    return this.client.getInstructions()
   }
 
   /**
    * Sends a ping to the server to check if it is still connected.
    */
   async ping(options?: RequestOptions) {
-    return await this.client.ping(options);
+    return await this.client.ping(options)
   }
 
   /**
    * Sends a completion request to the server.
    */
   async complete(params: CompleteRequest['params'], options?: RequestOptions) {
-    return await this.client.complete(params, options);
+    return await this.client.complete(params, options)
   }
 
   /**
    * Sends a request for setting the logging level to the server.
    */
   async setLoggingLevel(level: LoggingLevel, options?: RequestOptions) {
-    return await this.client.setLoggingLevel(level, options);
+    return await this.client.setLoggingLevel(level, options)
   }
 
   /**
    * Gets the prompt with the given params from the server.
    */
   async getPrompt(params: GetPromptRequest['params'], options?: RequestOptions) {
-    return await this.client.getPrompt(params, options);
+    return await this.client.getPrompt(params, options)
   }
 
   /**
    * Lists all prompts available on the server.
    */
   async listPrompts(params?: ListPromptsRequest['params'], options?: RequestOptions) {
-    return await this.client.listPrompts(params, options);
+    return await this.client.listPrompts(params, options)
   }
 
   /**
    * Lists all resources available on the server.
    */
   async listResources(params?: ListResourcesRequest['params'], options?: RequestOptions) {
-    return await this.client.listResources(params, options);
+    return await this.client.listResources(params, options)
   }
 
   /**
    * Lists all resource templates available on the server.
    */
   async listResourceTemplates(params?: ListResourceTemplatesRequest['params'], options?: RequestOptions) {
-    return await this.client.listResourceTemplates(params, options);
+    return await this.client.listResourceTemplates(params, options)
   }
 
   /**
    * Reads the resource with the given params from the server.
    */
   async readResource(params: ReadResourceRequest['params'], options?: RequestOptions) {
-    return await this.client.readResource(params, options);
+    return await this.client.readResource(params, options)
   }
 
   /**
    * Subscribes to a resource on the server.
    */
   async subscribeResource(params: SubscribeRequest['params'], options?: RequestOptions) {
-    return await this.client.subscribeResource(params, options);
+    return await this.client.subscribeResource(params, options)
   }
 
   /**
    * Unsubscribes from a resource on the server.
    */
   async unsubscribeResource(params: UnsubscribeRequest['params'], options?: RequestOptions) {
-    return await this.client.unsubscribeResource(params, options);
+    return await this.client.unsubscribeResource(params, options)
   }
 
   /**
    * Calls a tool on the server with the given parameters.
    */
   async callTool(params: CallToolRequest['params'], options?: RequestOptions) {
-    return await this.client.callTool(params, CallToolResultSchema, options);
+    return await this.client.callTool(params, CallToolResultSchema, options)
   }
 
   /**
    * Lists all tools available on the server.
    */
   async listTools(params?: ListToolsRequest['params'], options?: RequestOptions) {
-    return await this.client.listTools(params, options);
+    return await this.client.listTools(params, options)
   }
 
   /**
    * Sends a notification for the roots list changed event to the server.
    */
   async sendRootsListChanged() {
-    return await this.client.sendRootsListChanged();
+    return await this.client.sendRootsListChanged()
   }
 
   /**
@@ -316,15 +322,19 @@ export class WebMcpClient {
    *
    * Do not use this method to emit notifications! Use notification() instead.
    */
-  request<T extends ZodType<object>>(request: SendRequestT, resultSchema: T, options?: RequestOptions): Promise<z.infer<T>> {
-    return this.client.request(request, resultSchema, options);
+  request<T extends ZodType<object>>(
+    request: SendRequestT,
+    resultSchema: T,
+    options?: RequestOptions
+  ): Promise<z.infer<T>> {
+    return this.client.request(request, resultSchema, options)
   }
 
   /**
    * Emits a notification, which is a one-way message that does not expect a response.
    */
   async notification(notification: SendNotificationT, options?: NotificationOptions): Promise<void> {
-    return await this.client.notification(notification, options);
+    return await this.client.notification(notification, options)
   }
 
   /**
@@ -334,20 +344,23 @@ export class WebMcpClient {
    */
   setRequestHandler<
     T extends ZodObject<{
-      method: ZodLiteral<string>;
+      method: ZodLiteral<string>
     }>
   >(
     requestSchema: T,
-    handler: (request: z.infer<T>, extra: RequestHandlerExtra<SendRequestT, SendNotificationT>) => SendResultT | Promise<SendResultT>
+    handler: (
+      request: z.infer<T>,
+      extra: RequestHandlerExtra<SendRequestT, SendNotificationT>
+    ) => SendResultT | Promise<SendResultT>
   ): void {
-    this.client.setRequestHandler(requestSchema, handler);
+    this.client.setRequestHandler(requestSchema, handler)
   }
 
   /**
    * Removes the request handler for the given method.
    */
   removeRequestHandler(method: string): void {
-    this.client.removeRequestHandler(method);
+    this.client.removeRequestHandler(method)
   }
 
   /**
@@ -357,17 +370,17 @@ export class WebMcpClient {
    */
   setNotificationHandler<
     T extends ZodObject<{
-      method: ZodLiteral<string>;
+      method: ZodLiteral<string>
     }>
   >(notificationSchema: T, handler: (notification: z.infer<T>) => void | Promise<void>): void {
-    this.client.setNotificationHandler(notificationSchema, handler);
+    this.client.setNotificationHandler(notificationSchema, handler)
   }
 
   /**
    * Removes the notification handler for the given method.
    */
   removeNotificationHandler(method: string): void {
-    this.client.removeNotificationHandler(method);
+    this.client.removeNotificationHandler(method)
   }
 
   /**
@@ -379,7 +392,7 @@ export class WebMcpClient {
       extra: RequestHandlerExtra<SendRequestT, SendNotificationT>
     ) => SendResultT | Promise<SendResultT>
   ): void {
-    this.client.setRequestHandler(ElicitRequestSchema, handler);
+    this.client.setRequestHandler(ElicitRequestSchema, handler)
   }
 
   /**
@@ -391,7 +404,7 @@ export class WebMcpClient {
       extra: RequestHandlerExtra<SendRequestT, SendNotificationT>
     ) => SendResultT | Promise<SendResultT>
   ): void {
-    this.client.setRequestHandler(CreateMessageRequestSchema, handler);
+    this.client.setRequestHandler(CreateMessageRequestSchema, handler)
   }
 
   /**
@@ -403,42 +416,52 @@ export class WebMcpClient {
       extra: RequestHandlerExtra<SendRequestT, SendNotificationT>
     ) => SendResultT | Promise<SendResultT>
   ): void {
-    this.client.setRequestHandler(ListRootsRequestSchema, handler);
+    this.client.setRequestHandler(ListRootsRequestSchema, handler)
   }
 
   /**
    * Registers a handler for the tool list changed notification.
    */
-  onToolListChanged(handler: (notification: z.infer<typeof ToolListChangedNotificationSchema>) => void | Promise<void>): void {
-    this.client.setNotificationHandler(ToolListChangedNotificationSchema, handler);
+  onToolListChanged(
+    handler: (notification: z.infer<typeof ToolListChangedNotificationSchema>) => void | Promise<void>
+  ): void {
+    this.client.setNotificationHandler(ToolListChangedNotificationSchema, handler)
   }
 
   /**
    * Registers a handler for the prompt list changed notification.
    */
-  onPromptListChanged(handler: (notification: z.infer<typeof PromptListChangedNotificationSchema>) => void | Promise<void>): void {
-    this.client.setNotificationHandler(PromptListChangedNotificationSchema, handler);
+  onPromptListChanged(
+    handler: (notification: z.infer<typeof PromptListChangedNotificationSchema>) => void | Promise<void>
+  ): void {
+    this.client.setNotificationHandler(PromptListChangedNotificationSchema, handler)
   }
 
   /**
    * Registers a handler for the resource list changed notification.
    */
-  onResourceListChanged(handler: (notification: z.infer<typeof ResourceListChangedNotificationSchema>) => void | Promise<void>): void {
-    this.client.setNotificationHandler(ResourceListChangedNotificationSchema, handler);
+  onResourceListChanged(
+    handler: (notification: z.infer<typeof ResourceListChangedNotificationSchema>) => void | Promise<void>
+  ): void {
+    this.client.setNotificationHandler(ResourceListChangedNotificationSchema, handler)
   }
 
   /**
    * Registers a handler for the resource updated notification.
    */
-  onResourceUpdated(handler: (notification: z.infer<typeof ResourceUpdatedNotificationSchema>) => void | Promise<void>): void {
-    this.client.setNotificationHandler(ResourceUpdatedNotificationSchema, handler);
+  onResourceUpdated(
+    handler: (notification: z.infer<typeof ResourceUpdatedNotificationSchema>) => void | Promise<void>
+  ): void {
+    this.client.setNotificationHandler(ResourceUpdatedNotificationSchema, handler)
   }
 
   /**
    * Registers a handler for the logging message notification.
    */
-  onLoggingMessage(handler: (notification: z.infer<typeof LoggingMessageNotificationSchema>) => void | Promise<void>): void {
-    this.client.setNotificationHandler(LoggingMessageNotificationSchema, handler);
+  onLoggingMessage(
+    handler: (notification: z.infer<typeof LoggingMessageNotificationSchema>) => void | Promise<void>
+  ): void {
+    this.client.setNotificationHandler(LoggingMessageNotificationSchema, handler)
   }
 
   /**
@@ -446,13 +469,13 @@ export class WebMcpClient {
    */
   async onPagehide(event: PageTransitionEvent) {
     if (event.persisted) {
-      return;
+      return
     }
 
     if (isStreamableHTTPClientTransport(this.transport)) {
-      await this.transport.terminateSession();
+      await this.transport.terminateSession()
     } else if (this.transport && typeof this.transport['close'] === 'function') {
-      await this.transport.close();
+      await this.transport.close()
     }
   }
 }
@@ -460,38 +483,40 @@ export class WebMcpClient {
 /**
  * Creates a new SSEClientTransport instance.
  */
-export const createSSEClientTransport = (url: URL, opts?: SSEClientTransportOptions) => new SSEClientTransport(url, opts);
+export const createSSEClientTransport = (url: URL, opts?: SSEClientTransportOptions) =>
+  new SSEClientTransport(url, opts)
 
 /**
  * Creates a new StreamableHTTPClientTransport instance.
  */
 export const createStreamableHTTPClientTransport = (url: URL, opts?: StreamableHTTPClientTransportOptions) =>
-  new StreamableHTTPClientTransport(url, opts);
+  new StreamableHTTPClientTransport(url, opts)
 
 /**
  * Creates a new MessageChannelClientTransport instance.
  */
 export const createMessageChannelClientTransport = (endpoint: string, globalObject?: object) =>
-  new MessageChannelClientTransport(endpoint, globalObject);
+  new MessageChannelClientTransport(endpoint, globalObject)
 
 /**
  * Checks if the transport is a SSEClientTransport.
  */
-export const isSSEClientTransport = (transport: unknown): transport is SSEClientTransport => transport instanceof SSEClientTransport;
+export const isSSEClientTransport = (transport: unknown): transport is SSEClientTransport =>
+  transport instanceof SSEClientTransport
 
 /**
  * Checks if the transport is a StreamableHTTPClientTransport.
  */
 export const isStreamableHTTPClientTransport = (transport: unknown): transport is StreamableHTTPClientTransport =>
-  transport instanceof StreamableHTTPClientTransport;
+  transport instanceof StreamableHTTPClientTransport
 
 /**
  * Checks if the transport is a MessageChannelClientTransport.
  */
 export const isMessageChannelClientTransport = (transport: unknown): transport is MessageChannelClientTransport =>
-  transport instanceof MessageChannelClientTransport;
+  transport instanceof MessageChannelClientTransport
 
 /**
  * Checks if the client is an instance of MCP Client.
  */
-export const isMcpClient = (client: unknown): client is Client => client instanceof Client;
+export const isMcpClient = (client: unknown): client is Client => client instanceof Client

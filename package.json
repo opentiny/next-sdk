@@ -8,7 +8,7 @@
     "dev": "pnpm -F doc-ai dev",
     "wiki": "pnpm -F next-wiki docs:dev",
     "inspector": "npx @modelcontextprotocol/inspector",
-    "build": "pnpm -F @opentiny/next-sdk build",
+    "build": "pnpm -F @opentiny/next-sdk build:all",
     "build:remoter": "pnpm -F @opentiny/next-remoter build",
     "build:site": "pnpm -F @opentiny/next-remoter build:site",
     "dev:remoter": "pnpm -F @opentiny/next-remoter dev",

@@ -1,12 +1,13 @@
 import { streamText, stepCountIs, generateText } from 'ai'
-import type { MCPTransport, ToolSet } from 'ai'
+import type { ToolSet } from 'ai'
 import { getMcpClients, getMcpTools } from './utils'
 import type { IAgentModelProviderOption, McpServerConfig } from './type'
 import { AIProviderFactories } from './utils/aiProviderFactories'
 import { ProviderV2 } from '@ai-sdk/provider'
+import { OpenAIProvider } from '@ai-sdk/openai'
 
 export class AgentModelProvider {
-  llm: ProviderV2
+  llm: ProviderV2 | OpenAIProvider
   mcpServers: McpServerConfig[]
   isGetMcpClients = false
   mcpClients: any[] = []
@@ -19,7 +20,8 @@ export class AgentModelProvider {
     if (llm) {
       this.llm = llm
     } else if (llmConfig) {
-      let providerFn: (options: any) => ProviderV2
+      let providerFn: (options: any) => ProviderV2 | OpenAIProvider
+
       if (typeof llmConfig.providerType === 'string') {
         providerFn = AIProviderFactories[llmConfig.providerType]
       } else {
@@ -82,7 +84,5 @@ export class AgentModelProvider {
       stopWhen: stepCountIs(maxSteps),
       ...options
     })
-
-  
   }
 }
