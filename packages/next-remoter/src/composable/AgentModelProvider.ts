@@ -6,7 +6,7 @@ import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive } from 'vue'
 import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
-import { AgentModelProvider, AIProviderType } from '@opentiny/next-sdk'
+import { AgentModelProvider } from '@opentiny/next-sdk'
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
   if (part.type == 'tool-input-start') {
@@ -45,7 +45,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
       llmConfig: {
         apiKey: 'sk-trial',
         baseURL: 'https://agent.opentiny.design/api/v1/ai',
-        providerType: AIProviderType.DEEPSEEK
+        providerType: 'deepseek'
       },
       mcpServer: [
         {
