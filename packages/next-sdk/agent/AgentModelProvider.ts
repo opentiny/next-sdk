@@ -7,7 +7,7 @@ import { ProviderV2 } from '@ai-sdk/provider'
 
 export class AgentModelProvider {
   llm: ProviderV2
-  mcpServers: Array<McpServerConfig | MCPTransport>
+  mcpServers: McpServerConfig[]
   isGetMcpClients = false
   mcpClients: any[] = []
 
@@ -42,6 +42,12 @@ export class AgentModelProvider {
     }
   }
 
+  async initClients() {
+    if (!this.isGetMcpClients) {
+      this.mcpClients = await getMcpClients(this.mcpServers)
+      this.isGetMcpClients = true
+    }
+  }
   async chat({
     model,
     maxSteps = 5,
@@ -51,9 +57,14 @@ export class AgentModelProvider {
       throw new Error('LLM is not initialized')
     }
 
+    // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
+    await this.initClients();
+    const tools = await getMcpTools(this.mcpClients)
+
     const { text } = await generateText({
       // @ts-ignore  ProviderV2 是所有llm的父类， 在每一个具体的llm 类都有一个选择model的函数用法
       model: this.llm(model),
+      tools: tools as ToolSet,
       stopWhen: stepCountIs(maxSteps),
       ...options
     })
@@ -70,6 +81,7 @@ export class AgentModelProvider {
     }
 
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
+    await this.initClients();
     const tools = await getMcpTools(this.mcpClients)
 
     const result = streamText({
