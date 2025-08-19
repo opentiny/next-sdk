@@ -607,6 +607,44 @@ const tools = await client.listTools();
 console.log('Available tools:', tools);
 ```
 
+## tools()
+
+用来对接 AI SDK 返回一个工具集对象, 对接后可以让 AI SDK 调用 MCP 服务。
+
+### 类型
+
+```typescript
+async tools(params?: ListToolsRequest['params'], options?: RequestOptions)
+```
+
+### 参数
+
+- `params?: ListToolsRequest['params']:` 列表参数
+- `options?: RequestOptions`: 请求选项
+
+### 返回值
+
+- `Promise<ToolSet>`: 工具集对象
+
+### 示例
+
+```typescript
+import { openai } from '@ai-sdk/openai';
+import { streamText } from 'ai';
+
+const tools = await client.tools();
+
+const result = await streamText({
+  model: openai('gpt-4.1'),
+  tools,
+  prompt: 'What is the weather in Brooklyn, New York?',
+  onFinish: async () => {
+    await client.close();
+  },
+});
+
+```
+
 ## sendRootsListChanged()
 
 向服务器发送根列表已更改的通知。

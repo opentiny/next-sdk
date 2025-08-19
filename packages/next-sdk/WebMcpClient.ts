@@ -315,11 +315,11 @@ export class WebMcpClient {
    * Returns a set of AI SDK tools from the MCP server
    * @returns A record of tool names to their implementations
    */
-  async tools(): Promise<ToolSet> {
+  async tools(params?: ListToolsRequest['params'], options?: RequestOptions): Promise<ToolSet> {
     const tools: Record<string, Tool> = {}
 
     try {
-      const listToolsResult = await this.listTools()
+      const listToolsResult = await this.listTools(params, options)
 
       for (const { name, description, inputSchema } of listToolsResult.tools) {
         const execute = async (args: any, options: ToolCallOptions): Promise<any> => {
