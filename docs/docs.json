@@ -1,0 +1,85 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "OpenTiny NEXT SDK",
+  "colors": {
+    "primary": "#191919",
+    "light": "#b3b3b3",
+    "dark": "#191919"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "使用文档",
+        "groups": [
+          {
+            "group": "介绍",
+            "pages": [
+              "guide//index",
+              "guide/why"
+            ]
+          },
+          {
+            "group": "指引",
+            "pages": [
+              "guide/connect-web-agent",
+              "guide/mcp-host",
+              "guide/electron",
+              "guide/uni-app",
+              "guide/connect-local"
+            ]
+          },
+          {
+            "group": "API",
+            "pages": [
+              "guide/api-client",
+              "guide/api-server",
+              "guide/api-tools"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "资源",
+        "groups": [
+          {
+            "group": "API documentation",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": []
+    }
+  },
+  "logo": {
+    "light": "/assets/images/logo/light.svg",
+    "dark": "/assets/images/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+    ]
+  },
+  "contextual": {
+    "options": [
+     "copy",
+     "view",
+     "chatgpt",
+     "claude",
+     "perplexity",
+     "mcp",
+     "cursor",
+     "vscode"
+   ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
+    }
+  }
+}
