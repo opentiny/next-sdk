@@ -53,14 +53,13 @@ export class AgentModelProvider {
     await this.initClients();
     const tools = await getMcpTools(this.mcpClients)
 
-    const { text } = await generateText({
+    return generateText({
       // @ts-ignore  ProviderV2 是所有llm的父类， 在每一个具体的llm 类都有一个选择model的函数用法
       model: this.llm(model),
       tools: tools as ToolSet,
       stopWhen: stepCountIs(maxSteps),
       ...options
     })
-    return text
   }
 
   async chatStream({
@@ -76,7 +75,7 @@ export class AgentModelProvider {
     await this.initClients();
     const tools = await getMcpTools(this.mcpClients)
 
-    const result = streamText({
+    return streamText({
       // @ts-ignore 同上
       model: this.llm(model),
       tools: tools as ToolSet,
@@ -84,6 +83,6 @@ export class AgentModelProvider {
       ...options
     })
 
-    return result
+  
   }
 }
