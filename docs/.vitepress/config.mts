@@ -36,6 +36,7 @@ export default defineConfig({
           items: [
             { text: 'WebMcpClient 类', link: '/guide/api-client' },
             { text: 'WebMcpServer 类', link: '/guide/api-server' },
+            { text: 'AgentModelProvider 类', link: '/guide/api-agentModelProvider' },
             { text: '工具函数', link: '/guide/api-tools' },
           ]
         }
