@@ -10,7 +10,7 @@ import { McpServerConfig, MCPClient } from '../type'
 /** 创建 McpClients, 其中 mcpServers 允许为配置为 McpServerConfig, 或者任意的 MCPTransport
  * 参考: https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#initializing-an-mcp-client
  */
-export const getMcpClients = async (mcpServers: Array<McpServerConfig | MCPTransport>) => {
+export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
   if (!mcpServers || mcpServers?.length === 0) {
     return []
   }
@@ -18,15 +18,15 @@ export const getMcpClients = async (mcpServers: Array<McpServerConfig | MCPTrans
   const allMcpClients = await Promise.all(
     mcpServers.map(async (item) => {
       try {
-        let transport: MCPTransport
+        let transport: MCPClientConfig['transport']
         // FIXME
-        if (item.type === 'streamableHttp') {
-          transport = new StreamableHTTPClientTransport(new URL(item.url))
+        if (item.type==='streamableHttp') {
+           transport = new StreamableHTTPClientTransport(new URL(item.url))
         } else {
-          transport = item as MCPTransport
+          transport = item as MCPClientConfig['transport'] // sse 或 自定义的 MCPTranport
         }
 
-        return createMCPClient({ transport: transport as MCPClientConfig['transport'] })
+        return createMCPClient({ transport: transport as MCPClientConfig['transport']})
       } catch (error) {
         console.error(`Failed to create MCP client`, item, error)
         return []

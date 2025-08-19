@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/markdown-it":"^14.1.2",
     "@opentiny/tiny-vue-mcp": "^0.0.3",
     "@opentiny/next-sdk": "workspace:*",
     "@opentiny/vue": "^3.24.0",

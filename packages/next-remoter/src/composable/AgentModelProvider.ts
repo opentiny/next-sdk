@@ -17,7 +17,7 @@ const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, i
     })
     lastToolCall.items.push(infoItem)
     if (isFirstToolCall) {
-      handler.onMessage(lastToolCall)
+      handler.onMessage && handler.onMessage(lastToolCall)
     }
   }
 
@@ -47,7 +47,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
         baseURL: 'https://agent.opentiny.design/api/v1/ai',
         providerType: 'deepseek'
       },
-      mcpServer: [
+      mcpServers: [
         {
           type: 'streamableHttp',
           url: `${AGENT_ROOT}mcp?sessionId=${globalConversation.sessionId}`
@@ -56,7 +56,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
     })
   }
 
-  /** 同步请示不需要实现 */
+  /** 同步请求不需要实现 */
   chat(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
     throw new Error('Method not implemented.')
   }
