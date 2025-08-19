@@ -32,14 +32,6 @@ export class AgentModelProvider {
     } else {
       throw new Error('Either llmConfig or llm must be provided')
     }
-
-    // 3、初始化 mcpClients
-    if (!this.isGetMcpClients) {
-      getMcpClients(this.mcpServers).then((clients) => {
-        this.mcpClients = clients
-        this.isGetMcpClients = true
-      })
-    }
   }
 
   async initClients() {
