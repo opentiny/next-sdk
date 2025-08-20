@@ -30,6 +30,9 @@ import { globalConversation } from './composable/utils'
 import { showTinyRobot } from './composable/utils'
 import TinyRobotChat from './components/tiny-robot-chat.vue'
 
+defineOptions({
+  name:"TinyRemoter"
+})
 const props = defineProps({
   sessionId: {
     type: String,
