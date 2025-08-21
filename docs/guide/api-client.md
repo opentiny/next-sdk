@@ -629,19 +629,28 @@ async tools(params?: ListToolsRequest['params'], options?: RequestOptions)
 ### 示例
 
 ```typescript
-import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { AgentModelProvider } from '@opentiny/next-sdk';
+
+const webAgent = new AgentModelProvider({
+  llmConfig: {
+    apiKey: 'sk-xxx',
+    baseURL: 'https://xxxxx',
+    providerType: 'deepseek'
+  }
+})
+
 
 const tools = await client.tools();
 
-const result = await streamText({
-  model: openai('gpt-4.1'),
-  tools,
-  prompt: 'What is the weather in Brooklyn, New York?',
-  onFinish: async () => {
-    await client.close();
-  },
-});
+const generateTextResult = webAgent.chat({
+    model: 'deepseek-ai/DeepSeek-V3',
+    messages:[
+        {{ role: 'system', content: '你是xxx' }},
+        {{ role: 'user', content: '1+1 等于多少？' }},
+    ],
+    tools,
+    // .......
+})
 
 ```
 

@@ -323,7 +323,6 @@ export class WebMcpClient {
 
       for (const { name, description, inputSchema } of listToolsResult.tools) {
         const execute = async (args: any, options: ToolCallOptions): Promise<any> => {
-          options?.abortSignal?.throwIfAborted()
           return this.callTool({ name, arguments: args }, { signal: options?.abortSignal })
         }
 
