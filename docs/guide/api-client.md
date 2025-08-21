@@ -645,8 +645,8 @@ const tools = await client.tools();
 const generateTextResult = webAgent.chat({
     model: 'deepseek-ai/DeepSeek-V3',
     messages:[
-        {{ role: 'system', content: '你是xxx' }},
-        {{ role: 'user', content: '1+1 等于多少？' }},
+        { role: 'system', content: '你是xxx' },
+        { role: 'user', content: '1+1 等于多少？' },
     ],
     tools,
     // .......

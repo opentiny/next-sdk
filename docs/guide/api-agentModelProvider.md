@@ -3,6 +3,7 @@
 ```typescript
 import { AgentModelProvider } from '@opentiny/next-sdk'
 ```
+
 本文统一使用 `llm` 术语，来指代所有的在线大语言模式或本地部署的大语言模型。
 
 `AgentModelProvider 类`是对 `ai-sdk Provider` 一个简单封装，通过它可以直接跟 `llm` 进行对话，以及 Mcp 工具的调用,达到简化代码的目的。当然你也可以直接使用 `ai-sdk` 进行 `llm`的访问。
@@ -62,7 +63,7 @@ const webAgent = new AgentModelProvider({
 })
 ```
 
-在 `llmConfig.providerType` 中，指定了 `ai-sdk Provider`的函数类型，它内置了常用的`openai`与 `deepseek` 两种类型。 如果需要连接其它的 `llm` 模型，传入自定义的 `Provider ` 函数。
+在 `llmConfig.providerType` 中，指定了 `ai-sdk Provider`的函数类型，它内置了常用的`openai`与 `deepseek` 两种类型。 如果需要连接其它的 `llm` 模型，传入自定义的 `Provider` 函数。
 
 ```typescript
 import { createAnthropic } from '@ai-sdk/anthropic'
@@ -118,8 +119,8 @@ const webAgent = new AgentModelProvider({
 const generateTextResult = webAgent.chat({
     model: 'deepseek-ai/DeepSeek-V3',
     messages:[
-        {{ role: 'system', content: '你是xxx' }},
-        {{ role: 'user', content: '1+1 等于多少？' }},
+        { role: 'system', content: '你是xxx' },
+        { role: 'user', content: '1+1 等于多少？' },
     ],
     // .......
 })
@@ -127,8 +128,8 @@ const generateTextResult = webAgent.chat({
 const streamTextResult = webAgent.chatStream({
     model: 'deepseek-ai/DeepSeek-V3',
     messages:[
-        {{ role: 'system', content: '你是xxx' }},
-        {{ role: 'user', content: '1+1 等于多少？' }},
+        { role: 'system', content: '你是xxx' },
+        { role: 'user', content: '1+1 等于多少？' },
     ],
     // .......
 })
