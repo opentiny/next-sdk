@@ -1,6 +1,6 @@
 {
   "name": "@opentiny/next-sdk",
-  "version": "0.1.1",
+  "version": "0.1.1-alpha.1",
   "type": "module",
   "license": "MIT",
   "author": "Chunhui Mo",
@@ -19,13 +19,15 @@
     "@ai-sdk/openai": "^2.0.0",
     "@ai-sdk/deepseek": "^1.0.7",
     "@ai-sdk/provider": "^2.0.0",
+    "qrcode": "^1.5.4",
     "zod": "^3.23.8",
     "ajv": "^8.17.1",
     "ai": "^5.0.9"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "@types/qrcode": "^1.5.5"
   },
   "publishConfig": {
     "access": "public",

@@ -2,11 +2,8 @@ import { createQrCode } from './createQrCode'
 
 // 配置选项接口
 interface FloatingBlockOptions {
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
-  size?: number
-  theme?: 'light' | 'dark'
   qrCodeUrl?: string
-  onShowAIChat?: (show: boolean) => void
+  onShowAIChat?: () => void
   sessionId?: string
 }
 
@@ -14,19 +11,13 @@ interface FloatingBlockOptions {
 type ActionType = 'qr-code' | 'ai-chat' | 'remote-control'
 
 class FloatingBlock {
-  private options: Required<FloatingBlockOptions>
+  private options: FloatingBlockOptions
   private isExpanded: boolean
   private floatingBlock!: HTMLDivElement
   private dropdownMenu!: HTMLDivElement
-  private showAIChatModal: boolean = false
 
   constructor(options: FloatingBlockOptions = {}) {
-    this.options = {
-      position: 'bottom-right', // 位置：bottom-right, bottom-left, top-right, top-left
-      size: 60, // 浮动块大小
-      theme: 'light', // 主题：light, dark
-      ...options
-    }
+    this.options = options
 
     this.isExpanded = false
     this.init()
@@ -92,7 +83,7 @@ class FloatingBlock {
             <path d="M9 18H15V20H9V18Z" fill="currentColor"/>
           </svg>
         </div>
-        <span>发送指令到遥控器</span>
+        <span>发送遥控指令</span>
       </div>
     `
 
@@ -171,13 +162,13 @@ class FloatingBlock {
     const base64 = await qrCode.toDataURL()
     // 创建二维码弹窗
     const modal = this.createModal(
-      '扫码打开智能遥控器',
+      '扫码前往智能遥控器',
       `
       <div style="text-align: center; padding: 20px;">
         <div style="width: 200px; height: 200px; background: #f0f0f0; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
           <img src="${base64}" alt="二维码" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
-        <p style="color: #666; margin: 0;">扫描二维码获取更多信息</p>
+        <p style="color: #666; margin: 0;">请使用手机微信或者浏览器扫描二维码跳转到智能遥控器</p>
       </div>
     `
     )
@@ -185,8 +176,7 @@ class FloatingBlock {
   }
 
   private showAIChat(): void {
-    this.showAIChatModal = !this.showAIChatModal
-    this.options.onShowAIChat?.(this.showAIChatModal)
+    this.options.onShowAIChat?.()
   }
 
   private showRemoteControl(): void {
@@ -196,7 +186,7 @@ class FloatingBlock {
       `
       <div style="padding: 20px;">
         <div style="display: flex; gap: 10px;">
-          <input type="text" placeholder="输入用户名..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+          <input type="text" placeholder="输入用户名" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
           <button style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">发送</button>
         </div>
       </div>
@@ -266,7 +256,7 @@ class FloatingBlock {
         justify-content: center;
         color: white;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
+        z-index: 99;
         overflow: hidden;
       }
 

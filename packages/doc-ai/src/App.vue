@@ -4,17 +4,17 @@
     <div class="main-content">
       <router-view />
     </div>
-    <!-- <tiny-remoter :sessionId="SSEION_ID">
+    <tiny-remoter :sessionId="SSEION_ID">
       <template #chat v-if="isAntDesignX">
         <ant-design-x></ant-design-x>
       </template>
-    </tiny-remoter> -->
+    </tiny-remoter>
   </div>
 </template>
 
 <script setup lang="ts">
-// import { TinyRemoter } from '@opentiny/next-remoter'
-// import antDesignX from './components/ant-design-x.vue'
+import { TinyRemoter } from '@opentiny/next-remoter'
+import antDesignX from './components/ant-design-x.vue'
 import { WebMcpClient, createMessageChannelPairTransport } from '@opentiny/next-sdk'
 import type { Transport } from '@opentiny/next-sdk'
 import { AGENT_ROOT, SSEION_ID } from './const'
