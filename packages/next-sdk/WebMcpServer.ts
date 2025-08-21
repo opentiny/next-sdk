@@ -88,6 +88,10 @@ export class WebMcpServer {
     this.server.server.onerror = (error: Error) => {
       this.onerror?.(error)
     }
+
+    this.server.server.setRequestHandler(SetLevelRequestSchema, async () => {
+      return {}
+    })
   }
 
   /**
