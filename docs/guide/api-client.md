@@ -609,7 +609,7 @@ console.log('Available tools:', tools);
 
 ## tools()
 
-用来对接 `AgentModelProvider` 返回一个工具集对象, 对接后可以让 `AgentModelProvider` 实例直接调用 MCP 服务。
+用来对接 `AgentModelProvider` 返回一个工具集对象, 对接后可以让 `AgentModelProvider` 实例直接调用 MCP 工具。
 
 ### 类型
 
