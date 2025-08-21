@@ -40,7 +40,7 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
 export const getMcpTools = async (mcpClients: MCPClient[], options: Record<string, any>): Promise<ToolSet> => {
   const tools = await Promise.all(mcpClients.map((client) => client?.tools?.()))
   const toolsResult = tools.reduce((acc, curr) => ({ ...acc, ...curr }), {})
-  const toolsOptions = options.tools || {}
+  const toolsOptions = options?.tools ?? {}
 
   return {
     ...toolsResult,
