@@ -607,6 +607,53 @@ const tools = await client.listTools();
 console.log('Available tools:', tools);
 ```
 
+## tools()
+
+用来对接 `AgentModelProvider` 返回一个工具集对象, 对接后可以让 `AgentModelProvider` 实例直接调用 MCP 工具。
+
+### 类型
+
+```typescript
+async tools(params?: ListToolsRequest['params'], options?: RequestOptions)
+```
+
+### 参数
+
+- `params?: ListToolsRequest['params']:` 列表参数
+- `options?: RequestOptions`: 请求选项
+
+### 返回值
+
+- `Promise<ToolSet>`: 工具集对象
+
+### 示例
+
+```typescript
+import { AgentModelProvider } from '@opentiny/next-sdk';
+
+const webAgent = new AgentModelProvider({
+  llmConfig: {
+    apiKey: 'sk-xxx',
+    baseURL: 'https://xxxxx',
+    providerType: 'deepseek'
+  }
+})
+
+
+const tools = await client.tools();
+
+const generateTextResult = webAgent.chat({
+    model: 'deepseek-ai/DeepSeek-V3',
+    messages:[
+        { role: 'system', content: '你是xxx' },
+        { role: 'user', content: '1+1 等于多少？' },
+    ],
+    tools,
+    // .......
+})
+
+```
+
 ## sendRootsListChanged()
 
 向服务器发送根列表已更改的通知。
