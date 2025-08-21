@@ -137,4 +137,4 @@ const streamTextResult = webAgent.chatStream({
 ```
 
 > [!TIP]
-> 以上2个函数的入参以及返回结果， 都是与 `ai-sdk` 全部兼容的，请参考 [ai-sdk core 文档](https://ai-sdk.dev/docs/ai-sdk-core) 了解详细的情况。
+> 以上2个函数的入参以及返回结果， 都是与 `ai-sdk` 的 `generateText` 和 `streamText` 全部兼容的，请参考 [ai-sdk core 文档](https://ai-sdk.dev/docs/ai-sdk-core) 了解详细的情况。
