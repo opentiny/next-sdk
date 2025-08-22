@@ -10,7 +10,7 @@
           </template>
         </tr-welcome>
         <tr-prompts
-          :items="promptItems"
+          :items="props.promptItems"
           :wrap="true"
           item-class="prompt-item"
           class="tiny-prompts"
@@ -22,7 +22,7 @@
 
     <template #footer>
       <div class="chat-input">
-        <TrSuggestionPills :items="suggestionPillItems" @item-click="handleSuggestionPillItemClick" /><br />
+        <TrSuggestionPills :items="props.suggestionPillItems" @item-click="handleSuggestionPillItemClick" /><br />
         <tr-sender
           ref="senderRef"
           mode="single"
@@ -53,18 +53,28 @@ import {
   TrSuggestionPills,
   TrBubbleProvider,
   BubbleMarkdownMessageRenderer,
-  BubbleChainMessageRenderer
+  BubbleChainMessageRenderer,
+  type PromptProps,
+  type SuggestionPillItem
 } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import { showTinyRobot } from '../composable/utils'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
-import { computed, nextTick, watch, defineProps, ref } from 'vue'
+import { computed, nextTick, watch, defineProps, ref, PropType } from 'vue'
 
 const props = defineProps({
   isFullscreen: {
     type: Boolean,
     default: false
+  },
+  promptItems: {
+    type: Array as PropType<PromptProps[]>,
+    default: () => []
+  },
+  suggestionPillItems: {
+    type: Array as PropType<SuggestionPillItem[]>,
+    default: () => []
   }
 })
 
@@ -83,7 +93,6 @@ const messageRenderers = {
 
 const {
   welcomeIcon,
-  promptItems,
   messages,
   messageState,
   inputMessage,
@@ -95,7 +104,6 @@ const {
   clearTemplate,
   handleSendMessage,
   handleMessageKeydown,
-  suggestionPillItems,
   handleSuggestionPillItemClick
 } = useTinyRobot()
 

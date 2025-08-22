@@ -2,23 +2,26 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "OpenTiny NEXT SDK",
-  description: "OpenTiny NEXT SDK",
+  title: 'OpenTiny NEXT SDK',
+  description: 'OpenTiny NEXT SDK',
   base: '/next-sdk/',
+  vite: {
+    server: {
+      port: 3000
+    }
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: 'logo.png',
-    nav: [
-      { text: '指引', link: '/guide/', activeMatch: '/guide/' },
-    ],
+    nav: [{ text: '指引', link: '/guide/', activeMatch: '/guide/' }],
 
     sidebar: {
       '/guide/': [
-          {
-            text: '介绍',
-            items: [
-              { text: '开始', link: '/guide/' },
-              { text: '为什么选 NEXT SDK', link: '/guide/why' }
+        {
+          text: '介绍',
+          items: [
+            { text: '开始', link: '/guide/' },
+            { text: '为什么选 NEXT SDK', link: '/guide/why' }
           ]
         },
         {
@@ -38,14 +41,13 @@ export default defineConfig({
             { text: 'WebMcpClient 类', link: '/guide/api-client' },
             { text: 'WebMcpServer 类', link: '/guide/api-server' },
             { text: 'AgentModelProvider 类', link: '/guide/api-agentModelProvider' },
-            { text: '工具函数', link: '/guide/api-tools' },
+            { text: 'createRemoter 函数', link: '/guide/api-createRemoter' },
+            { text: '工具函数', link: '/guide/api-tools' }
           ]
         }
-      ],
+      ]
     },
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/opentiny/next-sdk' }
-    ]
+    socialLinks: [{ icon: 'github', link: 'https://github.com/opentiny/next-sdk' }]
   }
 })
