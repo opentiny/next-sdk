@@ -22,7 +22,7 @@ const props = defineProps({
     default: () => [
       {
         label: '智能操作网页',
-        description: '帮我选中最贵的手机商品',
+        description: '帮我在商品列表中选中最贵的手机商品',
         icon: h('span', { style: { fontSize: '18px' } }, '🕹')
       }
     ]

@@ -7,6 +7,7 @@ import { reactive } from 'vue'
 import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
 import { AgentModelProvider } from '@opentiny/next-sdk'
+import { createOllama } from 'ollama-ai-provider-v2'
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
   if (part.type == 'tool-input-start') {
@@ -43,9 +44,9 @@ export class CustomAgentModelProvider extends BaseModelProvider {
     super(config)
     this.agent = new AgentModelProvider({
       llmConfig: {
-        apiKey: 'sk-trial',
-        baseURL: 'https://agent.opentiny.design/api/v1/ai',
-        providerType: 'deepseek'
+        baseURL: 'http://localhost:11434/api',
+        providerType: createOllama,
+        isReActModel: true
       },
       mcpServers: [
         {
@@ -75,7 +76,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
 
     const result = await this.agent.chatStream({
       messages: request.messages,
-      model: 'deepseek-ai/DeepSeek-V3',
+      model: 'deepseek-r1:1.5b',
       abortSignal: request.options?.signal
     })
 

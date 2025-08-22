@@ -23,6 +23,7 @@
     "@opentiny/tiny-robot-kit": "0.3.0-alpha.3",
     "@opentiny/tiny-robot-svgs": "0.3.0-alpha.3",
     "@modelcontextprotocol/sdk": "^1.16.0",
+    "ollama-ai-provider-v2": "^1.1.2",
     "@opentiny/vue": "^3.25.0",
     "vue": "^3.3.11"
   },

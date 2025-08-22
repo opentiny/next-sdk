@@ -5,17 +5,19 @@ import type { IAgentModelProviderOption, McpServerConfig } from './type'
 import { AIProviderFactories } from './utils/aiProviderFactories'
 import { ProviderV2 } from '@ai-sdk/provider'
 import { OpenAIProvider } from '@ai-sdk/openai'
+import { getSystemPromptMessages } from './react'
 
 export class AgentModelProvider {
   llm: ProviderV2 | OpenAIProvider
   mcpServers: McpServerConfig[]
   isGetMcpClients = false
   mcpClients: any[] = []
+  isReActModel: boolean
 
   constructor({ llmConfig, mcpServers, llm }: IAgentModelProviderOption) {
     // 1、保存 mcpServer
     this.mcpServers = mcpServers || []
-
+    this.isReActModel = llmConfig?.isReActModel || false
     // 2、保存 llm
     if (llm) {
       this.llm = llm
@@ -42,6 +44,7 @@ export class AgentModelProvider {
       this.isGetMcpClients = true
     }
   }
+
   async chat({
     model,
     maxSteps = 5,
@@ -75,12 +78,15 @@ export class AgentModelProvider {
 
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
     await this.initClients()
-    const tools = await getMcpTools(this.mcpClients, options)
+    const tools = this.mcpClients[0]?.listTools?.()
+    const systemPrompt = await getSystemPromptMessages(tools)
+    debugger
 
     return streamText({
       // @ts-ignore 同上
       model: this.llm(model),
-      tools: tools as ToolSet,
+      system: systemPrompt,
+      tools: this.isReActModel ? undefined : (tools as ToolSet),
       stopWhen: stepCountIs(maxSteps),
       ...options
     })
