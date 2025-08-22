@@ -17,7 +17,10 @@ class FloatingBlock {
   private dropdownMenu!: HTMLDivElement
 
   constructor(options: FloatingBlockOptions = {}) {
-    this.options = options
+    this.options = {
+      qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
+      ...options
+    }
 
     this.isExpanded = false
     this.init()

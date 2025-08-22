@@ -39,7 +39,6 @@ watch(
     if (newVal) {
       globalConversation.sessionId = newVal
       createRemoter({
-        qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
         sessionId: props.sessionId,
         onShowAIChat: () => {
           showTinyRobot.value = true
