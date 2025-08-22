@@ -1,9 +1,13 @@
 import { QrCode } from './QrCode'
 
-// 配置选项接口
+/**  配置选项接口 */
 interface FloatingBlockOptions {
-  qrCodeUrl?: string
+  /** 弹出 AI 对话框的回调函数 */
   onShowAIChat?: () => void
+
+  /** 遥控端页面地址，默认为： https://ai.opentiny.design/next-remoter */
+  qrCodeUrl?: string
+  /** 被遥控页面的 sessionId, 必填 */
   sessionId: string
 }
 
@@ -12,7 +16,7 @@ type ActionType = 'qr-code' | 'ai-chat' | 'remote-control'
 
 class FloatingBlock {
   private options: FloatingBlockOptions
-  private isExpanded: boolean
+  private isExpanded = false
   private floatingBlock!: HTMLDivElement
   private dropdownMenu!: HTMLDivElement
 
@@ -22,11 +26,10 @@ class FloatingBlock {
     }
 
     this.options = {
-      qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
+      qrCodeUrl: options.qrCodeUrl || 'https://ai.opentiny.design/next-remoter',
       ...options
     }
 
-    this.isExpanded = false
     this.init()
   }
 
@@ -37,8 +40,8 @@ class FloatingBlock {
     this.addStyles()
   }
 
+  // 创建主浮动块
   private createFloatingBlock(): void {
-    // 创建主浮动块
     this.floatingBlock = document.createElement('div')
     this.floatingBlock.className = 'tiny-remoter-floating-block'
     this.floatingBlock.innerHTML = `
@@ -50,8 +53,8 @@ class FloatingBlock {
     document.body.appendChild(this.floatingBlock)
   }
 
+  // 创建下拉菜单
   private createDropdownMenu(): void {
-    // 创建下拉菜单
     this.dropdownMenu = document.createElement('div')
     this.dropdownMenu.className = 'tiny-remoter-floating-dropdown'
     this.dropdownMenu.innerHTML = `
@@ -164,10 +167,10 @@ class FloatingBlock {
     this.closeDropdown()
   }
 
+  // 创建二维码弹窗
   private async showQRCode(): Promise<void> {
-    const qrCode = new QrCode(this.options.qrCodeUrl + '?sessionId=' + this.options.sessionId)
+    const qrCode = new QrCode(this.options.qrCodeUrl + '?sessionId=' + this.options.sessionId, {})
     const base64 = await qrCode.toDataURL()
-    // 创建二维码弹窗
     const modal = this.createModal(
       '扫码前往智能遥控器',
       `
@@ -182,12 +185,13 @@ class FloatingBlock {
     this.showModal(modal)
   }
 
+  // 创建AI对话弹窗--- 暂时调 “用户函数”
   private showAIChat(): void {
     this.options.onShowAIChat?.()
   }
 
+  // 创建遥控指令弹窗
   private showRemoteControl(): void {
-    // 创建遥控器弹窗
     const modal = this.createModal(
       '输入需要发送的用户名',
       `
@@ -243,8 +247,8 @@ class FloatingBlock {
     }, 100)
   }
 
+  // 创建样式表
   private addStyles(): void {
-    // 创建样式表
     const style = document.createElement('style')
     style.textContent = `
       /* 浮动块样式 */
@@ -474,7 +478,7 @@ class FloatingBlock {
     document.head.appendChild(style)
   }
 
-  // 销毁组件
+  // TODO 销毁组件, 缺少删除样式表
   public destroy(): void {
     if (this.floatingBlock.parentNode) {
       this.floatingBlock.parentNode.removeChild(this.floatingBlock)
@@ -486,6 +490,6 @@ class FloatingBlock {
 }
 
 // 导出组件
-export const createRemoter = (options: FloatingBlockOptions = {}) => {
+export const createRemoter = (options = {} as FloatingBlockOptions) => {
   return new FloatingBlock(options)
 }
