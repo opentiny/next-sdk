@@ -42,7 +42,6 @@ export const useTinyRobot = () => {
     }
   }
 
-  // TODO: 以后用参数传入这些默认的模板
   function handleSuggestionPillItemClick(item: SuggestionItem) {
     if (item.id === '1') {
       let templateText = `请对 [目标组件] ,执行 [操作]`
