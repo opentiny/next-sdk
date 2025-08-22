@@ -1,4 +1,4 @@
-import { createQrCode } from './createQrCode'
+import { QrCode } from './QrCode'
 
 // 配置选项接口
 interface FloatingBlockOptions {
@@ -165,7 +165,7 @@ class FloatingBlock {
   }
 
   private async showQRCode(): Promise<void> {
-    const qrCode = createQrCode(this.options.qrCodeUrl + '?sessionId=' + this.options.sessionId)
+    const qrCode = new QrCode(this.options.qrCodeUrl + '?sessionId=' + this.options.sessionId)
     const base64 = await qrCode.toDataURL()
     // 创建二维码弹窗
     const modal = this.createModal(

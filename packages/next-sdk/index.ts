@@ -18,3 +18,4 @@ export type * from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 export type * from '@modelcontextprotocol/sdk/server/mcp.js'
 export { AgentModelProvider } from './agent/AgentModelProvider'
 export { createRemoter } from './remoter/createRemoter'
+export {QrCode, type QrCodeOption} from "./remoter/QrCode"
