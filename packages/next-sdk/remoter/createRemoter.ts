@@ -4,7 +4,7 @@ import { createQrCode } from './createQrCode'
 interface FloatingBlockOptions {
   qrCodeUrl?: string
   onShowAIChat?: () => void
-  sessionId?: string
+  sessionId: string
 }
 
 // 动作类型
@@ -16,7 +16,11 @@ class FloatingBlock {
   private floatingBlock!: HTMLDivElement
   private dropdownMenu!: HTMLDivElement
 
-  constructor(options: FloatingBlockOptions = {}) {
+  constructor(options: FloatingBlockOptions) {
+    if (!options.sessionId) {
+      throw new Error('sessionId is required')
+    }
+
     this.options = {
       qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
       ...options
