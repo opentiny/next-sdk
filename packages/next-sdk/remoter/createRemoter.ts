@@ -478,7 +478,7 @@ class FloatingBlock {
     document.head.appendChild(style)
   }
 
-  // TODO 销毁组件, 缺少删除样式表
+  // 销毁组件
   public destroy(): void {
     if (this.floatingBlock.parentNode) {
       this.floatingBlock.parentNode.removeChild(this.floatingBlock)

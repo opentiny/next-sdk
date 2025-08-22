@@ -14,6 +14,8 @@ showTinyRobot.value = true
 const query = new URLSearchParams(window.location.search)
 
 globalConversation.sessionId = query.get('sessionId') as string
+
+// TODO:   接收更多的 query
 </script>
 
 <style scoped lang="less">
