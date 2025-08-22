@@ -1,13 +1,13 @@
 import QRCodePck from 'qrcode'
 
 /** QrCode 类的配置信息 */
-export type QrCodeOption= ConstructorParameters<typeof QrCode>[1]
+export type QrCodeOption = ConstructorParameters<typeof QrCode>[1]
 
 /**
  * 二维码工具类,根据传入的value,生成相应的二维码，并输出到 <canvas> 或  <img>上。
  * @example
  * const qr= new QrCode('https://www.baidu.com', { size: 100 })
- * 
+ *
  * qr.toCanvas(canvasDom)
  * qr.toImage(imgDom)
  */
@@ -52,5 +52,3 @@ export class QrCode {
     img.src = await this.toDataURL()
   }
 }
-
- 
