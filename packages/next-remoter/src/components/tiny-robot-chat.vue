@@ -81,11 +81,20 @@ const messageRenderers = {
   }
 }
 
-const { welcomeIcon, messages, messageState, inputMessage, abortRequest, roles, senderRef, handleSendMessage } =
-  useTinyRobot({
-    sessionId: props.sessionId,
-    agentRoot: props.agentRoot
-  })
+const {
+  welcomeIcon,
+  messages,
+  messageState,
+  inputMessage,
+  abortRequest,
+  roles,
+  senderRef,
+  sendMessage,
+  handleSendMessage
+} = useTinyRobot({
+  sessionId: props.sessionId,
+  agentRoot: props.agentRoot
+})
 
 const displayedMessages = computed(() => {
   if (messageState.status === STATUS.PROCESSING) {
@@ -117,6 +126,10 @@ const scrollToBottom = () => {
 // 最新消息滚动到底部
 watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 
+defineSlots<{
+  welcome(): any
+  suggestions(): any
+}>()
 // 暴露一些重要方法，方便用户写插槽时，可以使用
 defineExpose({
   /** 欢迎图标 */
@@ -134,7 +147,7 @@ defineExpose({
   /** 取消发送 */
   abortRequest,
   /** 发送消息 */
-  handleSendMessage
+  sendMessage
 })
 </script>
 

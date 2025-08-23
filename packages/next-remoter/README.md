@@ -56,7 +56,7 @@ createRemoter({
 // v-model:show  双向绑定是否显示，内部关闭是emit('update:show',false)
 // sessionId     必须传
 // title         左上角的 container.title
-// suggestions   输入框上面的提示文字
+// agentRoot     后端代理的地址，有默认值
 
 // remoterRef实例需要：
 // expose({  sendMessage, abortRequest,  messages,  messageState,senderRef})

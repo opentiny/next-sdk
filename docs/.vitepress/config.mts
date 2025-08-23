@@ -36,7 +36,7 @@ export default defineConfig({
           ]
         },
         {
-          text: 'API',
+          text: 'NEXT SDK API',
           items: [
             { text: 'WebMcpClient 类', link: '/guide/api-client' },
             { text: 'WebMcpServer 类', link: '/guide/api-server' },
@@ -44,6 +44,10 @@ export default defineConfig({
             { text: 'createRemoter 函数', link: '/guide/api-createRemoter' },
             { text: '工具函数', link: '/guide/api-tools' }
           ]
+        },
+        {
+          text: 'TinyRemoter for Vue',
+          items: [{ text: 'TinyRobot版本', link: '/remoter-ui/tiny-robot-remoter' }]
         }
       ]
     },
