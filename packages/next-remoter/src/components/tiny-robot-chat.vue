@@ -1,28 +1,20 @@
 <template>
-  <!-- mcp-robot弹窗 -->
-
-  <tr-container v-model:show="showTinyRobot" v-model:fullscreen="fullscreenValue">
+  <tr-container v-model:show="show" v-model:fullscreen="fullscreen">
+    <template #title>
+      <h3 class="tr-container__title">{{ title }}</h3>
+    </template>
     <tr-bubble-provider :message-renderers="messageRenderers">
-      <div style="flex: 1" v-if="showMessages.length === 0">
-        <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon">
-          <template #footer>
-            <div class="welcome-footer"></div>
-          </template>
-        </tr-welcome>
-        <tr-prompts
-          :items="props.promptItems"
-          :wrap="true"
-          item-class="prompt-item"
-          class="tiny-prompts"
-          @item-click="handlePromptItemClick"
-        ></tr-prompts>
-      </div>
-      <tr-bubble-list style="flex: 1" v-else :items="showMessages" :roles="roles" auto-scroll> </tr-bubble-list>
+      <slot name="welcome" v-if="displayedMessages.length === 0">
+        <div style="flex: 1">
+          <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon"> </tr-welcome>
+        </div>
+      </slot>
+      <tr-bubble-list v-else style="flex: 1" :items="displayedMessages" :roles="roles" auto-scroll> </tr-bubble-list>
     </tr-bubble-provider>
 
     <template #footer>
       <div class="chat-input">
-        <TrSuggestionPills :items="props.suggestionPillItems" @item-click="handleSuggestionPillItemClick" /><br />
+        <slot name="suggestions"> </slot>
         <tr-sender
           ref="senderRef"
           mode="single"
@@ -32,11 +24,8 @@
           :loading="GeneratingStatus.includes(messageState.status)"
           :showWordLimit="true"
           :maxLength="1000"
-          :template="currentTemplate"
           @submit="handleSendMessage"
           @cancel="abortRequest"
-          @keydown="handleMessageKeydown($event)"
-          @reset-template="clearTemplate"
         ></tr-sender>
       </div>
     </template>
@@ -47,67 +36,58 @@
 import {
   TrBubbleList,
   TrContainer,
-  TrPrompts,
   TrSender,
   TrWelcome,
-  TrSuggestionPills,
   TrBubbleProvider,
   BubbleMarkdownMessageRenderer,
-  BubbleChainMessageRenderer,
-  type PromptProps,
-  type SuggestionPillItem
+  BubbleChainMessageRenderer
 } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { useTinyRobot } from '../composable/useTinyRobot'
-import { showTinyRobot } from '../composable/utils'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
-import { computed, nextTick, watch, defineProps, ref, PropType } from 'vue'
+import { computed, nextTick, watch } from 'vue'
+
+defineOptions({
+  name: 'TinyRemoter'
+})
 
 const props = defineProps({
-  isFullscreen: {
-    type: Boolean,
-    default: false
+  /** 必传的会话id */
+  sessionId: {
+    type: String,
+    required: true
   },
-  promptItems: {
-    type: Array as PropType<PromptProps[]>,
-    default: () => []
+  agentRoot: {
+    type: String,
+    default: 'https://agent.opentiny.design/api/v1/webmcp-trial/'
   },
-  suggestionPillItems: {
-    type: Array as PropType<SuggestionPillItem[]>,
-    default: () => []
+  /** 左上角的标题 */
+  title: {
+    type: String,
+    default: 'OpenTiny NEXT'
   }
 })
 
-const fullscreenValue = ref(false)
+const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
+const show = defineModel('show', { type: Boolean, default: false })
 
-const mdRenderer = new BubbleMarkdownMessageRenderer()
 const messageRenderers = {
   markdown: ReactiveMarkdown,
   chain: {
     component: BubbleChainMessageRenderer,
     defaultProps: {
-      contentRenderer: (content: string) => mdRenderer.md.render(content)
+      contentRenderer: (content: string) => new BubbleMarkdownMessageRenderer().md.render(content)
     }
   }
 }
 
-const {
-  welcomeIcon,
-  messages,
-  messageState,
-  inputMessage,
-  abortRequest,
-  roles,
-  handlePromptItemClick,
-  senderRef,
-  currentTemplate,
-  clearTemplate,
-  handleSendMessage,
-  handleMessageKeydown,
-  handleSuggestionPillItemClick
-} = useTinyRobot()
+const { welcomeIcon, messages, messageState, inputMessage, abortRequest, roles, senderRef, handleSendMessage } =
+  useTinyRobot({
+    sessionId: props.sessionId,
+    agentRoot: props.agentRoot
+  })
 
-const showMessages = computed(() => {
+const displayedMessages = computed(() => {
   if (messageState.status === STATUS.PROCESSING) {
     return [
       ...messages.value,
@@ -137,69 +117,31 @@ const scrollToBottom = () => {
 // 最新消息滚动到底部
 watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 
-watch(
-  () => props.isFullscreen,
-  (value) => {
-    fullscreenValue.value = value
-  },
-  { immediate: true }
-)
+// 暴露一些重要方法，方便用户写插槽时，可以使用
+defineExpose({
+  /** 欢迎图标 */
+  welcomeIcon,
+  /** 对话消息 */
+  messages,
+  /** 对话消息状态 */
+  messageState,
+  /** 对话卡片的角色配置 */
+  roles,
+  /** 输入框的文本 */
+  inputMessage,
+  /** 输入框组件的实例 */
+  senderRef,
+  /** 取消发送 */
+  abortRequest,
+  /** 发送消息 */
+  handleSendMessage
+})
 </script>
 
 <style scoped lang="less">
+/** 避免输入框没有外边距 */
 .chat-input {
   margin-top: 8px;
   padding: 10px 15px;
-}
-
-.tr-container {
-  container-type: inline-size;
-
-  :deep(.tr-welcome__title-wrapper) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-.welcome-footer {
-  margin-top: 12px;
-  color: rgb(128, 128, 128);
-  font-size: 12px;
-  line-height: 20px;
-}
-
-.tiny-prompts {
-  padding: 16px 24px;
-
-  :deep(.prompt-item) {
-    width: 100%;
-    box-sizing: border-box;
-
-    @container (width >=64rem) {
-      width: calc(50% - 8px);
-    }
-
-    .tr-prompt__content-label {
-      font-size: 14px;
-      line-height: 24px;
-    }
-  }
-}
-
-.tr-history-demo {
-  position: absolute;
-  right: 100%;
-  top: 100%;
-  z-index: 100;
-  width: 300px;
-  height: 600px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-}
-</style>
-
-<style>
-.tr-chain-item__body .tr-chain-item__content {
-  word-break: break-all;
 }
 </style>
