@@ -46,7 +46,7 @@ class FloatingBlock {
     this.floatingBlock.className = 'tiny-remoter-floating-block'
     this.floatingBlock.innerHTML = `
       <div class="tiny-remoter-floating-block__icon">
-        <img style="display: block; width: 40px;" src="https://ai.opentiny.design/next-sdk/logo.png" alt="icon" />
+        <img style="display: block; width: 40px;" src="https://ai.opentiny.design/next-remoter/svgs/logo-next-bg-blue-left.svg" alt="icon" />
       </div>
     `
 
@@ -258,9 +258,6 @@ class FloatingBlock {
         right: 30px;
         width: 60px;
         height: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 50%;
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -269,16 +266,16 @@ class FloatingBlock {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 99;
         overflow: hidden;
-      }
-
-      .tiny-remoter-floating-block:hover {
-        transform: scale(1.1);
-        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+        border-radius: 50%;
       }
 
       .tiny-remoter-floating-block__icon {
         transform: scale(0.8);
         transition: transform 0.3s ease;
+      }
+
+       .tiny-remoter-floating-block__icon:hover {
+        transform: scale(1.1);
       }
 
       .tiny-remoter-floating-block.expanded .tiny-remoter-floating-block__icon {

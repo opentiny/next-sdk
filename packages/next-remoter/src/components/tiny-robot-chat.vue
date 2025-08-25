@@ -3,6 +3,9 @@
     <template #title>
       <h3 class="tr-container__title">{{ title }}</h3>
     </template>
+    <template #operations>
+      <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="createConversation()" />
+    </template>
     <tr-bubble-provider :message-renderers="messageRenderers">
       <slot name="welcome" v-if="displayedMessages.length === 0">
         <div style="flex: 1">
@@ -55,12 +58,13 @@ import {
   TrBubbleProvider,
   TrPrompts,
   TrSuggestionPills,
+  TrIconButton,
   BubbleMarkdownMessageRenderer,
   BubbleChainMessageRenderer
 } from '@opentiny/tiny-robot'
 import { PromptProps, SuggestionPillItem } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
-import { IconEdit } from '@opentiny/tiny-robot-svgs'
+import { IconEdit, IconNewSession } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
 import { computed, nextTick, watch, h, CSSProperties, markRaw } from 'vue'
@@ -83,11 +87,15 @@ const props = defineProps({
   /** 左上角的标题 */
   title: {
     type: String,
-    default: 'OpenTiny NEXT'
+    default: ''
   },
   locale: {
     type: String,
     default: 'zh-CN'
+  },
+  isRemoter: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -103,7 +111,8 @@ const {
   roles,
   senderRef,
   sendMessage,
-  handleSendMessage
+  handleSendMessage,
+  createConversation
 } = useTinyRobot({
   sessionId: props.sessionId,
   agentRoot: props.agentRoot
@@ -191,7 +200,7 @@ const messageRenderers = {
 watch(
   () => props.sessionId,
   (value) => {
-    if (value) {
+    if (value && !props.isRemoter) {
       createRemoter({
         sessionId: value,
         onShowAIChat: () => {
@@ -305,10 +314,6 @@ defineExpose({
       line-height: 24px;
     }
   }
-}
-
-:deep(.tr-container__header-operations button.tr-icon-button:first-child) {
-  display: none;
 }
 
 .chat-input-pills {
