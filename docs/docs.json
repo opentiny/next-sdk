@@ -26,15 +26,24 @@
               "guide/mcp-host",
               "guide/electron",
               "guide/uni-app",
-              "guide/connect-local"
+              "guide/connect-local",
+              "guide/faq"
             ]
           },
           {
-            "group": "API",
+            "group": "NEXT SDK API",
             "pages": [
               "guide/api-client",
               "guide/api-server",
+              "guide/api-agentModelProvider",
+              "guide/api-createRemoter",
               "guide/api-tools"
+            ]
+          },
+          {
+            "group": "TinyRemoter for Vue",
+            "pages": [
+              "remoter-ui/tiny-robot-remoter"
             ]
           }
         ]
