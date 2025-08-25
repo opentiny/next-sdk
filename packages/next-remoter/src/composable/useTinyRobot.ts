@@ -3,7 +3,7 @@ import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, onMounted, ref } from 'vue'
 import { CustomAgentModelProvider } from './AgentModelProvider'
 import { BubbleMarkdownMessageRenderer, TrSender } from '@opentiny/tiny-robot'
-import logo from '../svgs/logo-next-bg-blue.svg'
+import logo from '../svgs/logo-next-bg-blue-right.svg'
 
 const mdRenderer = new BubbleMarkdownMessageRenderer()
 
