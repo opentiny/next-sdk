@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm -F doc-ai dev",
-    "wiki": "pnpm -F next-docs dev",
+    "wiki": "pnpm --filter ./docs run dev",
     "inspector": "npx @modelcontextprotocol/inspector",
     "build": "pnpm -F @opentiny/next-sdk build:all",
     "build:remoter": "pnpm -F @opentiny/next-remoter build",

@@ -1,6 +1,9 @@
-# Electron 应用接入
-
+---
+title: "Electron 应用接入"
+---
+<Info>
 以下是将 Electron 集成到普通前端项目的详细指南。
+</Info>
 
 ## 1. 项目准备
 
@@ -28,13 +31,13 @@ npm install --save-dev concurrently wait-on
 
 完整依赖列表：
 
-- `electron` - Electron 核心运行时
-- `vite-plugin-electron` - Vite 的 Electron 插件，用于简化 Electron 开发
-- `vite-plugin-electron-renderer` - Vite 的 Electron 渲染进程插件
-- `electron-builder` - Electron 应用打包工具
-- `@types/node` - Node.js 的 TypeScript 类型定义
-- `concurrently` - 允许同时运行多个命令
-- `wait-on` - 等待资源可用的工具，用于确保开发服务器启动后再启动 Electron
+* **electron** - Electron 核心运行时
+* **vite-plugin-electron** - Vite 的 Electron 插件，用于简化 Electron 开发
+* **vite-plugin-electron-renderer** - Vite 的 Electron 渲染进程插件
+* **electron-builder** - Electron 应用打包工具
+* **@types/node** - Node.js 的 TypeScript 类型定义
+* **concurrently** - 允许同时运行多个命令
+* **wait-on** - 等待资源可用的工具，用于确保开发服务器启动后再启动 Electron
 
 ## 3. 配置 package.json
 

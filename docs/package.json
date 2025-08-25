@@ -1,11 +1,12 @@
 {
   "name": "next-docs",
   "scripts": {
-    "dev": "vitepress dev",
+    "dev": "mint dev",
     "build": "vitepress build",
     "preview": "vitepress preview"
   },
   "devDependencies": {
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "mint": "^4.2.75"
   }
 }

@@ -1,4 +1,6 @@
-# WebMcpClient 类
+---
+title: "WebMcpClient 类"
+---
 
 ```typescript
 import { WebMcpClient } from '@opentiny/next-sdk'
@@ -15,10 +17,11 @@ constructor(clientInfo: Implementation, options?: ClientOptions)
 ```
 
 ### 参数
-
-- `clientInfo.name?: string`：Client 名称，默认 'mcp-client'
-- `clientInfo.version?: string`：Client 版本号，默认 '1.0.0'
-- `options.capabilities?`：Client 能力配置
+|       参数                   | 描述  | 默认值
+| --------------------------- | ------------- | -------
+| clientInfo.name?: string    | Client 名称   | mcp-client
+| clientInfo.version?: string | Client 版本号  | 1.0.0
+| options.capabilities?       | Client 能力配置 | {}
 
 ### 示例
 
@@ -47,18 +50,18 @@ async connect(options: Transport | ClientConnectOptions): Promise<{ transport: T
 ```
 
 ### 参数
-
-- `options`：options 可以直接传入一个 Transport，也可以传入一个对象
-- `options.url: string`：Agent 服务地址
-- `options.token?: string`：令牌
-- `options.sessionId?: string`：会话 ID
-- `options.authProvider?: AuthClientProvider`：OAuth 鉴权提供者
-- `options.type?: 'channel' | 'sse'`：
-- `options.agent?: boolean`：是否连接到 WebAgent
-- `options.onError?: (error: Error) => void`：连接错误的回调函数
-- `options.onUnauthorized?: () => Promise<void>`：未鉴权的回调函数，允许业务自定义未鉴权的逻辑
-- `options.onReconnect?: () => Promise<void>`：重连的回调函数，允许业务自定义重连逻辑
-
+| 参数                   | 描述  
+| ---------------------------  | -------------
+| options                   | options 可以直接传入一个 Transport，也可以传入一个对象
+| options.url: string      | Agent 服务地址
+| options.token?: string   | 令牌
+| options.sessionId?: string |  会话 ID
+| options.authProvider?: AuthClientProvider | OAuth 鉴权提供者
+| options.type?: 'channel' \| 'sse' | 连接类型
+| options.agent?: boolean | 是否连接到 WebAgent
+| options.onError?: (error: Error) => void | 连接错误的回调函数
+| options.onUnauthorized?: () => Promise | 未鉴权的回调函数，允许业务自定义未鉴权的逻辑
+| options.onReconnect?: () => Promise | 重连的回调函数，允许业务自定义重连逻辑
 ### 返回值
 
 - `transport: Transport`

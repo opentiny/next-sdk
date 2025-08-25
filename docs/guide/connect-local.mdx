@@ -1,8 +1,12 @@
-# 本地连接
+---
+title: "本地连接"
+---
 
+<Info>
 除了支持和远程 WebAgent 服务连接，NEXT SDK 还支持本地 iframe 方式连接。
+</Info>
 
-在受控端的 App.vue 文件中加入以下代码：
+在 App.vue 文件中加入以下代码：
 
 ```typescript
 import { onMounted } from 'vue'
@@ -24,19 +28,19 @@ onMounted(async () => {
   }, async (params) => {
     return { content: [{ type: 'text', text: `收到: ${params.foo}` }] }
   })
- 
+
+  await transport.listen()
   await server.connect(transport)
 })
 ```
 
-在遥控端（iframe 嵌套的页面）加入以下代码：
+在 iframe 嵌套的子页面中加入以下代码：
 
 ```typescript
 import { onMounted } from 'vue'
-import { WebMcpClient, createMessageChannelClientTransport } from '@opentiny/next-sdk'
+import { WebMcpClient } from '@opentiny/next-sdk'
 
 onMounted(async () => {
-  // 第二个参数需要与服务端保持相同的对象引用,默认为当前 window
   const transport = createMessageChannelClientTransport('endpoint', window.parent)
   const client = new WebMcpClient()
   await client.connect(transport)
