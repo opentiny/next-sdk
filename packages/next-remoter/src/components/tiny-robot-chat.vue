@@ -8,6 +8,13 @@
         <div style="flex: 1">
           <tr-welcome :title="lang[locale].title" :description="lang[locale].description" :icon="welcomeIcon">
           </tr-welcome>
+          <tr-prompts
+            :items="promptItems"
+            :wrap="true"
+            item-class="prompt-item"
+            class="tiny-prompts"
+            @item-click="handlePromptItemClick"
+          ></tr-prompts>
         </div>
       </slot>
       <tr-bubble-list v-else style="flex: 1" :items="displayedMessages" :roles="roles" auto-scroll> </tr-bubble-list>
@@ -15,7 +22,11 @@
 
     <template #footer>
       <div class="chat-input">
-        <slot name="suggestions"> </slot>
+        <slot name="suggestions">
+          <div class="chat-input-pills">
+            <tr-suggestion-pills class="pills" @item-click="handlePillItemClick" :items="pillItems" />
+          </div>
+        </slot>
         <tr-sender
           ref="senderRef"
           mode="single"
@@ -42,13 +53,17 @@ import {
   TrSender,
   TrWelcome,
   TrBubbleProvider,
+  TrPrompts,
+  TrSuggestionPills,
   BubbleMarkdownMessageRenderer,
   BubbleChainMessageRenderer
 } from '@opentiny/tiny-robot'
+import { PromptProps, SuggestionPillItem } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
+import { IconEdit } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
-import { computed, nextTick, watch } from 'vue'
+import { computed, nextTick, watch, h, CSSProperties, markRaw } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
 
 defineOptions({
@@ -79,31 +94,6 @@ const props = defineProps({
 const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
 const show = defineModel('show', { type: Boolean, default: false })
 
-const lang: Record<string, { title: string; description: string; placeholder: string; thinking: string }> = {
-  'zh-CN': {
-    title: '智能助手',
-    description: '您好，我是Opentiny Next AI智能助手',
-    placeholder: '请输入您的问题',
-    thinking: '正在思考中...'
-  },
-  'en-US': {
-    title: 'AI Assistant',
-    description: 'Hello, I am OpenTiny Next AI Assistant',
-    placeholder: 'Please enter your question',
-    thinking: 'Thinking...'
-  }
-}
-
-const messageRenderers = {
-  markdown: ReactiveMarkdown,
-  chain: {
-    component: BubbleChainMessageRenderer,
-    defaultProps: {
-      contentRenderer: (content: string) => new BubbleMarkdownMessageRenderer().md.render(content)
-    }
-  }
-}
-
 const {
   welcomeIcon,
   messages,
@@ -118,6 +108,80 @@ const {
   sessionId: props.sessionId,
   agentRoot: props.agentRoot
 })
+
+const lang: Record<string, { title: string; description: string; placeholder: string; thinking: string }> = {
+  'zh-CN': {
+    title: 'OpenTiny NEXT',
+    description: '我是你的私人智能助手',
+    placeholder: '请输入您的问题',
+    thinking: '正在思考中...'
+  },
+  'en-US': {
+    title: 'OpenTiny NEXT',
+    description: 'I am your private AI assistant',
+    placeholder: 'Please enter your question',
+    thinking: 'Thinking...'
+  }
+}
+
+const handlePromptItemClick = (ev: MouseEvent, item: PromptProps) => {
+  sendMessage(item.description)
+}
+
+const handlePillItemClick = (item: SuggestionPillItem) => {
+  sendMessage(item.text)
+}
+
+const promptItems: PromptProps[] = [
+  {
+    label: props.locale === 'zh-CN' ? '日常助理场景' : 'Daily Assistant',
+    description:
+      props.locale === 'zh-CN'
+        ? '今天需要我帮你安排日程，规划旅行，还是起草一封邮件？'
+        : 'What do you need help with today? Schedule, travel, or draft an email?',
+    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '🧠'),
+    badge: 'NEW'
+  },
+  {
+    label: props.locale === 'zh-CN' ? '学习/知识型场景' : 'Learning/Knowledge',
+    description:
+      props.locale === 'zh-CN'
+        ? '有什么想了解的吗？可以是“Vue3 和 React 的区别”！'
+        : 'What do you want to know? Can be "The difference between Vue3 and React"?',
+    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '🤔')
+  },
+  {
+    label: props.locale === 'zh-CN' ? '创意生成场景' : 'Creative Generation',
+    description:
+      props.locale === 'zh-CN'
+        ? '想写段文案、起个名字，还是来点灵感？'
+        : 'Want to write a copy, come up with a name, or get some inspiration?',
+    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '✨')
+  }
+]
+
+const pillItems: SuggestionPillItem[] = [
+  {
+    id: 'work',
+    text: props.locale === 'zh-CN' ? '工作助手' : 'Work Assistant',
+    icon: markRaw(IconEdit)
+  },
+  {
+    id: 'content',
+    text: props.locale === 'zh-CN' ? '内容创作' : 'Content Creation',
+    icon: markRaw(IconEdit)
+  }
+]
+
+const messageRenderers = {
+  markdown: ReactiveMarkdown,
+  chain: {
+    component: BubbleChainMessageRenderer,
+    defaultProps: {
+      contentRenderer: (content: string) => new BubbleMarkdownMessageRenderer().md.render(content)
+    }
+  }
+}
 
 watch(
   () => props.sessionId,
@@ -196,6 +260,54 @@ defineExpose({
 .chat-input {
   margin-top: 8px;
   padding: 10px 15px;
+}
+
+.tr-container {
+  container-type: inline-size;
+
+  :deep(.tr-welcome__title-wrapper) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .tr-welcome__title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+}
+
+.welcome-footer {
+  margin-top: 12px;
+  color: rgb(128, 128, 128);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.tiny-prompts {
+  padding: 16px 24px;
+
+  :deep(.prompt-item) {
+    width: 100%;
+    box-sizing: border-box;
+
+    @container (width >=64rem) {
+      width: calc(50% - 8px);
+    }
+
+    .tr-prompt__content-label {
+      font-size: 14px;
+      line-height: 24px;
+    }
+  }
+}
+
+:deep(.tr-container__header-operations button.tr-icon-button:first-child) {
+  display: none;
+}
+
+.chat-input-pills {
+  margin-bottom: 8px;
 }
 
 :deep(.tr-welcome__icon) {
