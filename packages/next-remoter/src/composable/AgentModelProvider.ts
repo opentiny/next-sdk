@@ -4,8 +4,6 @@ import type { StreamHandler } from '@opentiny/tiny-robot-kit'
 import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive } from 'vue'
-import { AGENT_ROOT } from '../const'
-import { globalConversation } from './utils'
 import { AgentModelProvider } from '@opentiny/next-sdk'
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
@@ -39,7 +37,7 @@ const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, i
 export class CustomAgentModelProvider extends BaseModelProvider {
   transport: any
   agent: AgentModelProvider
-  constructor(config: AIModelConfig) {
+  constructor(config: AIModelConfig, sessionId: string, agentRoot: string) {
     super(config)
     this.agent = new AgentModelProvider({
       llmConfig: {
@@ -50,7 +48,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
       mcpServers: [
         {
           type: 'streamableHttp',
-          url: `${AGENT_ROOT}mcp?sessionId=${globalConversation.sessionId}`
+          url: `${agentRoot}mcp?sessionId=${sessionId}`
         }
       ]
     })

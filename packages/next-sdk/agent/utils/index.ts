@@ -37,8 +37,13 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
 }
 
 /** 合并所有的Mcp Tools */
-export const getMcpTools = async (mcpClients: MCPClient[]): Promise<ToolSet> => {
+export const getMcpTools = async (mcpClients: MCPClient[], options: Record<string, any>): Promise<ToolSet> => {
   const tools = await Promise.all(mcpClients.map((client) => client?.tools?.()))
+  const toolsResult = tools.reduce((acc, curr) => ({ ...acc, ...curr }), {})
+  const toolsOptions = options?.tools ?? {}
 
-  return tools.reduce((acc, curr) => ({ ...acc, ...curr }), {})
+  return {
+    ...toolsResult,
+    ...toolsOptions
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "docs",
+  "name": "next-docs",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",

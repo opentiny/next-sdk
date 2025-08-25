@@ -19,6 +19,10 @@ export default defineConfig({
       resolvers: [TinyVueSingleResolver]
     })
   ],
+  server: {
+    port: 8087,
+    host: true
+  },
   build: {
     sourcemap: true,
     minify: false,

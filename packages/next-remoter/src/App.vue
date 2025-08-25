@@ -1,19 +1,40 @@
 <template>
   <div>
-    <tiny-robot-chat :is-fullscreen="true"></tiny-robot-chat>
+    <tiny-remoter
+      ref="robotRef"
+      v-model:show="show"
+      v-model:fullscreen="fullscreen"
+      title="OpenTiny 智能遥控器"
+      :session-id="sessionId"
+      :agentRoot="agentRoot"
+    >
+      <template #welcome>
+        <div style="flex: 1">
+          <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手"> </tr-welcome>
+        </div>
+      </template>
+    </tiny-remoter>
   </div>
 </template>
 
 <script setup lang="ts">
-import { globalConversation } from './composable/utils'
-import { showTinyRobot } from './composable/utils'
-import TinyRobotChat from './components/tiny-robot-chat.vue'
+import { ref } from 'vue'
+import { TrWelcome } from '@opentiny/tiny-robot'
+import { TinyRemoter } from './index'
 
-showTinyRobot.value = true
+const show = ref(true)
+const fullscreen = ref(true)
+const robotRef = ref<InstanceType<typeof TinyRemoter>>()
 
 const query = new URLSearchParams(window.location.search)
 
-globalConversation.sessionId = query.get('sessionId') as string
+const sessionId = query.get('sessionId')!
+if (!sessionId) {
+  alert('The URL lost sessionId')
+}
+
+// 组件内部的已经有默认值。 这里允许通过url 更换agent地址。
+const agentRoot = query.get('agentRoot') || 'https://agent.opentiny.design/api/v1/webmcp-trial/'
 </script>
 
 <style scoped lang="less">
