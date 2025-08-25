@@ -134,41 +134,46 @@ const handlePillItemClick = (item: SuggestionPillItem) => {
 
 const promptItems: PromptProps[] = [
   {
-    label: props.locale === 'zh-CN' ? '日常助理场景' : 'Daily Assistant',
+    label: props.locale === 'zh-CN' ? '企业办公助手' : 'Enterprise Office Assistant',
     description:
       props.locale === 'zh-CN'
-        ? '今天需要我帮你安排日程，规划旅行，还是起草一封邮件？'
-        : 'What do you need help with today? Schedule, travel, or draft an email?',
+        ? '需要我帮你处理邮件、安排会议、整理文档，还是优化工作流程？'
+        : 'Need help with emails, meeting scheduling, document organization, or workflow optimization?',
     icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '🧠'),
     badge: 'NEW'
   },
   {
-    label: props.locale === 'zh-CN' ? '学习/知识型场景' : 'Learning/Knowledge',
+    label: props.locale === 'zh-CN' ? '开发技术支持' : 'Development Support',
     description:
       props.locale === 'zh-CN'
-        ? '有什么想了解的吗？可以是“Vue3 和 React 的区别”！'
-        : 'What do you want to know? Can be "The difference between Vue3 and React"?',
-    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '🤔')
+        ? '遇到代码问题？需要架构建议？还是想了解最新的技术趋势？'
+        : 'Facing code issues? Need architecture advice? Or want to learn about latest tech trends?',
+    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '💻')
   },
   {
-    label: props.locale === 'zh-CN' ? '创意生成场景' : 'Creative Generation',
+    label: props.locale === 'zh-CN' ? '项目管理协作' : 'Project Management',
     description:
       props.locale === 'zh-CN'
-        ? '想写段文案、起个名字，还是来点灵感？'
-        : 'Want to write a copy, come up with a name, or get some inspiration?',
-    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '✨')
+        ? '需要项目规划、任务分配、进度跟踪，还是团队协作建议？'
+        : 'Need project planning, task assignment, progress tracking, or team collaboration advice?',
+    icon: h('span', { style: { fontSize: '18px' } as CSSProperties }, '📊')
   }
 ]
 
 const pillItems: SuggestionPillItem[] = [
   {
-    id: 'work',
-    text: props.locale === 'zh-CN' ? '工作助手' : 'Work Assistant',
+    id: 'office',
+    text: props.locale === 'zh-CN' ? '办公助手' : 'Office Assistant',
     icon: markRaw(IconEdit)
   },
   {
-    id: 'content',
-    text: props.locale === 'zh-CN' ? '内容创作' : 'Content Creation',
+    id: 'development',
+    text: props.locale === 'zh-CN' ? '开发支持' : 'Development Support',
+    icon: markRaw(IconEdit)
+  },
+  {
+    id: 'management',
+    text: props.locale === 'zh-CN' ? '项目管理' : 'Project Management',
     icon: markRaw(IconEdit)
   }
 ]
