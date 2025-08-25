@@ -49,6 +49,7 @@ import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { useTinyRobot } from '../composable/useTinyRobot'
 import ReactiveMarkdown from './ReactiveMarkdown.vue'
 import { computed, nextTick, watch } from 'vue'
+import { createRemoter } from '@opentiny/next-sdk'
 
 defineOptions({
   name: 'TinyRemoter'
@@ -117,6 +118,23 @@ const {
   sessionId: props.sessionId,
   agentRoot: props.agentRoot
 })
+
+watch(
+  () => props.sessionId,
+  (value) => {
+    if (value) {
+      createRemoter({
+        sessionId: value,
+        onShowAIChat: () => {
+          show.value = true
+        }
+      })
+    }
+  },
+  {
+    immediate: true
+  }
+)
 
 const displayedMessages = computed(() => {
   if (messageState.status === STATUS.PROCESSING) {
