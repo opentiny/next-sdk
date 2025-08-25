@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <!-- 导入 NEXT SDK -->
+    <script src="https://unpkg.com/@opentiny/next-sdk@0.1.1-alpha.2/dist/index.umd.js"></script>
+    <meta charset="UTF-8" />
+    <title>WebMCP 示例</title>
+    <script>
+      const { createMessageChannelPairTransport, WebMcpServer, WebMcpClient, ResourceTemplate, z } = WebMCP
+
+      async function connect() {
+        // Create pair MCP transports
+        const [serverTransport, clientTransport] = createMessageChannelPairTransport()
+        // Create an MCP server
+        const server = new WebMcpServer({ name: 'demo-server', version: '1.0.0' })
+
+        // Add an addition tool
+        server.registerTool(
+          'add',
+          {
+            title: 'Addition Tool',
+            description: 'Add two numbers',
+            inputSchema: { a: z.number(), b: z.number() }
+          },
+          async ({ a, b }) => ({
+            content: [{ type: 'text', text: String(a + b) }]
+          })
+        )
+
+        // Add a dynamic greeting resource
+        server.registerResource(
+          'greeting',
+          new ResourceTemplate('greeting://{name}', { list: undefined }),
+          {
+            title: 'Greeting Resource',
+            description: 'Dynamic greeting generator'
+          },
+          async (uri, { name }) => ({
+            contents: [{ uri: uri.href, text: `Hello, ${name}!` }]
+          })
+        )
+
+        // Add a code review prompt
+        server.registerPrompt(
+          'review',
+          {
+            title: 'Code Review',
+            description: 'Review code for best practices and potential issues',
+            argsSchema: { code: z.string() }
+          },
+          ({ code }) => ({
+            messages: [{ role: 'user', content: { type: 'text', text: `code: ${code}` } }]
+          })
+        )
+
+        // Create an MCP Client
+        const client = new WebMcpClient({ name: 'demo-client', version: '1.0.0' })
+
+        // Connect the client and server
+        await server.connect(serverTransport)
+        await client.connect(clientTransport)
+
+        // Client callTool, readResource, and getPrompt
+        console.log(await client.callTool({ name: 'add', arguments: { a: 5, b: 6 } }))
+        console.log(await client.readResource({ uri: 'greeting://John' }))
+        console.log(await client.getPrompt({ name: 'review', arguments: { code: 'x' } }))
+
+        // Connect to the Web Agent server
+        const { transport, sessionId } = await client.connect({
+          url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
+          agent: true
+        })
+
+        // Display the session ID
+        document.getElementById('sessionId').innerText = sessionId
+
+        window.addEventListener('pagehide', async () => {
+          await transport.terminateSession()
+        })
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="connect()">Connect Web Agent</button>
+    https://agent.opentiny.design/api/v1/webmcp-trial/mcp?sessionId=<span id="sessionId"></span>
+  </body>
+</html>
