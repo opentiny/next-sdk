@@ -4,14 +4,19 @@
       ref="robotRef"
       v-model:show="show"
       v-model:fullscreen="fullscreen"
-      title="OpenTiny 智能遥控器"
+      title="OpenTiny Next"
+      :locale="locale"
       :session-id="sessionId"
       :agentRoot="agentRoot"
     >
       <template #welcome>
         <div style="flex: 1">
-          <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手"> </tr-welcome>
+          <tr-welcome :title="lang[locale].title" :description="lang[locale].description" :icon="robotRef?.welcomeIcon">
+          </tr-welcome>
         </div>
+      </template>
+      <template #suggestions>
+        <tr-prompt-list :items="promptItems" />
       </template>
     </tiny-remoter>
   </div>
@@ -27,6 +32,25 @@ const fullscreen = ref(true)
 const robotRef = ref<InstanceType<typeof TinyRemoter>>()
 
 const query = new URLSearchParams(window.location.search)
+const locale = query.get('lang') || 'zh-CN'
+
+const lang: Record<string, { title: string; description: string }> = {
+  'zh-CN': {
+    title: '智能助手',
+    description: '您好，我是Opentiny Next AI智能助手'
+  },
+  'en-US': {
+    title: 'AI Assistant',
+    description: 'Hello, I am OpenTiny Next AI Assistant'
+  }
+}
+
+const promptItems = ref([
+  {
+    label: '智能助手',
+    value: '智能助手'
+  }
+])
 
 const sessionId = query.get('sessionId')!
 if (!sessionId) {

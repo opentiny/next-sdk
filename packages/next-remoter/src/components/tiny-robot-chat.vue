@@ -6,7 +6,8 @@
     <tr-bubble-provider :message-renderers="messageRenderers">
       <slot name="welcome" v-if="displayedMessages.length === 0">
         <div style="flex: 1">
-          <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手" :icon="welcomeIcon"> </tr-welcome>
+          <tr-welcome :title="lang[locale].title" :description="lang[locale].description" :icon="welcomeIcon">
+          </tr-welcome>
         </div>
       </slot>
       <tr-bubble-list v-else style="flex: 1" :items="displayedMessages" :roles="roles" auto-scroll> </tr-bubble-list>
@@ -19,7 +20,9 @@
           ref="senderRef"
           mode="single"
           v-model="inputMessage"
-          :placeholder="GeneratingStatus.includes(messageState.status) ? '正在思考中...' : '请输入您的问题'"
+          :placeholder="
+            GeneratingStatus.includes(messageState.status) ? lang[locale].thinking : lang[locale].placeholder
+          "
           :clearable="!!inputMessage"
           :loading="GeneratingStatus.includes(messageState.status)"
           :showWordLimit="true"
@@ -65,11 +68,30 @@ const props = defineProps({
   title: {
     type: String,
     default: 'OpenTiny NEXT'
+  },
+  locale: {
+    type: String,
+    default: 'zh-CN'
   }
 })
 
 const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
 const show = defineModel('show', { type: Boolean, default: false })
+
+const lang: Record<string, { title: string; description: string; placeholder: string; thinking: string }> = {
+  'zh-CN': {
+    title: '智能助手',
+    description: '您好，我是Opentiny Next AI智能助手',
+    placeholder: '请输入您的问题',
+    thinking: '正在思考中...'
+  },
+  'en-US': {
+    title: 'AI Assistant',
+    description: 'Hello, I am OpenTiny Next AI Assistant',
+    placeholder: 'Please enter your question',
+    thinking: 'Thinking...'
+  }
+}
 
 const messageRenderers = {
   markdown: ReactiveMarkdown,
@@ -102,7 +124,7 @@ const displayedMessages = computed(() => {
       ...messages.value,
       {
         role: 'assistant',
-        content: '正在思考中...',
+        content: lang[props.locale].thinking,
         loading: true
       }
     ]
@@ -156,5 +178,10 @@ defineExpose({
 .chat-input {
   margin-top: 8px;
   padding: 10px 15px;
+}
+
+:deep(.tr-welcome__icon) {
+  width: 48px;
+  height: 48px;
 }
 </style>

@@ -3,6 +3,8 @@ import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, onMounted, ref } from 'vue'
 import { CustomAgentModelProvider } from './AgentModelProvider'
 import { BubbleMarkdownMessageRenderer, TrSender } from '@opentiny/tiny-robot'
+import logo from '../svgs/logo-next-bg-blue.svg'
+
 const mdRenderer = new BubbleMarkdownMessageRenderer()
 
 interface useTinyRobotOption {
@@ -21,7 +23,7 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
 
   const aiAvatar = h(IconAi, { style: { fontSize: '32px' } })
   const userAvatar = h(IconUser, { style: { fontSize: '32px' } })
-  const welcomeIcon = h(IconAi, { style: { fontSize: '48px' } })
+  const welcomeIcon = h(logo, { style: { width: '48px', height: '48px' } })
 
   const { messageManager } = useConversation({ client })
   const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager

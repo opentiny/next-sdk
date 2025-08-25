@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import { TinyVueSingleResolver } from '@opentiny/unplugin-tiny-vue'
+import svgLoader from 'vite-svg-loader'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -17,6 +18,10 @@ export default defineConfig({
     }),
     AutoImport({
       resolvers: [TinyVueSingleResolver]
+    }),
+    svgLoader({
+      defaultImport: 'component',
+      svgo: false
     })
   ],
   server: {
