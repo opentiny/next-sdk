@@ -8,6 +8,7 @@
       :locale="locale"
       :session-id="sessionId"
       :agentRoot="agentRoot"
+      :is-remoter="true"
     >
     </tiny-remoter>
   </div>
@@ -33,4 +34,14 @@ if (!sessionId) {
 const agentRoot = query.get('agentRoot') || 'https://agent.opentiny.design/api/v1/webmcp-trial/'
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+:deep(.tr-container__header-operations) {
+  .tr-icon-button {
+    display: none;
+  }
+
+  .tr-icon-button:first-child {
+    display: block;
+  }
+}
+</style>
