@@ -51,7 +51,6 @@ import type {
   NotificationOptions,
   RequestHandlerExtra
 } from '@modelcontextprotocol/sdk/shared/protocol.js'
-import { dynamicTool, jsonSchema, Tool, ToolCallOptions, ToolSet } from 'ai'
 
 /**
  * Options for configuring the server transport.
@@ -309,38 +308,6 @@ export class WebMcpClient {
    */
   async listTools(params?: ListToolsRequest['params'], options?: RequestOptions) {
     return await this.client.listTools(params, options)
-  }
-
-  /**
-   * Returns a set of AI SDK tools from the MCP server
-   * @returns A record of tool names to their implementations
-   */
-  async tools(params?: ListToolsRequest['params'], options?: RequestOptions): Promise<ToolSet> {
-    const tools: Record<string, Tool> = {}
-
-    try {
-      const listToolsResult = await this.listTools(params, options)
-
-      for (const { name, description, inputSchema } of listToolsResult.tools) {
-        const execute = async (args: any, options: ToolCallOptions): Promise<any> => {
-          return this.callTool({ name, arguments: args }, { signal: options?.abortSignal })
-        }
-
-        tools[name] = dynamicTool({
-          description,
-          inputSchema: jsonSchema({
-            ...inputSchema,
-            properties: inputSchema.properties ?? {},
-            additionalProperties: false
-          }),
-          execute
-        })
-      }
-
-      return tools
-    } catch (error) {
-      throw error
-    }
   }
 
   /**
