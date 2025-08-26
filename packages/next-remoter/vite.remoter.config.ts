@@ -8,6 +8,14 @@ import svgLoader from 'vite-svg-loader'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/next-remoter/',
+  build: {
+    rollupOptions: {
+      input: {
+        index: 'index.html',
+        scan: 'scan.html'
+      }
+    }
+  },
   plugins: [
     vue(),
     Components({
