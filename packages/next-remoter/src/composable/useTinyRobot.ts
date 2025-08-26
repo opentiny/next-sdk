@@ -1,15 +1,13 @@
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
-import { h, onMounted, ref } from 'vue'
+import { h, onMounted, Ref, ref } from 'vue'
 import { CustomAgentModelProvider } from './AgentModelProvider'
-import { BubbleMarkdownMessageRenderer, TrSender } from '@opentiny/tiny-robot'
+import { TrSender } from '@opentiny/tiny-robot'
 import logo from '../../public/svgs/logo-next-bg-blue-right.svg'
 
-const mdRenderer = new BubbleMarkdownMessageRenderer()
-
 interface useTinyRobotOption {
-  sessionId: string
-  agentRoot: string
+  sessionId: Ref<string>
+  agentRoot: Ref<string>
 }
 
 export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
@@ -33,14 +31,12 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
       type: 'markdown',
       placement: 'start',
       avatar: aiAvatar,
-      maxWidth: '80%',
-      contentRenderer: mdRenderer
+      maxWidth: '80%'
     },
     user: {
       placement: 'end',
       avatar: userAvatar,
-      maxWidth: '80%',
-      contentRenderer: mdRenderer
+      maxWidth: '80%'
     }
   }
   const senderRef = ref<InstanceType<typeof TrSender>>()
