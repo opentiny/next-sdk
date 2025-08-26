@@ -6,31 +6,33 @@ import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { reactive, Ref } from 'vue'
 import { AgentModelProvider } from '@opentiny/next-sdk'
 
-const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
+const onToolCallChain = (part: any, handler: StreamHandler) => {
   if (part.type == 'tool-input-start') {
-    const infoItem = reactive({
+    handler.onData({
+      type: 'tool',
       id: part.id,
-      title: part.toolName,
-      content: ` \n\n 正在调用工具${part.toolName}，参数：`
+      name: part.toolName,
+      status: 'running',
+      content: ``
     })
-    lastToolCall.items.push(infoItem)
-    if (isFirstToolCall) {
-      handler.onMessage && handler.onMessage(lastToolCall)
-    }
   }
 
   if (part.type == 'tool-input-delta') {
-    const find = lastToolCall.items.find((item: any) => item.id === part.id)
-    if (find) {
-      find.content += part.delta
-    }
+    handler.onData({
+      type: 'tool',
+      id: part.id,
+      status: 'running',
+      delta: part.delta
+    })
   }
 
   if (part.type == 'tool-result') {
-    const find = lastToolCall.items.find((item: any) => item.id === part.toolCallId)
-    if (find) {
-      find.content += `\n\n 工具调用成功 \n\n  `
-    }
+    handler.onData({
+      type: 'tool',
+      id: part.toolCallId,
+      status: 'success',
+      delta: ''
+    })
   }
 }
 
@@ -60,17 +62,6 @@ export class CustomAgentModelProvider extends BaseModelProvider {
   }
 
   async chatStream(request: ChatCompletionRequest, handler: StreamHandler): Promise<void> {
-    const content = reactive({
-      type: 'markdown',
-      content: ''
-    })
-
-    let isFirstToolCall = true
-    const lastToolCall = {
-      type: 'chain',
-      items: []
-    }
-
     const result = await this.agent.chatStream({
       messages: request.messages,
       model: 'deepseek-ai/DeepSeek-V3',
@@ -78,24 +69,32 @@ export class CustomAgentModelProvider extends BaseModelProvider {
     })
 
     for await (const part of result.fullStream) {
-      console.log(part, part.type)
+      // console.log(part, part.type)
 
       // 节点开始
       if (part.type === 'text-start') {
-        handler.onMessage(content)
+        handler.onData({
+          type: 'markdown',
+          content: ''
+        })
       }
 
       if (part.type.startsWith('tool-')) {
-        onToolCallChain(part, handler, lastToolCall, isFirstToolCall)
-        isFirstToolCall = false
+        onToolCallChain(part, handler)
       }
 
       if (part.type === 'text-delta') {
-        content.content += part.text
+        handler.onData({
+          type: 'markdown',
+          delta: part.text
+        })
       }
 
       if (part.type === 'text-end') {
-        content.content += '\n\n '
+        handler.onData({
+          type: 'markdown',
+          delta: '\n\n '
+        })
       }
     }
 

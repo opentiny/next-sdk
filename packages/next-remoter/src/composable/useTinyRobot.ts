@@ -23,7 +23,45 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
   const userAvatar = h(IconUser, { style: { fontSize: '32px' } })
   const welcomeIcon = h(logo, { style: { width: '48px', height: '48px' } })
 
-  const { messageManager, createConversation } = useConversation({ client })
+  const { messageManager, createConversation } = useConversation({
+    client,
+    events: {
+      onReceiveData(data, messages, preventDefault) {
+        preventDefault()
+        console.log('onReceiveData=', data)
+
+        let lastMessage = messages.value[messages.value.length - 1]
+
+        if (lastMessage.role !== 'assistant') {
+          const message = {
+            role: 'assistant',
+            content: []
+          }
+
+          messages.value.push(message)
+
+          lastMessage = message
+        }
+
+        if (data.type === 'tool') {
+          const toolContent = lastMessage.content.find((item) => item.id === data.id)
+          if (!toolContent) {
+            lastMessage.content.push(data)
+          } else {
+            toolContent.content += data.delta
+            toolContent.status = data.status
+          }
+        } else if (data.type === 'markdown') {
+          const markdownContent = lastMessage.content.find((item) => item.type === 'markdown')
+          if (!markdownContent) {
+            lastMessage.content.push(data)
+          } else {
+            markdownContent.content += data.delta
+          }
+        }
+      }
+    }
+  })
   const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager
 
   const roles = {

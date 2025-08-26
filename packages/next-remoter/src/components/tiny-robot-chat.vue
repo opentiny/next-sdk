@@ -7,14 +7,23 @@
       <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="createConversation()" />
     </template>
     <tr-bubble-provider :content-renderers="contentRenderer">
-      <slot name="welcome" v-if="displayedMessages.length === 0">
+      <slot name="welcome" v-if="messages.length === 0">
         <div style="flex: 1">
           <tr-welcome :title="lang[locale].title" :description="lang[locale].description" :icon="welcomeIcon">
           </tr-welcome>
           <tr-prompts :items="promptItems" :wrap="true" class="tiny-prompts" item-class="prompt-item"></tr-prompts>
         </div>
       </slot>
-      <tr-bubble-list v-else style="flex: 1" :items="displayedMessages" :roles="roles" auto-scroll> </tr-bubble-list>
+      <tr-bubble-list
+        v-else
+        style="flex: 1"
+        :items="messages"
+        :roles="roles"
+        auto-scroll
+        :loading="messageState.status === STATUS.PROCESSING"
+        :loading-role="assistant"
+      >
+      </tr-bubble-list>
     </tr-bubble-provider>
 
     <template #footer>
@@ -228,22 +237,6 @@ if (props.mode === 'remoter') {
     }
   })
 }
-
-// 展示的对话消息。 当处于查询时，自动补充一个ai消息。
-const displayedMessages = computed(() => {
-  if (messageState.status === STATUS.PROCESSING) {
-    return [
-      ...messages.value,
-      {
-        role: 'assistant',
-        content: lang[props.locale].thinking,
-        loading: true
-      }
-    ]
-  }
-
-  return messages.value
-})
 
 // 最新消息滚动到底部
 const scrollToBottom = () => {
