@@ -11,21 +11,21 @@ title: "Electron 应用接入"
 
 - 使用现代前端构建工具（如 Vite、Webpack 等）
 - 项目可以正常运行和构建
-- 使用包管理器（如 npm、yarn、pnpm 等）
+- 使用包管理器（如 Npm、Yarn、Pnpm 等）
 
 ## 2. 安装 Electron 相关依赖
 
 ```bash
-# 安装Electron核心依赖
+# 安装 Electron 核心依赖
 npm install --save-dev electron vite-plugin-electron vite-plugin-electron-renderer
 
-# 如果使用TypeScript，还需要安装类型定义
+# 如果使用 TypeScript ，还需要安装类型定义
 npm install --save-dev @types/node
 
-# 如果需要打包成可执行文件，安装electron-builder
+# 如果需要打包成可执行文件，安装  electron-builder
 npm install --save-dev electron-builder
 
-# 如果需要在开发环境中同时运行多个命令，安装concurrently和wait-on
+# 如果需要在开发环境中同时运行多个命令，安装 concurrently 和 wait-on
 npm install --save-dev concurrently wait-on
 ```
 
@@ -82,7 +82,7 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-// 在ES模块中获取__dirname的等效值
+// 在ES模块中获取 __dirname 的等效值
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -213,9 +213,9 @@ export default defineConfig({
 在前端代码中添加 Electron 环境检测函数：
 
 ```typescript
-// 检查是否在Electron环境中运行
+// 检查是否在 Electron 环境中运行
 const isElectron = (): boolean => {
-  // 在Electron环境中，window.process和window.process.versions.electron都存在
+  // 在 Electron 环境中，window.process 和 window.process.versions.electron 都存在
   // @ts-ignore
   return (
     typeof window !== 'undefined' &&
@@ -229,13 +229,13 @@ const isElectron = (): boolean => {
 根据运行环境动态设置 API 请求 URL：
 
 ```typescript
-// 根据运行环境确定正确的API URL
+// 根据运行环境确定正确的 API URL
 let apiUrl;
 if (isElectron()) {
-  // Electron环境中使用完整URL
+  // Electron 环境中使用完整 URL
   apiUrl = 'http://localhost:3060/api';
 } else {
-  // Web环境使用相对路径
+  // Web 环境使用相对路径
   apiUrl = '/api';
 }
 ```
@@ -245,16 +245,16 @@ if (isElectron()) {
 使用以下命令进行开发和构建：
 
 ```bash
-# 开发模式 - 启动Web开发服务器
+# 开发模式 - 启动 Web 开发服务器
 npm run dev:web
 
-# 开发模式 - 启动Electron应用
+# 开发模式 - 启动 Electron 应用
 npm run electron:dev
 
-# 构建Web应用
+# 构建 Web 应用
 npm run build:web
 
-# 构建Electron应用并打包成exe
+# 构建 Electron 应用并打包成 exe
 npm run electron:build
 ```
 

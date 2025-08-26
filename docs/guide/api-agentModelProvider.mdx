@@ -8,7 +8,7 @@ import { AgentModelProvider } from '@opentiny/next-sdk'
 
 本文统一使用 `llm` 术语，来指代所有的在线大语言模式或本地部署的大语言模型。
 
-`AgentModelProvider 类`是对 `ai-sdk Provider` 一个简单封装，通过它可以直接跟 `llm` 进行对话，以及 Mcp 工具的调用,达到简化代码的目的。当然你也可以直接使用 `ai-sdk` 进行 `llm`的访问。
+AgentModelProvider 类是对 ai-sdk Provider 一个简单封装，通过它可以直接跟 llm 进行对话，以及 MCP 工具的调用,达到简化代码的目的。你也可以直接使用 ai-sdk 进行 llm 的访问。
 
 ## 初始化实例
 
@@ -102,7 +102,7 @@ const webAgent = new AgentModelProvider({
 
 如果指定了多个 `McpServerConfig` 对象，会给每一个 `McpServer`都建立连接，并查询工具后进行合并后，再进入对话。
 
-如果需要自定义 Mcp 连接，请参考 [ai-sdk的初始化Mcp Client](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#initializing-an-mcp-client)
+如果需要自定义 MCP 连接，请参考 [ai-sdk的初始化MCP Client](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#initializing-an-mcp-client)
 
 ## 使用 `AgentModelProvider` 的实例
 
