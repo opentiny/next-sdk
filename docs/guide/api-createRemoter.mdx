@@ -1,6 +1,7 @@
 ---
-title: "createRemoter 函数"
+title: 'createRemoter 函数'
 ---
+
 ```typescript
 import { createRemoter } from '@opentiny/next-sdk'
 ```
@@ -31,26 +32,116 @@ const remoter = createRemoter({
 })
 ```
 
-## 功能说明
+## 菜单项配置
 
-### 下拉菜单
+### 默认菜单项
 
-点击浮动按钮后展开的功能菜单包含三个选项：
+系统默认提供以下三个菜单项：
 
-1. **弹出二维码** (`qr-code`)
-   - 生成包含会话ID的二维码
-   - 支持自定义二维码URL
-   - 弹窗显示二维码图片
+1. **qr-code** - 弹出二维码
+2. **ai-chat** - 弹出AI对话框
+3. **remote-control** - 发送遥控指令
 
-2. **弹出AI对话框** (`ai-chat`)
-   - 调用 `onShowAIChat` 回调函数
-   - 可自定义AI对话实现逻辑
+### 自定义菜单项显示
 
-3. **发送遥控指令** (`remote-control`)
-   - 显示遥控指令输入界面
-   - 包含用户名输入框和发送按钮
+```typescript
+// 隐藏二维码菜单项
+const remoter = createRemoter({
+  sessionId: 'your-session-id',
+  onShowAIChat: () => {
+    console.log('显示AI对话框')
+  },
+  menuItems: [
+    {
+      action: 'qr-code',
+      show: false // 隐藏二维码菜单项
+    }
+  ]
+})
+```
 
-通过 `createRemoter` 函数，你可以轻松为你的应用添加一个功能完整的智能遥控器浮动组件，提升用户体验和交互便利性。
+### 自定义菜单项文本
+
+```typescript
+// 自定义菜单项文本
+const remoter = createRemoter({
+  sessionId: 'your-session-id',
+  onShowAIChat: () => {
+    console.log('显示AI对话框')
+  },
+  menuItems: [
+    {
+      action: 'ai-chat',
+      text: '智能对话' // 自定义文本
+    },
+    {
+      action: 'remote-control',
+      text: '远程控制' // 自定义文本
+    }
+  ]
+})
+```
+
+### 完整配置示例
+
+```typescript
+// 完整配置示例
+const remoter = createRemoter({
+  sessionId: 'your-session-id',
+  qrCodeUrl: 'https://your-custom-url.com',
+  onShowAIChat: () => {
+    console.log('显示AI对话框')
+  },
+  menuItems: [
+    {
+      action: 'qr-code',
+      show: true,
+      text: '扫码连接',
+      icon: `<svg>...</svg>` // 自定义图标
+    },
+    {
+      action: 'ai-chat',
+      show: true,
+      text: 'AI助手'
+    },
+    {
+      action: 'remote-control',
+      show: false // 完全隐藏遥控指令菜单项
+    }
+  ]
+})
+```
+
+## 配置选项
+
+| 参数         | 类型             | 必填 | 默认值                                     | 说明                   |
+| ------------ | ---------------- | ---- | ------------------------------------------ | ---------------------- |
+| sessionId    | string           | ✅   | -                                          | 被遥控页面的会话ID     |
+| onShowAIChat | function         | ❌   | -                                          | 显示AI对话框的回调函数 |
+| qrCodeUrl    | string           | ❌   | https:\/\/ai.opentiny.design\/next-remoter | 遥控端页面地址         |
+| menuItems    | MenuItemConfig[] | ❌   | 默认配置                                   | 菜单项配置数组         |
+
+### MenuItemConfig 接口
+
+```typescript
+interface MenuItemConfig {
+  /** 菜单项标识 */
+  action: 'qr-code' | 'ai-chat' | 'remote-control'
+  /** 是否显示该菜单项 */
+  show?: boolean
+  /** 菜单项文本 */
+  text?: string
+  /** 菜单项图标SVG */
+  icon?: string
+}
+```
+
+## 销毁组件
+
+```typescript
+// 销毁组件，清理DOM和事件监听器
+remoter.destroy()
+```
 
 ## Vue 技术栈扩展
 

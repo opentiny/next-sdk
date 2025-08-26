@@ -217,6 +217,12 @@ const contentRenderer = { markdown: new BubbleMarkdownContentRenderer() }
 if (props.mode === 'remoter') {
   createRemoter({
     sessionId: props.sessionId,
+    menuItems: [
+      {
+        action: 'remote-control',
+        show: false // 隐藏发送用户名选项
+      }
+    ],
     onShowAIChat: () => {
       show.value = true
     }
