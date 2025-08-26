@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { TinyRemoter } from './index'
+import { TrWelcome, TrPrompts, TrSuggestionPillButton } from '@opentiny/tiny-robot'
 
 const show = ref(true)
 const fullscreen = ref(true)
@@ -61,7 +62,7 @@ const promptItems = promts.map((str) => ({ label: str }))
 
 const suggestions = query.getAll('suggestion') || [] // suggestion=你好&suggestion=世界
 function handleSuggestionClick(str: string) {
-  robotRef.value?.inputMessage.value = str
+  robotRef.value.inputMessage = str
 }
 </script>
 
@@ -92,11 +93,11 @@ function handleSuggestionClick(str: string) {
       line-height: 24px;
     }
   }
+}
 
-  .chat-input-pills {
-    margin-bottom: 8px;
-    display: flex;
-    gap: 16px;
-  }
+.chat-input-pills {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 16px;
 }
 </style>
