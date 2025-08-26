@@ -35,7 +35,8 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
         if (lastMessage.role !== 'assistant') {
           const message = {
             role: 'assistant',
-            content: []
+            content: '',
+            uiContent: []
           }
 
           messages.value.push(message)
@@ -44,19 +45,20 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
         }
 
         if (data.type === 'tool') {
-          const toolContent = lastMessage.content.find((item) => item.id === data.id)
+          const toolContent = lastMessage.uiContent.find((item) => item.id === data.id)
           if (!toolContent) {
-            lastMessage.content.push(data)
+            lastMessage.uiContent.push(data)
           } else {
             toolContent.content += data.delta
             toolContent.status = data.status
           }
         } else if (data.type === 'markdown') {
-          const markdownContent = lastMessage.content.find((item) => item.type === 'markdown')
+          const markdownContent = lastMessage.uiContent.find((item) => item.type === 'markdown')
           if (!markdownContent) {
-            lastMessage.content.push(data)
+            lastMessage.uiContent.push(data)
           } else {
             markdownContent.content += data.delta
+            lastMessage.content += data.delta
           }
         }
       }
@@ -69,7 +71,8 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
       type: 'markdown',
       placement: 'start',
       avatar: aiAvatar,
-      maxWidth: '80%'
+      maxWidth: '80%',
+      customContentField: 'uiContent'
     },
     user: {
       placement: 'end',
