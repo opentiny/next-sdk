@@ -1,15 +1,13 @@
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
-import { h, onMounted, ref } from 'vue'
+import { h, onMounted, Ref, ref } from 'vue'
 import { CustomAgentModelProvider } from './AgentModelProvider'
-import { BubbleMarkdownMessageRenderer, TrSender } from '@opentiny/tiny-robot'
+import { TrSender } from '@opentiny/tiny-robot'
 import logo from '../../public/svgs/logo-next-bg-blue-right.svg'
 
-const mdRenderer = new BubbleMarkdownMessageRenderer()
-
 interface useTinyRobotOption {
-  sessionId: string
-  agentRoot: string
+  sessionId: Ref<string>
+  agentRoot: Ref<string>
 }
 
 export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
@@ -25,7 +23,47 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
   const userAvatar = h(IconUser, { style: { fontSize: '32px' } })
   const welcomeIcon = h(logo, { style: { width: '48px', height: '48px' } })
 
-  const { messageManager, createConversation } = useConversation({ client })
+  const { messageManager, createConversation } = useConversation({
+    client,
+    events: {
+      onReceiveData(data, messages, preventDefault) {
+        preventDefault()
+        console.log('onReceiveData=', data)
+
+        let lastMessage = messages.value[messages.value.length - 1]
+
+        if (lastMessage.role !== 'assistant') {
+          const message = {
+            role: 'assistant',
+            content: '',
+            uiContent: []
+          }
+
+          messages.value.push(message)
+
+          lastMessage = message
+        }
+
+        if (data.type === 'tool') {
+          const toolContent = lastMessage.uiContent.find((item) => item.id === data.id)
+          if (!toolContent) {
+            lastMessage.uiContent.push(data)
+          } else {
+            toolContent.content += data.delta
+            toolContent.status = data.status
+          }
+        } else if (data.type === 'markdown') {
+          const markdownContent = lastMessage.uiContent.find((item) => item.type === 'markdown')
+          if (!markdownContent) {
+            lastMessage.uiContent.push(data)
+          } else {
+            markdownContent.content += data.delta
+            lastMessage.content += data.delta
+          }
+        }
+      }
+    }
+  })
   const { messageState, inputMessage, sendMessage, abortRequest, messages } = messageManager
 
   const roles = {
@@ -34,13 +72,12 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
       placement: 'start',
       avatar: aiAvatar,
       maxWidth: '80%',
-      contentRenderer: mdRenderer
+      customContentField: 'uiContent'
     },
     user: {
       placement: 'end',
       avatar: userAvatar,
-      maxWidth: '80%',
-      contentRenderer: mdRenderer
+      maxWidth: '80%'
     }
   }
   const senderRef = ref<InstanceType<typeof TrSender>>()

@@ -6,28 +6,41 @@
     <template #operations>
       <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="createConversation()" />
     </template>
-    <tr-bubble-provider :message-renderers="messageRenderers">
-      <slot name="welcome" v-if="displayedMessages.length === 0">
+    <tr-bubble-provider :content-renderers="contentRenderer">
+      <slot name="welcome" v-if="messages.length === 0">
         <div style="flex: 1">
           <tr-welcome :title="lang[locale].title" :description="lang[locale].description" :icon="welcomeIcon">
           </tr-welcome>
-          <tr-prompts
-            :items="promptItems"
-            :wrap="true"
-            item-class="prompt-item"
-            class="tiny-prompts"
-            @item-click="handlePromptItemClick"
-          ></tr-prompts>
+          <tr-prompts :items="promptItems" :wrap="true" class="tiny-prompts" item-class="prompt-item"></tr-prompts>
         </div>
       </slot>
-      <tr-bubble-list v-else style="flex: 1" :items="displayedMessages" :roles="roles" auto-scroll> </tr-bubble-list>
+      <tr-bubble-list
+        v-else
+        style="flex: 1"
+        :items="messages"
+        :roles="roles"
+        auto-scroll
+        :loading="messageState.status === STATUS.PROCESSING"
+        :loading-role="assistant"
+      >
+      </tr-bubble-list>
     </tr-bubble-provider>
 
     <template #footer>
       <div class="chat-input">
         <slot name="suggestions">
           <div class="chat-input-pills">
-            <tr-suggestion-pills class="pills" @item-click="handlePillItemClick" :items="pillItems" />
+            <tr-dropdown-menu
+              v-for="pill in pillItems"
+              :key="pill.id"
+              :items="pill.menus"
+              @item-click="handlePillItemClick"
+              trigger="click"
+            >
+              <template #trigger>
+                <TrSuggestionPillButton>{{ pill.text }}</TrSuggestionPillButton>
+              </template>
+            </tr-dropdown-menu>
           </div>
         </slot>
         <tr-sender
@@ -57,17 +70,16 @@ import {
   TrWelcome,
   TrBubbleProvider,
   TrPrompts,
-  TrSuggestionPills,
+  TrDropdownMenu,
+  TrSuggestionPillButton,
   TrIconButton,
-  BubbleMarkdownMessageRenderer,
-  BubbleChainMessageRenderer
+  BubbleMarkdownContentRenderer
 } from '@opentiny/tiny-robot'
-import { PromptProps, SuggestionPillItem } from '@opentiny/tiny-robot'
+import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
-import { IconEdit, IconNewSession } from '@opentiny/tiny-robot-svgs'
+import { IconNewSession } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobot } from '../composable/useTinyRobot'
-import ReactiveMarkdown from './ReactiveMarkdown.vue'
-import { computed, nextTick, watch, h, CSSProperties, markRaw } from 'vue'
+import { computed, nextTick, watch, h, CSSProperties, toRef } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
 
 defineOptions({
@@ -80,6 +92,7 @@ const props = defineProps({
     type: String,
     required: true
   },
+  /** 后端的代理服务器地址 */
   agentRoot: {
     type: String,
     default: 'https://agent.opentiny.design/api/v1/webmcp-trial/'
@@ -87,15 +100,20 @@ const props = defineProps({
   /** 左上角的标题 */
   title: {
     type: String,
-    default: ''
+    default: 'OpenTiny Next'
   },
+  /** 语言 en-US、zh-CN */
   locale: {
     type: String,
     default: 'zh-CN'
   },
-  isRemoter: {
-    type: Boolean,
-    default: false
+  /** 展示模式： 'remoter' | 'chat-dialog'
+   * 遥控器模式： 自动在右下角显示一个AI图标，且有3个菜单项。
+   * 对话框模式： 直接显示一个对话框界面
+   *  */
+  mode: {
+    type: String,
+    default: 'remoter'
   }
 })
 
@@ -114,8 +132,8 @@ const {
   handleSendMessage,
   createConversation
 } = useTinyRobot({
-  sessionId: props.sessionId,
-  agentRoot: props.agentRoot
+  sessionId: toRef(props, 'sessionId'),
+  agentRoot: toRef(props, 'agentRoot')
 })
 
 const lang: Record<string, { title: string; description: string; placeholder: string; thinking: string }> = {
@@ -133,14 +151,7 @@ const lang: Record<string, { title: string; description: string; placeholder: st
   }
 }
 
-const handlePromptItemClick = (ev: MouseEvent, item: PromptProps) => {
-  sendMessage(item.description)
-}
-
-const handlePillItemClick = (item: SuggestionPillItem) => {
-  sendMessage(item.text)
-}
-
+// 默认的Prompts。 仅做为介绍性文字，点击不触发事件
 const promptItems: PromptProps[] = [
   {
     label: props.locale === 'zh-CN' ? '企业办公助手' : 'Enterprise Office Assistant',
@@ -169,72 +180,65 @@ const promptItems: PromptProps[] = [
   }
 ]
 
-const pillItems: SuggestionPillItem[] = [
+// 默认的 SuggestionPills
+const mapMake = (str: string, id: number) => {
+  const [text, inputMessage] = str.split('#')
+  return { id, text, inputMessage }
+}
+const pillItems = [
   {
     id: 'office',
     text: props.locale === 'zh-CN' ? '办公助手' : 'Office Assistant',
-    icon: markRaw(IconEdit)
+    menus: [
+      '接收邮件#请同步邮箱的新邮件。',
+      '编写邮件#请新建一个邮件，收件人为 opentiny-next@meeting.com, 内容为举办一个临时会议。',
+      '安排会议#创建一个临时的在线会议，主题为讨论问题，时长为1小时。',
+      '整理文档#请分析附件中的销售情况，把销售额绘制成折线图。'
+    ].map(mapMake)
   },
   {
     id: 'development',
     text: props.locale === 'zh-CN' ? '开发支持' : 'Development Support',
-    icon: markRaw(IconEdit)
+    menus: [
+      '遇到代码问题#请检查当前位置的报错原因。',
+      '架构建议#请使用NodeJs实现一个分块上传文件的模块。',
+      '最新的技术趋势#请分析Vue与React 框架的优劣分别是什么？'
+    ].map(mapMake)
   },
   {
     id: 'management',
     text: props.locale === 'zh-CN' ? '项目管理' : 'Project Management',
-    icon: markRaw(IconEdit)
+    menus: [
+      '项目规划#如何开展品牌推广的活动？',
+      '任务分配#将本季度的销售任务分配给三个人，并生成甘特图进行跟踪。',
+      '进度跟踪#分析团队的任务完成情况。'
+    ].map(mapMake)
   }
 ]
-
-const messageRenderers = {
-  markdown: ReactiveMarkdown,
-  chain: {
-    component: BubbleChainMessageRenderer,
-    defaultProps: {
-      contentRenderer: (content: string) => new BubbleMarkdownMessageRenderer().md.render(content)
-    }
-  }
+const handlePillItemClick = (item: ReturnType<typeof mapMake>) => {
+  inputMessage.value = item.inputMessage
 }
 
-watch(
-  () => props.sessionId,
-  (value) => {
-    if (value && !props.isRemoter) {
-      createRemoter({
-        sessionId: value,
-        menuItems: [
-          {
-            action: 'remote-control',
-            show: false // 隐藏发送用户名选项
-          }
-        ],
-        onShowAIChat: () => {
-          show.value = true
-        }
-      })
-    }
-  },
-  {
-    immediate: true
-  }
-)
+// 自定义消息渲染器
+const contentRenderer = { markdown: new BubbleMarkdownContentRenderer() }
 
-const displayedMessages = computed(() => {
-  if (messageState.status === STATUS.PROCESSING) {
-    return [
-      ...messages.value,
+// 如果是遥控器模式，则初始化右下角的AI 图标
+if (props.mode === 'remoter') {
+  createRemoter({
+    sessionId: props.sessionId,
+    menuItems: [
       {
-        role: 'assistant',
-        content: lang[props.locale].thinking,
-        loading: true
+        action: 'remote-control',
+        show: false // 隐藏发送用户名选项
       }
-    ]
-  }
+    ],
+    onShowAIChat: () => {
+      show.value = true
+    }
+  })
+}
 
-  return messages.value
-})
-
+// 最新消息滚动到底部
 const scrollToBottom = () => {
   const containerBody = document.querySelector('div.tr-bubble-list')
   if (containerBody) {
@@ -246,15 +250,15 @@ const scrollToBottom = () => {
     })
   }
 }
-
-// 最新消息滚动到底部
 watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 
+// 定义插槽
 defineSlots<{
   welcome(): any
   suggestions(): any
 }>()
-// 暴露一些重要方法，方便用户写插槽时，可以使用
+
+// 定义输出：  暴露一些重要方法，方便用户写插槽时，可以使用。
 defineExpose({
   /** 欢迎图标 */
   welcomeIcon,
@@ -297,13 +301,6 @@ defineExpose({
   }
 }
 
-.welcome-footer {
-  margin-top: 12px;
-  color: rgb(128, 128, 128);
-  font-size: 12px;
-  line-height: 20px;
-}
-
 .tiny-prompts {
   padding: 16px 24px;
 
@@ -324,6 +321,8 @@ defineExpose({
 
 .chat-input-pills {
   margin-bottom: 8px;
+  display: flex;
+  gap: 16px;
 }
 
 :deep(.tr-welcome__icon) {
