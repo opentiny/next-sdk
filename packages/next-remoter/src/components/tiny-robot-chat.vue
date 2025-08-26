@@ -203,6 +203,12 @@ watch(
     if (value && !props.isRemoter) {
       createRemoter({
         sessionId: value,
+        menuItems: [
+          {
+            action: 'remote-control',
+            show: false // 隐藏发送用户名选项
+          }
+        ],
         onShowAIChat: () => {
           show.value = true
         }
