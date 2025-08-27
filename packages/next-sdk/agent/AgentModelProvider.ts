@@ -42,6 +42,12 @@ export class AgentModelProvider {
       this.isGetMcpClients = true
     }
   }
+
+  async addMcpServer(mcpServer: McpServerConfig) {
+    this.mcpServers.push(mcpServer)
+    this.isGetMcpClients = false
+  }
+
   async chat({
     model,
     maxSteps = 5,

@@ -42,7 +42,7 @@ const query = new URLSearchParams(window.location.search)
 const locale = query.get('lang') || 'zh-CN'
 
 // 2、会话ID， 必传
-const sessionId = query.get('sessionId')!
+const sessionId = query.get('sessionId')
 if (!sessionId) {
   alert('The URL lost sessionId')
 }

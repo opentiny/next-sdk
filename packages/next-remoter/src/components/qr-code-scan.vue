@@ -2,11 +2,14 @@
   <div>
     <tr-icon-button :icon="TinyIconScan" size="28" svgSize="20" @click="handleScan()" />
     <teleport to="body">
-      <div v-show="isScanning" class="scanCode">
+      <div v-show="isScanning" class="scan-code">
         <div class="container">
           <div class="qrcode">
             <div id="reader"></div>
           </div>
+        </div>
+        <div class="btn">
+          <div class="left-back"><van-icon name="arrow-left" @click="clickBack" /></div>
         </div>
       </div>
     </teleport>
@@ -16,9 +19,9 @@
 <script setup>
 import { reactive, toRefs, onMounted, onUnmounted, ref } from 'vue'
 import { Html5Qrcode } from 'html5-qrcode'
-import { Modal } from '@opentiny/vue'
 import { IconScan } from '@opentiny/vue-icon'
 import { TrIconButton } from '@opentiny/tiny-robot'
+import { showToast } from 'vant'
 
 const TinyIconScan = IconScan()
 
@@ -32,6 +35,11 @@ const isScanning = ref(false)
 
 // 开始扫描二维码
 const start = () => {
+  if (!state.html5QrCode) {
+    alert('摄像头无访问权限！')
+    return
+  }
+
   isScanning.value = true
   state.html5QrCode
     .start(
@@ -73,11 +81,20 @@ const start = () => {
           message = '此浏览器不支持流API！'
         }
       }
+
+      showToast({
+        message: message,
+        duration: 3000
+      })
     })
 }
 
 const handleScan = () => {
   start()
+}
+
+const clickBack = () => {
+  stop()
 }
 
 // 获取摄像头权限并初始化
@@ -89,7 +106,7 @@ const getCameras = () => {
       }
     })
     .catch((err) => {
-      Modal.alert({
+      showToast({
         message: '摄像头无访问权限！',
         duration: 3000
       })
@@ -101,13 +118,14 @@ const stop = () => {
   state.html5QrCode
     .stop()
     .then((ignore) => {
-      isScanning.value = false
       console.log('停止扫码', ignore)
     })
     .catch((err) => {
-      isScanning.value = false
       console.log(err)
-      Modal.alert('停止扫码失败')
+      showToast('停止扫码失败')
+    })
+    .finally(() => {
+      isScanning.value = false
     })
 }
 
@@ -129,8 +147,13 @@ const { fileList } = toRefs(state)
 </script>
 
 <style lang="less" scoped>
-.scanCode {
+.scan-code {
   height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0);
