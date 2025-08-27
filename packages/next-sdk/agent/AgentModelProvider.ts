@@ -43,8 +43,8 @@ export class AgentModelProvider {
     }
   }
 
-  async addMcpServer(mcpServer: McpServerConfig) {
-    this.mcpServers.push(mcpServer)
+  async updateMcpServers(mcpServers: McpServerConfig[]) {
+    this.mcpServers = mcpServers
     this.isGetMcpClients = false
   }
 

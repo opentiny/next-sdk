@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <!-- 导入 NEXT SDK -->
+    <script src="https://unpkg.com/@opentiny/next-sdk@0.1.1-alpha.3/dist/index.umd.js"></script>
+    <meta charset="UTF-8" />
+    <title>WebMCP 示例</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        text-align: center;
+        margin-top: 100px;
+      }
+    </style>
+    <script>
+      const { createMessageChannelPairTransport, WebMcpServer, WebMcpClient, ResourceTemplate, createRemoter, z } =
+        WebMCP
+
+      async function connect() {
+        // Create pair MCP transports
+        const [serverTransport, clientTransport] = createMessageChannelPairTransport()
+        // Create an MCP server
+        const server = new WebMcpServer({
+          name: 'demo-server',
+          version: '1.0.0'
+        })
+
+        // Add an addition tool
+        server.registerTool(
+          '根据用户的心情生成用canvas绘制一个图形',
+          {
+            title: '生成图形',
+            description:
+              '根据用户的心情或者情绪生成用canvas绘制一个图形,要求：传入的color参数格式为十六进制颜色值,比如 #000000,type参数为circle或者rect,circle表示圆形，rect表示矩形',
+            inputSchema: { color: z.string(), type: z.string() }
+          },
+          async ({ color, type }) => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            if (type === 'circle') {
+              ctx.beginPath()
+              ctx.arc(50, 50, 40, 0, 2 * Math.PI)
+              ctx.fillStyle = color
+              ctx.fill()
+            } else if (type === 'rect') {
+              ctx.fillRect(0, 0, 100, 100)
+              ctx.fillStyle = color
+              ctx.fill()
+            }
+            document.body.appendChild(canvas)
+            return {
+              content: [{ type: 'text', text: String(color) }]
+            }
+          }
+        )
+
+        // Create an MCP Client
+        const client = new WebMcpClient({
+          name: 'demo-client',
+          version: '1.0.0'
+        })
+
+        // Connect the client and server
+        await server.connect(serverTransport)
+        await client.connect(clientTransport)
+
+        // Connect to the Web Agent server
+        const { transport, sessionId } = await client.connect({
+          url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
+          agent: true
+        })
+
+        createRemoter({
+          sessionId,
+          qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
+          menuItems: [
+            {
+              action: 'ai-chat',
+              show: false
+            },
+            {
+              action: 'remote-control',
+              show: false
+            }
+          ]
+        })
+
+        window.addEventListener('pagehide', async () => {
+          await transport.terminateSession()
+        })
+      }
+
+      connect()
+    </script>
+  </head>
+  <body>
+    <h1>根据用户的心情生成页面的背景颜色</h1>
+  </body>
+</html>
