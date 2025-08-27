@@ -1,10 +1,8 @@
-import {
-  experimental_createMCPClient as createMCPClient,
-  ToolSet,
-  experimental_MCPClientConfig as MCPClientConfig
-} from 'ai'
+import { experimental_createMCPClient as createMCPClient, experimental_MCPClientConfig as MCPClientConfig } from 'ai'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { McpServerConfig, MCPClient } from '../type'
+import { dynamicTool, jsonSchema, Tool, ToolCallOptions, ToolSet } from 'ai'
+import { WebMcpClient } from '../../WebMcpClient'
 
 /** 创建 McpClients, 其中 mcpServers 允许为配置为 McpServerConfig, 或者任意的 MCPTransport
  * 参考: https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#initializing-an-mcp-client
@@ -45,5 +43,37 @@ export const getMcpTools = async (mcpClients: MCPClient[], options: Record<strin
   return {
     ...toolsResult,
     ...toolsOptions
+  }
+}
+
+/**
+ * Returns a set of AI SDK tools from the MCP server
+ * @returns A record of tool names to their implementations
+ */
+export const getAISDKTools = async (client: WebMcpClient): Promise<ToolSet> => {
+  const tools: Record<string, Tool> = {}
+
+  try {
+    const listToolsResult = await client.listTools()
+
+    for (const { name, description, inputSchema } of listToolsResult.tools) {
+      const execute = async (args: any, options: ToolCallOptions): Promise<any> => {
+        return client.callTool({ name, arguments: args }, { signal: options?.abortSignal })
+      }
+
+      tools[name] = dynamicTool({
+        description,
+        inputSchema: jsonSchema({
+          ...inputSchema,
+          properties: (inputSchema.properties as Record<string, any>) ?? {},
+          additionalProperties: false
+        }),
+        execute
+      })
+    }
+
+    return tools
+  } catch (error) {
+    throw error
   }
 }

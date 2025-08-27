@@ -19,15 +19,16 @@
   },
   "dependencies": {
     "@opentiny/next-sdk": "workspace:*",
-    "@opentiny/tiny-robot": "0.3.0-alpha.3",
-    "@opentiny/tiny-robot-kit": "0.3.0-alpha.3",
-    "@opentiny/tiny-robot-svgs": "0.3.0-alpha.3",
+    "@opentiny/tiny-robot": "0.3.0-rc.0",
+    "@opentiny/tiny-robot-kit": "0.3.0-rc.0",
+    "@opentiny/tiny-robot-svgs": "0.3.0-rc.0",
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@opentiny/vue": "^3.25.0",
     "vue": "^3.3.11"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
+    "vite-svg-loader": "^5.1.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vue-tsc": "^1.8.25",

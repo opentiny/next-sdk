@@ -1,5 +1,5 @@
 ---
-title: "WebMcpClient 类"
+title: 'WebMcpClient 类'
 ---
 
 ```typescript
@@ -50,18 +50,20 @@ async connect(options: Transport | ClientConnectOptions): Promise<{ transport: T
 ```
 
 **参数**
-| 参数                   | 描述  
-| ---------------------------  | -------------
-| options                   | options 可以直接传入一个 Transport，也可以传入一个对象
-| options.url: string      | Agent 服务地址
-| options.token?: string   | 令牌
-| options.sessionId?: string |  会话 ID
-| options.authProvider?: AuthClientProvider | OAuth 鉴权提供者
-| options.type?: 'channel' \| 'sse' | 连接类型
-| options.agent?: boolean | 是否连接到 WebAgent
-| options.onError?: (error: Error) => void | 连接错误的回调函数
-| options.onUnauthorized?: () => Promise | 未鉴权的回调函数，允许业务自定义未鉴权的逻辑
-| options.onReconnect?: () => Promise | 重连的回调函数，允许业务自定义重连逻辑
+
+| 参数                                      | 描述                                                   |
+| ----------------------------------------- | ------------------------------------------------------ |
+| options                                   | options 可以直接传入一个 Transport，也可以传入一个对象 |
+| options.url: string                       | Agent 服务地址                                         |
+| options.token?: string                    | 令牌                                                   |
+| options.sessionId?: string                | 会话 ID                                                |
+| options.authProvider?: AuthClientProvider | OAuth 鉴权提供者                                       |
+| options.type?: 'channel' \| 'sse'         | 连接类型                                               |
+| options.agent?: boolean                   | 是否连接到 WebAgent                                    |
+| options.onError?: (error: Error) => void  | 连接错误的回调函数                                     |
+| options.onUnauthorized?: () => Promise    | 未鉴权的回调函数，允许业务自定义未鉴权的逻辑           |
+| options.onReconnect?: () => Promise       | 重连的回调函数，允许业务自定义重连逻辑                 |
+
 **返回值**
 
 - `transport: Transport`
@@ -119,8 +121,8 @@ const getAuthCodeByState = (url: string | URL, state: string) => {
       Authorization: `Bearer ${token}` // token 为设置的请求头 token
     },
     body: new URLSearchParams({ state })
-  });
-};
+  })
+}
 
 const MY_APP_METADATA = {
   client_name: 'my-app-client',
@@ -129,9 +131,9 @@ const MY_APP_METADATA = {
   response_types: ['code'],
   token_endpoint_auth_method: 'client_secret_post',
   scope: 'mcp:web'
-};
+}
 
-const authProvider = new AuthClientProvider({ clientMetadata: MY_APP_METADATA, getAuthCodeByState });
+const authProvider = new AuthClientProvider({ clientMetadata: MY_APP_METADATA, getAuthCodeByState })
 
 authProvider.saveClientInformation({
   client_id: clientId, // 在 WebAgent 平台注册应用之后，平台生成的 clientId
@@ -161,7 +163,7 @@ client.connect({
   },
   onReconnect: (error) => {
     // 自定义重连逻辑
-  },
+  }
 })
 ```
 
@@ -179,8 +181,8 @@ onclose?: () => void
 
 ```typescript
 client.onclose = () => {
-  console.log('客户端连接已关闭');
-};
+  console.log('客户端连接已关闭')
+}
 ```
 
 ## onerror()
@@ -201,8 +203,8 @@ onerror?: (error: Error) => void;
 
 ```typescript
 client.onerror = (error) => {
-  console.error('发生错误:', error.message);
-};
+  console.error('发生错误:', error.message)
+}
 ```
 
 ## close()
@@ -222,7 +224,7 @@ async close(): Promise<void>
 **示例**
 
 ```typescript
-await client.close();
+await client.close()
 ```
 
 ## getServerCapabilities()
@@ -242,9 +244,9 @@ getServerCapabilities(): ServerCapabilities | undefined
 **示例**
 
 ```typescript
-const capabilities = client.getServerCapabilities();
+const capabilities = client.getServerCapabilities()
 if (capabilities) {
-  console.log('服务器支持的功能:', capabilities);
+  console.log('服务器支持的功能:', capabilities)
 }
 ```
 
@@ -265,9 +267,9 @@ getServerVersion(): Implementation | undefined
 **示例**
 
 ```typescript
-const version = client.getServerVersion();
+const version = client.getServerVersion()
 if (version) {
-  console.log('服务器版本:', version);
+  console.log('服务器版本:', version)
 }
 ```
 
@@ -288,9 +290,9 @@ getInstructions(): string | undefined
 **示例**
 
 ```typescript
-const instructions = client.getInstructions();
+const instructions = client.getInstructions()
 if (instructions) {
-  console.log('服务器说明:', instructions);
+  console.log('服务器说明:', instructions)
 }
 ```
 
@@ -311,7 +313,7 @@ async ping(options?: RequestOptions)
 **示例**
 
 ```typescript
-await client.ping();
+await client.ping()
 ```
 
 ## complete()
@@ -339,7 +341,7 @@ async complete(params: CompleteRequest['params'], options?: RequestOptions)
 const result = await client.complete({
   prompt: '请继续写下去',
   context: '从前有座山'
-});
+})
 ```
 
 ## setLoggingLevel()
@@ -360,7 +362,7 @@ async setLoggingLevel(level: LoggingLevel, options?: RequestOptions)
 **示例**
 
 ```typescript
-await client.setLoggingLevel('debug');
+await client.setLoggingLevel('debug')
 ```
 
 ## getPrompt()
@@ -388,7 +390,7 @@ async getPrompt(params: GetPromptRequest['params'], options?: RequestOptions)
 const prompt = await client.getPrompt({
   name: 'welcome',
   args: { username: 'John' }
-});
+})
 ```
 
 ## listPrompts()
@@ -413,8 +415,8 @@ async listPrompts(params?: ListPromptsRequest['params'], options?: RequestOption
 **示例**
 
 ```typescript
-const prompts = await client.listPrompts();
-console.log('Available prompts:', prompts);
+const prompts = await client.listPrompts()
+console.log('Available prompts:', prompts)
 ```
 
 ## listResources()
@@ -439,8 +441,8 @@ async listResources(params?: ListResourcesRequest['params'], options?: RequestOp
 **示例**
 
 ```typescript
-const resources = await client.listResources();
-console.log('Available resources:', resources);
+const resources = await client.listResources()
+console.log('Available resources:', resources)
 ```
 
 ## listResourceTemplates()
@@ -465,8 +467,8 @@ async listResourceTemplates(params?: ListResourceTemplatesRequest['params'], opt
 **示例**
 
 ```typescript
-const templates = await client.listResourceTemplates();
-console.log('Available resource templates:', templates);
+const templates = await client.listResourceTemplates()
+console.log('Available resource templates:', templates)
 ```
 
 ## readResource()
@@ -493,8 +495,8 @@ async readResource(params: ReadResourceRequest['params'], options?: RequestOptio
 ```typescript
 const resource = await client.readResource({
   uri: 'file://config.json'
-});
-console.log('Resource content:', resource);
+})
+console.log('Resource content:', resource)
 ```
 
 ## subscribeResource()
@@ -521,8 +523,8 @@ async subscribeResource(params: SubscribeRequest['params'], options?: RequestOpt
 ```typescript
 const subscription = await client.subscribeResource({
   uri: 'file://config.json'
-});
-console.log('Subscription result:', subscription);
+})
+console.log('Subscription result:', subscription)
 ```
 
 ## unsubscribeResource()
@@ -549,7 +551,7 @@ async unsubscribeResource(params: UnsubscribeRequest['params'], options?: Reques
 ```typescript
 await client.unsubscribeResource({
   uri: 'file://config.json'
-});
+})
 ```
 
 ## callTool()
@@ -581,7 +583,7 @@ const result = await client.callTool({
     num2: 2,
     operator: '+'
   }
-});
+})
 ```
 
 ## listTools()
@@ -606,55 +608,8 @@ async listTools(params?: ListToolsRequest['params'], options?: RequestOptions)
 **示例**
 
 ```typescript
-const tools = await client.listTools();
-console.log('Available tools:', tools);
-```
-
-## tools()
-
-用来对接 `AgentModelProvider` 返回一个工具集对象, 对接后可以让 `AgentModelProvider` 实例直接调用 MCP 工具。
-
-**类型**
-
-```typescript
-async tools(params?: ListToolsRequest['params'], options?: RequestOptions)
-```
-
-**参数**
-
-- `params?: ListToolsRequest['params']:` 列表参数
-- `options?: RequestOptions`: 请求选项
-
-**返回值**
-
-- `Promise<ToolSet>`: 工具集对象
-
-**示例**
-
-```typescript
-import { AgentModelProvider } from '@opentiny/next-sdk';
-
-const webAgent = new AgentModelProvider({
-  llmConfig: {
-    apiKey: 'sk-xxx',
-    baseURL: 'https://xxxxx',
-    providerType: 'deepseek'
-  }
-})
-
-
-const tools = await client.tools();
-
-const generateTextResult = webAgent.chat({
-    model: 'deepseek-ai/DeepSeek-V3',
-    messages:[
-        { role: 'system', content: '你是xxx' },
-        { role: 'user', content: '1+1 等于多少？' },
-    ],
-    tools,
-    // .......
-})
-
+const tools = await client.listTools()
+console.log('Available tools:', tools)
 ```
 
 ## sendRootsListChanged()
@@ -670,7 +625,7 @@ async sendRootsListChanged()
 **示例**
 
 ```typescript
-await client.sendRootsListChanged();
+await client.sendRootsListChanged()
 ```
 
 ## request()
@@ -697,15 +652,15 @@ request<T extends ZodType<object>>(request: SendRequestT, resultSchema: T, optio
 
 ```typescript
 const result = await client.request(
-  { 
+  {
     method: 'getData',
     params: { id: 123 }
   },
-  z.object({ 
+  z.object({
     data: z.string()
   })
-);
-console.log('Request result:', result);
+)
+console.log('Request result:', result)
 ```
 
 ## notification()
@@ -732,7 +687,7 @@ await client.notification({
     status: 'ready',
     timestamp: new Date().toISOString()
   }
-});
+})
 ```
 
 ## setRequestHandler()
@@ -761,7 +716,7 @@ setRequestHandler<
 
 ```typescript
 client.setRequestHandler(
-  z.object({ 
+  z.object({
     method: z.literal('getData'),
     params: z.object({
       id: z.number()
@@ -770,9 +725,9 @@ client.setRequestHandler(
   async (request, extra) => {
     return {
       result: `Data for ID ${request.params.id}`
-    };
+    }
   }
-);
+)
 ```
 
 ## removeRequestHandler()
@@ -792,7 +747,7 @@ removeRequestHandler(method: string): void
 **示例**
 
 ```typescript
-client.removeRequestHandler('getData');
+client.removeRequestHandler('getData')
 ```
 
 ## setNotificationHandler()
@@ -825,9 +780,9 @@ client.setNotificationHandler(
     })
   }),
   async (notification) => {
-    console.log('Status updated:', notification.params.status);
+    console.log('Status updated:', notification.params.status)
   }
-);
+)
 ```
 
 ## removeNotificationHandler()
@@ -847,7 +802,7 @@ removeNotificationHandler(method: string): void
 **示例**
 
 ```typescript
-client.removeNotificationHandler('statusUpdate');
+client.removeNotificationHandler('statusUpdate')
 ```
 
 ## onElicit()
@@ -875,8 +830,8 @@ onElicit(
 client.onElicit(async (request, extra) => {
   return {
     result: '用户输入的内容'
-  };
-});
+  }
+})
 ```
 
 ## onCreateMessage()
@@ -905,8 +860,8 @@ client.onCreateMessage(async (request, extra) => {
   return {
     id: 'msg-1',
     content: request.params.content
-  };
-});
+  }
+})
 ```
 
 ## onListRoots()
@@ -937,8 +892,8 @@ client.onListRoots(async (request, extra) => {
       { name: 'root1', uri: '/root1' },
       { name: 'root2', uri: '/root2' }
     ]
-  };
-});
+  }
+})
 ```
 
 ## onToolListChanged()
@@ -959,8 +914,8 @@ onToolListChanged(handler: (notification: z.infer<typeof ToolListChangedNotifica
 
 ```typescript
 client.onToolListChanged(async (notification) => {
-  console.log('工具列表已更新');
-});
+  console.log('工具列表已更新')
+})
 ```
 
 ## onPromptListChanged()
@@ -981,8 +936,8 @@ onPromptListChanged(handler: (notification: z.infer<typeof PromptListChangedNoti
 
 ```typescript
 client.onPromptListChanged(async (notification) => {
-  console.log('提示列表已更新');
-});
+  console.log('提示列表已更新')
+})
 ```
 
 ## onResourceListChanged()
@@ -1003,8 +958,8 @@ onResourceListChanged(handler: (notification: z.infer<typeof ResourceListChanged
 
 ```typescript
 client.onResourceListChanged(async (notification) => {
-  console.log('资源列表已更新');
-});
+  console.log('资源列表已更新')
+})
 ```
 
 ## onResourceUpdated()
@@ -1025,8 +980,8 @@ onResourceUpdated(handler: (notification: z.infer<typeof ResourceUpdatedNotifica
 
 ```typescript
 client.onResourceUpdated(async (notification) => {
-  console.log('资源已更新:', notification.params.uri);
-});
+  console.log('资源已更新:', notification.params.uri)
+})
 ```
 
 ## onLoggingMessage()
@@ -1047,6 +1002,6 @@ onLoggingMessage(handler: (notification: z.infer<typeof LoggingMessageNotificati
 
 ```typescript
 client.onLoggingMessage(async (notification) => {
-  console.log(`[${notification.params.level}] ${notification.params.message}`);
-});
+  console.log(`[${notification.params.level}] ${notification.params.message}`)
+})
 ```

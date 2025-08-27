@@ -1,5 +1,5 @@
 ---
-title: "工具函数"
+title: '工具函数'
 ---
 
 ```typescript
@@ -17,7 +17,7 @@ import {
   createMessageChannelServerTransport,
   createMessageChannelPairTransport,
   isMessageChannelServerTransport,
-  isMcpServer,
+  isMcpServer
 } from '@opentiny/next-sdk'
 ```
 
@@ -43,8 +43,8 @@ function createSSEClientTransport(url: URL, opts?: SSEClientTransportOptions): S
 **示例**
 
 ```typescript
-const url = new URL('http://localhost:3000/sse');
-const transport = createSSEClientTransport(url);
+const url = new URL('http://localhost:3000/sse')
+const transport = createSSEClientTransport(url)
 ```
 
 ## createStreamableHTTPClientTransport()
@@ -54,7 +54,10 @@ const transport = createSSEClientTransport(url);
 **类型**
 
 ```typescript
-function createStreamableHTTPClientTransport(url: URL, opts?: StreamableHTTPClientTransportOptions): StreamableHTTPClientTransport
+function createStreamableHTTPClientTransport(
+  url: URL,
+  opts?: StreamableHTTPClientTransportOptions
+): StreamableHTTPClientTransport
 ```
 
 **参数**
@@ -69,8 +72,8 @@ opts?: StreamableHTTPClientTransportOptions - HTTP 客户端传输配置选项(�
 **示例**
 
 ```typescript
-const url = new URL('http://localhost:3000/stream');
-const transport = createStreamableHTTPClientTransport(url);
+const url = new URL('http://localhost:3000/stream')
+const transport = createStreamableHTTPClientTransport(url)
 ```
 
 ## createMessageChannelClientTransport()
@@ -95,7 +98,7 @@ globalObject?: object - 全局对象(可选)
 **示例**
 
 ```typescript
-const transport = createMessageChannelClientTransport('ws://localhost:3000');
+const transport = createMessageChannelClientTransport('ws://localhost:3000')
 ```
 
 ## isSSEClientTransport()
@@ -119,7 +122,7 @@ transport: unknown - 要检查的传输实例
 **示例**
 
 ```typescript
-const transport = createSSEClientTransport(new URL('http://localhost:3000'));
+const transport = createSSEClientTransport(new URL('http://localhost:3000'))
 if (isSSEClientTransport(transport)) {
   // 处理 SSE 传输
 }
@@ -146,7 +149,7 @@ transport: unknown - 要检查的传输实例
 **示例**
 
 ```typescript
-const transport = createStreamableHTTPClientTransport(new URL('http://localhost:3000'));
+const transport = createStreamableHTTPClientTransport(new URL('http://localhost:3000'))
 if (isStreamableHTTPClientTransport(transport)) {
   // 处理 HTTP 流传输
 }
@@ -224,7 +227,7 @@ globalObject?: object - 全局对象(可选)
 **示例**
 
 ```typescript
-const transport = createMessageChannelServerTransport('ws://localhost:3000');
+const transport = createMessageChannelServerTransport('ws://localhost:3000')
 ```
 
 ## createMessageChannelPairTransport()
@@ -244,7 +247,7 @@ function createMessageChannelPairTransport(): [Transport, Transport]
 **示例**
 
 ```typescript
-const [serverTransport, clientTransport] = createMessageChannelPairTransport();
+const [serverTransport, clientTransport] = createMessageChannelPairTransport()
 ```
 
 ## isMessageChannelServerTransport()
@@ -268,7 +271,7 @@ transport: unknown - 要检查的传输实例
 **示例**
 
 ```typescript
-const transport = createMessageChannelServerTransport('ws://localhost:3000');
+const transport = createMessageChannelServerTransport('ws://localhost:3000')
 if (isMessageChannelServerTransport(transport)) {
   // 处理 MessageChannel 服务端传输
 }
@@ -298,4 +301,47 @@ server: unknown - 要检查的服务端实例
 if (isMcpServer(server)) {
   // 处理 MCP 服务端
 }
+```
+
+## getAISDKTools()
+
+用来对接 `AgentModelProvider` 返回一个工具集对象, 对接后可以让 `AgentModelProvider` 实例直接调用 MCP 工具。
+
+**类型**
+
+```typescript
+async getAISDKTools(client: WebMcpClient): Promise<ToolSet>
+```
+**参数**
+
+- `client: WebMcpClient`: WebMcpClient 实例
+**返回值**
+
+- `Promise<ToolSet>`: 工具集对象
+**示例**
+
+```typescript
+import { AgentModelProvider, getAISDKTools, WebMcpClient } from '@opentiny/next-sdk'
+
+const webAgent = new AgentModelProvider({
+  llmConfig: {
+    apiKey: 'sk-xxx',
+    baseURL: 'https://xxxxx',
+    providerType: 'deepseek'
+  }
+})
+
+const client = new WebMcpClient()
+
+const tools = await getAISDKTools(client)
+
+const generateTextResult = webAgent.chat({
+  model: 'deepseek-ai/DeepSeek-V3',
+  messages: [
+    { role: 'system', content: '你是xxx' },
+    { role: 'user', content: '1+1 等于多少？' }
+  ],
+  tools
+  // .......
+})
 ```

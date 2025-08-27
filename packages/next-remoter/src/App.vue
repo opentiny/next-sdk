@@ -4,13 +4,23 @@
       ref="robotRef"
       v-model:show="show"
       v-model:fullscreen="fullscreen"
-      title="OpenTiny 智能遥控器"
+      :title="title"
+      :locale="locale"
       :session-id="sessionId"
       :agentRoot="agentRoot"
+      mode="chat-dialog"
     >
-      <template #welcome>
+      <template #welcome v-if="welcomeTitle">
         <div style="flex: 1">
-          <tr-welcome title="智能助手" description="您好，我是Opentiny AI智能助手"> </tr-welcome>
+          <tr-welcome :title="welcomeTitle" :description="welcomeDesc" :icon="robotRef?.welcomeIcon"> </tr-welcome>
+          <tr-prompts :items="promptItems" :wrap="true" class="tiny-prompts" item-class="prompt-item"></tr-prompts>
+        </div>
+      </template>
+      <template #suggestions v-if="suggestions.length > 0">
+        <div class="chat-input-pills">
+          <TrSuggestionPillButton v-for="sgg in suggestions" :key="sgg" @click="handleSuggestionClick(sgg)">{{
+            sgg
+          }}</TrSuggestionPillButton>
         </div>
       </template>
     </tiny-remoter>
@@ -19,8 +29,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TrWelcome } from '@opentiny/tiny-robot'
 import { TinyRemoter } from './index'
+import { TrWelcome, TrPrompts, TrSuggestionPillButton } from '@opentiny/tiny-robot'
 
 const show = ref(true)
 const fullscreen = ref(true)
@@ -28,60 +38,43 @@ const robotRef = ref<InstanceType<typeof TinyRemoter>>()
 
 const query = new URLSearchParams(window.location.search)
 
+// 1、语言 en-US、zh-CN
+const locale = query.get('lang') || 'zh-CN'
+
+// 2、会话ID， 必传
 const sessionId = query.get('sessionId')!
 if (!sessionId) {
   alert('The URL lost sessionId')
 }
 
-// 组件内部的已经有默认值。 这里允许通过url 更换agent地址。
+// 3、组件内部的已经有默认值。 这里允许通过url 更换agent地址。
 const agentRoot = query.get('agentRoot') || 'https://agent.opentiny.design/api/v1/webmcp-trial/'
+
+// 4、标题
+const title = query.get('title') || 'OpenTiny Next'
+
+// 5、  定制接收 prompts, suggestion的参数
+const welcomeTitle = query.get('welcome-title')
+const welcomeDesc = query.get('welcome-desc')
+
+const promts = query.getAll('promt') || [] // promt=你好&promt=世界
+const promptItems = promts.map((str) => ({ label: str }))
+
+const suggestions = query.getAll('suggestion') || [] // suggestion=你好&suggestion=世界
+function handleSuggestionClick(str: string) {
+  robotRef.value.inputMessage = str
+}
 </script>
 
 <style scoped lang="less">
-.next-sdk-ai-panel {
-  width: 480px;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 9999;
-}
-
-.next-sdk-trigger-btn {
-  position: fixed;
-  bottom: 136px;
-  right: 100px;
-  font-size: 24px;
-  z-index: 30;
-  cursor: pointer;
-}
-
-.next-sdk-qr-code-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.chat-input {
-  margin-top: 8px;
-  padding: 10px 15px;
-}
-
-.tr-container {
-  container-type: inline-size;
-
-  :deep(.tr-welcome__title-wrapper) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+:deep(.tr-container__header-operations) {
+  .tr-icon-button {
+    display: none;
   }
-}
 
-.welcome-footer {
-  margin-top: 12px;
-  color: rgb(128, 128, 128);
-  font-size: 12px;
-  line-height: 20px;
+  .tr-icon-button:first-child {
+    display: block;
+  }
 }
 
 .tiny-prompts {
@@ -102,17 +95,9 @@ const agentRoot = query.get('agentRoot') || 'https://agent.opentiny.design/api/v
   }
 }
 
-.tr-history-demo {
-  position: absolute;
-  right: 100%;
-  top: 100%;
-  z-index: 100;
-  width: 300px;
-  height: 600px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-}
-
-:deep(.tr-container__header-operations button.tr-icon-button:first-child) {
-  display: none;
+.chat-input-pills {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 16px;
 }
 </style>

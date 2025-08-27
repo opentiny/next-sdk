@@ -1,5 +1,17 @@
 import { QrCode } from './QrCode'
 
+/** 菜单项配置接口 */
+interface MenuItemConfig {
+  /** 菜单项标识 */
+  action: 'qr-code' | 'ai-chat' | 'remote-control'
+  /** 是否显示该菜单项 */
+  show?: boolean
+  /** 菜单项文本 */
+  text?: string
+  /** 菜单项图标SVG */
+  icon?: string
+}
+
 /**  配置选项接口 */
 interface FloatingBlockOptions {
   /** 弹出 AI 对话框的回调函数 */
@@ -9,16 +21,60 @@ interface FloatingBlockOptions {
   qrCodeUrl?: string
   /** 被遥控页面的 sessionId, 必填 */
   sessionId: string
+  /** 菜单项配置 */
+  menuItems?: MenuItemConfig[]
 }
 
 // 动作类型
 type ActionType = 'qr-code' | 'ai-chat' | 'remote-control'
+
+// 默认菜单项配置
+const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
+  {
+    action: 'qr-code',
+    show: true,
+    text: '弹出二维码',
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9H6V21H3C2.45 21 2 20.55 2 20V10C2 9.45 2.45 9 3 9Z" fill="currentColor"/>
+      <path d="M12 2H20C21.1 2 22 2.9 22 4V20C22 21.1 21.1 22 20 22H12C10.9 22 10 21.1 10 20V4C10 2.9 10.9 2 12 2ZM12 20H20V4H12V20Z" fill="currentColor"/>
+      <path d="M15 7H17V9H15V7Z" fill="currentColor"/>
+      <path d="M15 11H17V13H15V11Z" fill="currentColor"/>
+      <path d="M15 15H17V17H15V15Z" fill="currentColor"/>
+      <path d="M19 7H21V9H19V7Z" fill="currentColor"/>
+      <path d="M19 11H21V13H19V11Z" fill="currentColor"/>
+      <path d="M19 15H21V17H19V15Z" fill="currentColor"/>
+    </svg>`
+  },
+  {
+    action: 'ai-chat',
+    show: true,
+    text: '弹出AI对话框',
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z" fill="currentColor"/>
+      <path d="M7 9H17V11H7V9Z" fill="currentColor"/>
+      <path d="M7 12H14V14H7V12Z" fill="currentColor"/>
+    </svg>`
+  },
+  {
+    action: 'remote-control',
+    show: true,
+    text: '发送遥控指令',
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7 2H17C18.1 2 19 2.9 19 4V20C19 21.1 18.1 22 17 22H7C5.9 22 5 21.1 5 20V4C5 2.9 5.9 2 7 2ZM7 4V20H17V4H7Z" fill="currentColor"/>
+      <path d="M9 6H15V8H9V6Z" fill="currentColor"/>
+      <path d="M9 10H15V12H9V10Z" fill="currentColor"/>
+      <path d="M9 14H15V16H9V14Z" fill="currentColor"/>
+      <path d="M9 18H15V20H9V18Z" fill="currentColor"/>
+    </svg>`
+  }
+]
 
 class FloatingBlock {
   private options: FloatingBlockOptions
   private isExpanded = false
   private floatingBlock!: HTMLDivElement
   private dropdownMenu!: HTMLDivElement
+  private menuItems: MenuItemConfig[]
 
   constructor(options: FloatingBlockOptions) {
     if (!options.sessionId) {
@@ -30,7 +86,34 @@ class FloatingBlock {
       ...options
     }
 
+    // 合并默认菜单项配置和用户配置
+    this.menuItems = this.mergeMenuItems(options.menuItems)
+
     this.init()
+  }
+
+  /**
+   * 合并菜单项配置
+   * @param userMenuItems 用户自定义菜单项配置
+   * @returns 合并后的菜单项配置
+   */
+  private mergeMenuItems(userMenuItems?: MenuItemConfig[]): MenuItemConfig[] {
+    if (!userMenuItems) {
+      return DEFAULT_MENU_ITEMS
+    }
+
+    return DEFAULT_MENU_ITEMS.map((defaultItem) => {
+      const userItem = userMenuItems.find((item) => item.action === defaultItem.action)
+      if (userItem) {
+        return {
+          ...defaultItem,
+          ...userItem,
+          // 确保show属性存在，默认为true
+          show: userItem.show !== undefined ? userItem.show : defaultItem.show
+        }
+      }
+      return defaultItem
+    })
   }
 
   private init(): void {
@@ -46,7 +129,7 @@ class FloatingBlock {
     this.floatingBlock.className = 'tiny-remoter-floating-block'
     this.floatingBlock.innerHTML = `
       <div class="tiny-remoter-floating-block__icon">
-        <img style="display: block; width: 40px;" src="https://ai.opentiny.design/next-sdk/logo.png" alt="icon" />
+        <img style="display: block; width: 40px;" src="https://ai.opentiny.design/next-remoter/svgs/logo-next-bg-blue-left.svg" alt="icon" />
       </div>
     `
 
@@ -57,45 +140,23 @@ class FloatingBlock {
   private createDropdownMenu(): void {
     this.dropdownMenu = document.createElement('div')
     this.dropdownMenu.className = 'tiny-remoter-floating-dropdown'
-    this.dropdownMenu.innerHTML = `
-      <div class="tiny-remoter-dropdown-item" data-action="qr-code">
-        <div class="tiny-remoter-dropdown-item__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 9H6V21H3C2.45 21 2 20.55 2 20V10C2 9.45 2.45 9 3 9Z" fill="currentColor"/>
-            <path d="M12 2H20C21.1 2 22 2.9 22 4V20C22 21.1 21.1 22 20 22H12C10.9 22 10 21.1 10 20V4C10 2.9 10.9 2 12 2ZM12 20H20V4H12V20Z" fill="currentColor"/>
-            <path d="M15 7H17V9H15V7Z" fill="currentColor"/>
-            <path d="M15 11H17V13H15V11Z" fill="currentColor"/>
-            <path d="M15 15H17V17H15V15Z" fill="currentColor"/>
-            <path d="M19 7H21V9H19V7Z" fill="currentColor"/>
-            <path d="M19 11H21V13H19V11Z" fill="currentColor"/>
-            <path d="M19 15H21V17H19V15Z" fill="currentColor"/>
-          </svg>
+
+    // 根据配置动态生成菜单项
+    const menuItemsHTML = this.menuItems
+      .filter((item) => item.show !== false) // 过滤掉show为false的菜单项
+      .map(
+        (item) => `
+        <div class="tiny-remoter-dropdown-item" data-action="${item.action}">
+          <div class="tiny-remoter-dropdown-item__icon">
+            ${item.icon}
+          </div>
+          <span>${item.text}</span>
         </div>
-        <span>弹出二维码</span>
-      </div>
-      <div class="tiny-remoter-dropdown-item" data-action="ai-chat">
-        <div class="tiny-remoter-dropdown-item__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z" fill="currentColor"/>
-            <path d="M7 9H17V11H7V9Z" fill="currentColor"/>
-            <path d="M7 12H14V14H7V12Z" fill="currentColor"/>
-          </svg>
-        </div>
-        <span>弹出AI对话框</span>
-      </div>
-      <div class="tiny-remoter-dropdown-item" data-action="remote-control">
-        <div class="tiny-remoter-dropdown-item__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 2H17C18.1 2 19 2.9 19 4V20C19 21.1 18.1 22 17 22H7C5.9 22 5 21.1 5 20V4C5 2.9 5.9 2 7 2ZM7 4V20H17V4H7Z" fill="currentColor"/>
-            <path d="M9 6H15V8H9V6Z" fill="currentColor"/>
-            <path d="M9 10H15V12H9V10Z" fill="currentColor"/>
-            <path d="M9 14H15V16H9V14Z" fill="currentColor"/>
-            <path d="M9 18H15V20H9V18Z" fill="currentColor"/>
-          </svg>
-        </div>
-        <span>发送遥控指令</span>
-      </div>
-    `
+      `
+      )
+      .join('')
+
+    this.dropdownMenu.innerHTML = menuItemsHTML
 
     document.body.appendChild(this.dropdownMenu)
   }
@@ -258,9 +319,6 @@ class FloatingBlock {
         right: 30px;
         width: 60px;
         height: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 50%;
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -269,16 +327,16 @@ class FloatingBlock {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 99;
         overflow: hidden;
-      }
-
-      .tiny-remoter-floating-block:hover {
-        transform: scale(1.1);
-        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+        border-radius: 50%;
       }
 
       .tiny-remoter-floating-block__icon {
         transform: scale(0.8);
         transition: transform 0.3s ease;
+      }
+
+       .tiny-remoter-floating-block__icon:hover {
+        transform: scale(1.1);
       }
 
       .tiny-remoter-floating-block.expanded .tiny-remoter-floating-block__icon {
