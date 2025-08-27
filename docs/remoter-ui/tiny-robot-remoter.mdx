@@ -6,20 +6,20 @@ title: "TinyRobot版本"
 import { TinyRemoter } from '@opentiny/next-remoter'
 ```
 
-该组件为使用 `@opentiny/tiny-robot` 开发的 `TinyRemoter`, 仅支持 `Vue3`。
+该组件为使用 `@opentiny/tiny-robot` 开发的 `TinyRemoter`, 仅支持 `Vue3` 。
 
 ## 属性
 
 - v-model:fullscreen 双向绑定是否全屏
-- v-model:show 双向绑定是否显示，内部关闭是emit('update:show',false)
+- v-model:show 双向绑定是否显示，内部关闭是 emit('update:show',false)
 - sessionId 必须传
 - title 左上角的 container.title
 - agentRoot 后端代理的地址，有默认值 `https://agent.opentiny.design/api/v1/webmcp-trial/`
 
 ## 插槽
 
-- #welcome: 没有对话消息时，展示在组件中间的`Welcome & Promts` 等内容。设计成插槽可以让用户有完全的定制能力。
-- #suggestions: 展示在输入框上面的提示性组件。可以使用 `@opentiny/tiny-robot` 中的 `SuggestionPills`等强大功能的组件。
+- #welcome: 没有对话消息时，展示在组件中间的 `Welcome & Promts` 等内容。设计成插槽可以让用户有完全的定制能力。
+- #suggestions: 展示在输入框上面的提示性组件。可以使用 `@opentiny/tiny-robot` 中的 `SuggestionPills` 等强大功能的组件。
 
 ## 导出变量
 
@@ -44,7 +44,7 @@ defineExpose({
 })
 ```
 
-导出变量是方便在插槽中使用内部的功能，比如 `#welcome插槽` 中点击后 `Promts`,发出固定的请求:
+导出变量是方便在插槽中使用内部的功能，比如 ` #welcome 插槽` 中点击后 `Promts` ,发出固定的请求:
 
 ```typescript
 const robotRef = ref<InstanceType<typeof TinyRemoter>>()

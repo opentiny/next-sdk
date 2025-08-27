@@ -7,12 +7,12 @@ title: "uni-app 应用接入"
 
 ## 1、 项目准备
 
-首先，确保你的环境安装正确，比如 `Nodejs,npm, HBuilder X`等均能正常使用。
-打开 `HBuilder X` 开发环境，通过`文件` -> `新建` -> `项目` 菜单，创建一个标准的 `Uniapp x` 的应用，并确保能正常运行该项目。
+首先，确保你的环境安装正确，比如 Nodejs , Npm , HBuilder X 等均能正常使用。
+打开 HBuilder X 开发环境，通过 **文件 -> 新建 -> 项目** 菜单，创建一个标准的 Uniapp x 的应用，并确保能正常运行该项目。
 
 ## 2、 开发应用页面
 
-参考 [UniApp x 官网](https://doc.dcloud.net.cn/uni-app-x/)开发应用的页面，并在`pages.json`中注册，以下示例注册了电商商场的3个页面：
+参考 [ UniApp x ](https://doc.dcloud.net.cn/uni-app-x/) 官网开发应用的页面，并在 `pages.json` 中注册，以下示例注册了电商商场的3个页面：
 
 ```json
 {
@@ -67,7 +67,7 @@ title: "uni-app 应用接入"
 
 export const AGENT_ROOT = 'https://agent.opentiny.design/api/v1/webmcp-trial/'
 export const ROMOTER_ROOT = 'https://ai.opentiny.design/'
-export const webMcpServer = { value: null as any }  // 页面引入该对象，即引用了server
+export const webMcpServer = { value: null as any }  // 页面引入该对象，即引用了 server
 export const webMcpClient = { value: null as any }   
 export const webSessionId = { value: null as any }
 
@@ -107,7 +107,7 @@ export async function initMcpServer() {
   { capabilities: capabilities })
 
  webMcpServer.value = server
-    // ------- 在此可以注册业务的tools
+    // ------- 在此可以注册业务的 tools
 
  serverTransport.onerror = (error) => {
   console.error(`ServerTransport error:`, error)
@@ -120,9 +120,9 @@ export async function initMcpServer() {
 
 ```
 
- 在上面`next-sdk-store.uts` 模块中， 暴露了2个关键函数：`initMcpClient` 和 `initMcpServer` 分别用于初始化服务端和客户端。在初始化客户端时，使用到的 `sessionId` 可以固定一个字符串，也可以不传入，让框架随机生成一个  `sessionId` ，详细说明请参考 [WebMcpClient 类](/guide/api-client)。
+ 在上面 `next-sdk-store.uts` 模块中，暴露了2个关键函数： `initMcpClient` 和 `initMcpServer` 分别用于初始化服务端和客户端。在初始化客户端时，使用到的 `sessionId` 可以固定一个字符串，也可以不传入，让框架随机生成一个  `sessionId` ，详细说明请参考 [WebMcpClient 类](/guide/api-client)。
 
- 在 `App.uvue`文件是管理项目app 的生命周期的文件，我们可以在这里引入上面2个函数来接入`next-sdk` ：
+ 在 `App.uvue` 文件是管理项目 app 的生命周期的文件，我们可以在这里引入上面2个函数来接入 `next-sdk` ：
 
  ```javascript
  import { initMcpClient, initMcpServer } from './next-sdk-store'
@@ -130,7 +130,7 @@ export async function initMcpServer() {
  let firstBackTime = 0
  export default {
   onLaunch: function () {
-            // 在此接入
+  // 在此接入
    initMcpServer()
    initMcpClient()
   },
@@ -147,7 +147,7 @@ export async function initMcpServer() {
 
 ## 4、为应用编写工具
 
- 项目还需要编写一些业务相关的工具(Mcp Tool) 来实现智能化操作，这些工具可以写在 `initMcpServer` 函数内部，也可以写在任意模块中，比如 创建新模块`register-tools.uts`，并添加一组电商类的Tool:
+ 项目还需要编写一些业务相关的 Mcp Tool 工具来实现智能化操作，这些工具可以写在 `initMcpServer` 函数内部，也可以写在任意模块中，比如 创建新模块`register-tools.uts`，并添加一组电商类的 Tool:
 
  ```typescript
 import { webMcpServer } from "./next-sdk-store"
@@ -212,9 +212,9 @@ export function registerTools(){
  server.registerTool(
   'add-product-to-cart',
   {
-   description: '往购物车中添加商品,参数为商品的id和商品的数量',
+   description: '往购物车中添加商品,参数为商品的 id 和商品的数量',
    inputSchema: {
-    productId:z.number().describe("商品ID"),
+    productId:z.number().describe("商品 ID "),
     quantity:z.number().default(1).describe("商品数量"),
    }
   },
@@ -240,7 +240,7 @@ export function registerTools(){
 
  ```typescript
 uni.openDialogPage({
-    url: "/pages/qr",  // 注册一个全局的qu 弹出窗的页面，并在这里打开 
+    url: "/pages/qr",  // 注册一个全局的 qr 弹出窗的页面，并在这里打开 
 })
  ```
 

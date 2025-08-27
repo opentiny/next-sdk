@@ -9,7 +9,7 @@ title: "远程连接 WebAgent 服务器"
 
 ## 在 WebAgent 平台注册应用
 
-**1. 注册并登录**
+**一. 注册并登录**
 
 ![alt text](../assets/images/webAgent/WebAgent1.png)
 
@@ -21,25 +21,25 @@ title: "远程连接 WebAgent 服务器"
 
 * 输入注册的账号密码，完成登录。
 
-**2. 创建应用**
+**二. 创建应用**
 
-* 点击顶部菜单项：应用管理，跳转到应用管理页面
+1. 点击顶部菜单项：应用管理，跳转到应用管理页面
 
-* 点击创建应用，进入创建应用流程。
+2. 点击创建应用，进入创建应用流程
 
 ![alt text](../assets/images/webAgent/WebAgent2.png)
 
-* 选择**桌面应用**
+3. 选择桌面应用
 
 ![alt text](../assets/images/webAgent/WebAgent3.png)
 
-* 输入**应用名称**，点击**下一步**
+4. 输入应用名称，点击下一步
 
 ![alt text](../assets/images/webAgent/WebAgent4.png)
 
 
 
-* 输入三个重定向 **URL**。
+5. 输入三个重定向 URL
 
 ![alt text](../assets/images/webAgent/WebAgent5.png)
 
@@ -49,30 +49,30 @@ title: "远程连接 WebAgent 服务器"
 - `http://localhost:8089`  该地址为受控制端前端的地址，需要加上，不然会有跨域错误。
 - `http://localhost:8088`  该地址为控制端前端的地址，需要加上，不然会有跨域错误。
 
-* 输入操控端回调 **uri** (选填)。
+6. 输入操控端回调 uri (选填)。
 
 ![alt text](../assets/images/webAgent/WebAgent6.png)
 
 `http://localhost:6274/oauth/callback` 表示我们的应用允许被 `http://localhost:6274` 的操控端操控。
 
-* 输入**scope**为 **mcp:web**，然后点击**下一步**。
+7. 输入 scope 为 mcp:web，然后点击下一步。
 
 ![alt text](../assets/images/webAgent/WebAgent7.png)
 
 
-*  点击**下一步**
+8. 点击下一步
 
 ![alt text](../assets/images/webAgent/WebAgent8.png)
 
-*  **勾选** 我已仔细检查上述配置，确认创建此OAuth应用
+9. 勾选我已仔细检查上述配置，确认创建此 OAuth 应用
 
 ![alt text](../assets/images/webAgent/WebAgent9.png)
 
-*   **复制 clientId**
+10. 复制 clientId
 
 ![alt text](../assets/images/webAgent/WebAgent10.png)
 
-*  修改项目中的相关配置, 详情参考 创建 WebMcpClient，并与 WebAgent 连接
+11. 修改项目中的相关配置, 详情参考 创建 WebMcpClient ，并与 WebAgent 连接
 
 ## 安装 NEXT SDK
 
@@ -95,7 +95,7 @@ const getAuthCodeByState = (url: string | URL, state: string) => {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Bearer ${token}` // token为设置的请求头token
+      Authorization: `Bearer ${token}` // token 为设置的请求头 token
     },
     body: new URLSearchParams({ state })
   });
@@ -113,7 +113,7 @@ const ECS_METADATA = {
 const authProvider = new AuthClientProvider({ clientMetadata: ECS_METADATA, getAuthCodeByState });
 
 authProvider.saveClientInformation({
-  client_id: clientId, // 在WebAgent复制的 clientId
+  client_id: clientId, // 在 WebAgent 复制的 clientId
   redirect_uris: ECS_METADATA.redirect_uris
 });
 
@@ -130,7 +130,7 @@ onMounted(async () => {
 )}
 ```
 
-## 创建 WebMcpServer，并与 ServerTransport 连接
+## 创建 WebMcpServer ，并与 ServerTransport 连接
 
 在 **App.vue** 文件中加入以下代码：
 
