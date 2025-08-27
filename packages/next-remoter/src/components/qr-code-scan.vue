@@ -2,7 +2,7 @@
   <div>
     <tr-icon-button :icon="TinyIconScan" size="28" svgSize="20" @click="handleScan()" />
     <teleport to="body">
-      <div v-if="isScanning" class="scanCode">
+      <div v-show="isScanning" class="scanCode">
         <div class="container">
           <div class="qrcode">
             <div id="reader"></div>
@@ -43,11 +43,11 @@ const start = () => {
       (decodedText, decodedResult) => {
         console.log('decodedText', decodedText)
         console.log('decodedResult', decodedResult)
-        isScanning.value = false
+        stop()
       }
     )
     .catch((err) => {
-      isScanning.value = false
+      stop()
       console.log('扫码错误信息', err)
       let message = ''
       // 错误信息处理仅供参考，具体描述自定义
