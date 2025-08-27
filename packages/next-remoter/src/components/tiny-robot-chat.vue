@@ -21,7 +21,7 @@
         :roles="roles"
         auto-scroll
         :loading="messageState.status === STATUS.PROCESSING"
-        :loading-role="assistant"
+        loading-role="assistant"
       >
       </tr-bubble-list>
     </tr-bubble-provider>

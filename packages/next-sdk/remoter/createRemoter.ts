@@ -129,7 +129,7 @@ class FloatingBlock {
     this.floatingBlock.className = 'tiny-remoter-floating-block'
     this.floatingBlock.innerHTML = `
       <div class="tiny-remoter-floating-block__icon">
-        <img style="display: block; width: 40px;" src="https://ai.opentiny.design/next-remoter/svgs/logo-next-bg-blue-left.svg" alt="icon" />
+        <img style="display: block; width: 56px;" src="https://ai.opentiny.design/next-remoter/svgs/logo-next-no-bg-left.svg" alt="icon" />
       </div>
     `
 
