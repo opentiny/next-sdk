@@ -7,7 +7,7 @@ title: "快速开始"
 * **一个核心 SDK**，基于 MCP 官方 SDK 实现，简化了原生 MCP 方法，增强了 connect 方法，适用于 Web 应用
 * **一个遥控器**，集成了 TinyRobot AI 对话框，可以用对话方式操控 Web 应用，支持手机扫码遥控
 
-**NEXT SDK** 支持通过各种主流 MCP Host 对智能应用进行操控，支持主流大模型，支持主流 AI 对话框，支持[Vue](https://cn.vuejs.org/)、[React](https://react.dev/)、[Angular](https://www.angular.cn/) 主流前端框架。
+**NEXT SDK** 支持通过各种主流 MCP Host 对智能应用进行操控，支持主流大模型，支持主流 AI 对话框，支持 [ Vue ](https://cn.vuejs.org/)、[ React ](https://react.dev/)、[Angular](https://www.angular.cn/) 主流前端框架。
 
 ## 让你的应用智能化
 
@@ -22,6 +22,7 @@ npm i @opentiny/next-sdk
 **第二步：创建 WebMcpServer ，并与 ServerTransport 连接**
 
 ```typescript
+
 import { WebMcpServer, createMessageChannelPairTransport, z } from '@opentiny/next-sdk'
 
 const [serverTransport, clientTransport] = createMessageChannelPairTransport()
