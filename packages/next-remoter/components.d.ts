@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    QrCodeScan: typeof import('./src/components/qr-code-scan.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TinyRobotChat: typeof import('./src/components/tiny-robot-chat.vue')['default']

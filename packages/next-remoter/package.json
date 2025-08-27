@@ -24,6 +24,8 @@
     "@opentiny/tiny-robot-svgs": "0.3.0-rc.0",
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@opentiny/vue": "^3.25.0",
+    "@opentiny/vue-icon": "^3.25.0",
+    "html5-qrcode": "^2.3.8",
     "vue": "^3.3.11"
   },
   "devDependencies": {

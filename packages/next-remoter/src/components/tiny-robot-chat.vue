@@ -5,6 +5,7 @@
     </template>
     <template #operations>
       <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="createConversation()" />
+      <QrCodeScan />
     </template>
     <tr-bubble-provider :content-renderers="contentRenderer">
       <slot name="welcome" v-if="messages.length === 0">
@@ -79,8 +80,9 @@ import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { IconNewSession } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobot } from '../composable/useTinyRobot'
-import { computed, nextTick, watch, h, CSSProperties, toRef } from 'vue'
+import { nextTick, watch, h, CSSProperties, toRef } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
+import QrCodeScan from './qr-code-scan.vue'
 
 defineOptions({
   name: 'TinyRemoter'
