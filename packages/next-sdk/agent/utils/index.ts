@@ -12,7 +12,7 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
     return []
   }
   // 使用 Promise.all 并行处理所有 mcpServer 项
-  const allMcpClients = await Promise.all(
+  return Promise.all(
     mcpServers.map(async (item: McpServerConfig) => {
       try {
         let transport: MCPClientConfig['transport']
@@ -30,20 +30,27 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
       }
     })
   )
-
-  return allMcpClients
 }
 
 /** 合并所有的Mcp Tools */
-export const getMcpTools = async (mcpClients: MCPClient[], options: Record<string, any>): Promise<ToolSet> => {
+export const getMcpTools = async (
+  mcpClients: MCPClient[],
+  options: Record<string, any>,
+  ignoreToolnames: string[]
+): Promise<ToolSet> => {
   const tools = await Promise.all(mcpClients.map((client) => client?.tools?.()))
   const toolsResult = tools.reduce((acc, curr) => ({ ...acc, ...curr }), {})
   const toolsOptions = options?.tools ?? {}
 
-  return {
+  const mergedTools = {
     ...toolsResult,
     ...toolsOptions
   }
+
+  ignoreToolnames.forEach((name) => {
+    delete mergedTools[name]
+  })
+  return mergedTools
 }
 
 /**

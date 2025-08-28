@@ -11,8 +11,9 @@ interface useTinyRobotOption {
 }
 
 export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
+  const customAgentProvider = new CustomAgentModelProvider({ provider: 'custom' }, sessionId, agentRoot)
   const client = new AIClient({
-    providerImplementation: new CustomAgentModelProvider({ provider: 'custom' }, sessionId, agentRoot),
+    providerImplementation: customAgentProvider,
     provider: 'custom'
   })
 
@@ -96,6 +97,7 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
   })
 
   return {
+    agent: customAgentProvider.agent,
     client,
     fullscreen,
     show,

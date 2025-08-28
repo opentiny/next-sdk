@@ -149,6 +149,7 @@ const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
 const show = defineModel('show', { type: Boolean, default: false })
 
 const {
+  agent, // ai-sdk的自定义代理，client通过它和llm 对话。 agent.ignoreToolnames=[] 是记录需要过滤掉的tools
   client,
   welcomeIcon,
   messages,
@@ -255,18 +256,45 @@ const handlePillItemClick = (item: ReturnType<typeof mapMake>) => {
   inputMessage.value = item.inputMessage
 }
 
-const handleScanSuccess = (decodedText: string) => {
+// 处理扫码结果。 把结果添加到 agent.mcpServers， 以及 插入McpServerPicker的一个Plugin
+const handleScanSuccess = async (decodedText: string) => {
   const url = new URL(decodedText)
-  const agent = client?.provider?.agent
   const sessionId = url.searchParams.get('sessionId')
 
-  if (sessionId && agent) {
-    agent.insertMcpServers([
-      {
-        type: 'streamableHttp',
-        url: `${props.agentRoot}mcp?sessionId=${sessionId}`
+  if (sessionId) {
+    const mcpConfig = {
+      type: 'streamableHttp',
+      url: `${props.agentRoot}mcp?sessionId=${sessionId}`
+    } as const
+    // 1、 插入McpServers, 此时内部会判断重复。  不重复则 initClients()
+    const inserted = await agent.insertMcpServer(mcpConfig)
+
+    if (inserted) {
+      // 2、 插入Plugin
+      const lastClient = agent.mcpClients.slice(-1)[0] //
+      const clientTools = (await lastClient.tools()) || {}
+
+      const plugin: PluginInfo = {
+        id: `plugin-${sessionId}`,
+        name: url.origin,
+        icon: 'https://res.hc-cdn.com/tinyui-design/3.25.0.20250721191929/home/favicon.ico',
+        description: sessionId,
+        enabled: true,
+        expanded: true,
+        tools: Object.keys(clientTools).map((key) => {
+          return {
+            id: key,
+            name: key,
+            description: clientTools[key].description as string,
+            enabled: true
+          }
+        }),
+        // @ts-ignore
+        originMcpConfig: mcpConfig // 缓存对应的mcpServers中的一个值
       }
-    ])
+
+      installedPlugins.value.push(plugin)
+    }
   }
 }
 
@@ -340,16 +368,32 @@ const marketCategoryOptions = ref<MarketCategoryOption[]>([
 
 // 整个插件的打开或关闭
 const handlePluginToggle = (plugin: PluginInfo, enabled: boolean) => {
-  console.log('handlePluginToggle', plugin, enabled)
+  // Keep empty!
 }
 
 // 某个tool的打开或关闭。  全部tool状态一致时，会同时触发handlePluginToggle 一下。
 const handleToolToggle = (plugin: PluginInfo, toolId: string, enabled: boolean) => {
-  console.log('handleToolToggle', plugin, toolId, enabled)
+  if (enabled) {
+    agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== toolId)
+  } else {
+    agent.ignoreToolnames.push(toolId)
+  }
 }
-// 插件删除。 删除时要判断插件中的tool有没有启用
+// 插件删除
 const handlePluginDelete = (plugin: PluginInfo) => {
+  // 从安装插件删除， 市场插件还原状态。
   installedPlugins.value = installedPlugins.value.filter((item) => item !== plugin)
+  const findInMarket = marketPlugins.value.find((item) => item.id === plugin.id)
+  if (findInMarket) {
+    findInMarket.added = false
+  }
+
+  // 移除mcpServers
+  agent.mcpServers = agent.mcpClients.filter((item) => item !== plugin.originMcpConfig)
+  // 移除 ignoreToolnames
+  plugin.tools.forEach((tool) => {
+    agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== tool.name)
+  })
 }
 // 插件添加。 新添加的插件默认不启用，所以不需要更新 tools
 const handlePluginAdd = (plugin: PluginInfo) => {
@@ -357,7 +401,7 @@ const handlePluginAdd = (plugin: PluginInfo) => {
 
   installedPlugins.value.push({
     ...plugin,
-    id: `${plugin.id}-installed-${Date.now()}`, // 生成新的ID避免冲突
+    id: plugin.id,
     enabled: false, // 新添加的插件默认不启用
     added: true
   })

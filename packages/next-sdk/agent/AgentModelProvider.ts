@@ -12,6 +12,9 @@ export class AgentModelProvider {
   isGetMcpClients = false
   mcpClients: any[] = []
 
+  // 需要实时过滤掉的tools
+  ignoreToolnames: string[] = []
+
   constructor({ llmConfig, mcpServers, llm }: IAgentModelProviderOption) {
     // 1、保存 mcpServer
     this.mcpServers = mcpServers || []
@@ -46,13 +49,21 @@ export class AgentModelProvider {
   async updateMcpServers(mcpServers: McpServerConfig[]) {
     this.mcpServers = mcpServers
     this.isGetMcpClients = false
-    return await this.initClients()
+    return this.initClients()
   }
 
-  async insertMcpServers(mcpServers: McpServerConfig[]) {
-    this.mcpServers = [...this.mcpServers, ...mcpServers]
-    this.isGetMcpClients = false
-    return await this.initClients()
+  async insertMcpServer(mcpServer: McpServerConfig) {
+    const find = this.mcpServers.find((item) => item.url === mcpServer.url)
+
+    if (!find) {
+      this.mcpServers = [...this.mcpServers, mcpServer]
+      this.isGetMcpClients = false
+      await this.initClients()
+
+      return true
+    }
+    await this.initClients()
+    return false
   }
 
   async chat({
@@ -66,7 +77,7 @@ export class AgentModelProvider {
 
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
     await this.initClients()
-    const tools = await getMcpTools(this.mcpClients, options)
+    const tools = await getMcpTools(this.mcpClients, options, this.ignoreToolnames)
 
     return generateText({
       // @ts-ignore  ProviderV2 是所有llm的父类， 在每一个具体的llm 类都有一个选择model的函数用法
@@ -88,8 +99,8 @@ export class AgentModelProvider {
 
     // 每次会话需要获取最新的工具列表，因为工具是会发生变化的
     await this.initClients()
-    const tools = await getMcpTools(this.mcpClients, options)
-
+    const tools = await getMcpTools(this.mcpClients, options, this.ignoreToolnames)
+    debugger
     return streamText({
       // @ts-ignore 同上
       model: this.llm(model),
