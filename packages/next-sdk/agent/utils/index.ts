@@ -23,7 +23,7 @@ export const getMcpClients = async (mcpServers: McpServerConfig[]) => {
           transport = item as MCPClientConfig['transport'] // sse 或 自定义的 MCPTranport
         }
 
-        return createMCPClient({ transport: transport as MCPClientConfig['transport'] })
+        return await createMCPClient({ transport: transport as MCPClientConfig['transport'] })
       } catch (error) {
         console.error(`Failed to create MCP client`, item, error)
         return []
