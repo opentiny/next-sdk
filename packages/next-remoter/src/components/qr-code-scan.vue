@@ -17,11 +17,10 @@
 </template>
 ​
 <script setup lang="ts">
-import { reactive, onMounted, onUnmounted, ref } from 'vue'
+import { reactive, onUnmounted, ref } from 'vue'
 import { Html5Qrcode } from 'html5-qrcode'
 import { IconScan } from '@opentiny/vue-icon'
 import { TrIconButton } from '@opentiny/tiny-robot'
-import { showToast } from 'vant'
 
 defineOptions({
   name: 'QrCodeScan'
@@ -41,33 +40,36 @@ const isScanning = ref(false)
 // 开始扫描二维码
 const start = () => {
   if (!state.html5QrCode) {
-    alert('摄像头无访问权限！')
+    showToast('摄像头无访问权限！')
     return
   }
 
   isScanning.value = true
-  state.html5QrCode.start(
-    { facingMode: 'environment' },
-    {
-      fps: 1,
-      qrbox: { width: 250, height: 250 }
-    },
-    (decodedText) => {
-      emit('scanSuccess', decodedText)
-      stop()
-    },
-    () => {
-      stop()
+  state.html5QrCode
+    .start(
+      { facingMode: 'environment' },
+      {
+        fps: 1,
+        qrbox: { width: 250, height: 250 }
+      },
+      (decodedText) => {
+        emit('scanSuccess', decodedText)
+        stop()
+      }
+    )
+    .catch((err) => {
+      console.log(err)
       showToast({
         message: `二维码识别失败`,
         duration: 3000
       })
-    }
-  )
+    })
 }
 
 const handleScan = () => {
-  start()
+  getCameras().then(() => {
+    start()
+  })
 }
 
 const clickBack = () => {
@@ -76,7 +78,7 @@ const clickBack = () => {
 
 // 获取摄像头权限并初始化
 const getCameras = () => {
-  Html5Qrcode.getCameras()
+  return Html5Qrcode.getCameras()
     .then((devices) => {
       if (devices && devices.length) {
         state.html5QrCode = new Html5Qrcode('reader')
@@ -108,11 +110,6 @@ const stop = () => {
       isScanning.value = false
     })
 }
-
-// 组件挂载时获取摄像头权限
-onMounted(() => {
-  getCameras()
-})
 
 // 组件卸载时停止扫描
 onUnmounted(() => {
