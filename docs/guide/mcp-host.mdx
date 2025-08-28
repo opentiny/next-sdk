@@ -5,13 +5,13 @@ title: "通过 MCP Host 操控 Web 应用"
 当一个传统的 Web 应用通过 NEXT SDK 升级为智能应用之后，该应用就可以被 AI 操控了。
 </Info>
 
-操控 Web 应用的程序我们称为**遥控器**，它是一个接入了 AI 的对话框程序，遥控器的载体可以是多种多样的，可以是支持 MCP 的 IDE 软件，
+操控 Web 应用的程序我们称为 **遥控器**，它是一个接入了 AI 的对话框程序，遥控器的载体可以是多种多样的，可以是支持 MCP 的 IDE 软件，
 比如：[VSCode Copilot](https://vscode.js.cn/) 、[ Cursor ](https://cursor.com/cn) 等，可以是通过智能体平台搭建的智能体应用，
 比如：[Dify](https://docs.dify.ai/) 、[Coze](https://www.coze.cn/)等，也可以是网页 AI 对话框，比如： [Ant Design X](https://ant-design-x.antgroup.com/) 、[Element Plus X](https://element-plus.org/) 等，甚至可以是一个手机 App 或 小程序。
 
 ## VSCode Copilot
 
-a. 在 VSCode 软件中打开你的项目工程，在项目根目录增加 `.vscode` 文件夹，里面添加一个 `mcp.json` 文件，在该文件中加入以下内容：
+1. 在 VSCode 软件中打开你的项目工程，在项目根目录增加 `.vscode` 文件夹，里面添加一个 `mcp.json` 文件，在该文件中加入以下内容。
 
 ```json
 {
@@ -23,37 +23,37 @@ a. 在 VSCode 软件中打开你的项目工程，在项目根目录增加 `.vsc
 }
 ```
 
-b. 配置完成之后点击 `my-app-mcp-server` 上方的启动按钮，这时你的 Web 应用的 MCP Server 就启动了。
+2. 配置完成之后点击 `my-app-mcp-server` 上方的启动按钮，这时你的 Web 应用的 MCP Server 就启动了。
 
 ![](../assets/images/vscode-copilot/1.png)
 
-c. 然后使用快捷键 Ctrl + Alt + I 打开 VSCode Copilot AI 对话框，切换到 Agent 模式。
+3. 然后使用快捷键 Ctrl + Alt + I 打开 VSCode Copilot AI 对话框，切换到 Agent 模式。
 
 ![](../assets/images/vscode-copilot/2.png)
 
-d. 在输入框中输入需要操作的内容，这时 AI 就会调用你的 Web 应用中定义的 MCP 工具，操作你的 Web 应用，例如帮我选中ID为6的公司,就会调用定义的mcp工具，点击继续按钮
+4. 在输入框中输入需要操作的内容，这时 AI 就会调用你的 Web 应用中定义的 MCP 工具，操作你的 Web 应用，例如帮我选中 ID 为 6 的公司,就会调用定义的 MCP 工具，点击继续按钮。
 
 ![](../assets/images/vscode-copilot/4.png)
 
-e. 查看是否调用 MCP 工具成功
+5. 查看是否调用 MCP 工具成功。
 
 ![](../assets/images/vscode-copilot/3.png)
 
 ## Cursor
 
-a. 在 https://cursor.com/cn 官网下载Cursor软件
+1. 在 [Cursor](https://cursor.com/cn) 官网下载软件。
 
 ![](../assets/images/cursor/1.png)
 
-b. 在Cursor中配置mcp servers ctrl + L 弹出AI对话框，点击设置按钮进行设置 MCP Server 
+2. 在 Cursor 使用快捷键 Ctrl + L 弹出 AI 对话框，点击设置按钮进行设置 MCP Server。
 
 ![](../assets/images/cursor/2.png)
 
-c. 按照下面的步骤手动进行手动添加
+3. 按照下面的步骤手动进行手动添加。
 
 ```json
 {
-  "servers": {
+  "mcpServers": {
     "my-app-mcp-server": {
       "url": "https://ai.opentiny.design/mcp?sessionId=stream06-1921-4f09-af63-51de410e9e09"
     }
@@ -61,62 +61,60 @@ c. 按照下面的步骤手动进行手动添加
 }
 ```
 
-d. 查看mcp是否配置成功并且进行验证
+4. 查看 MCP 是否配置成功并且进行验证。
 
 ![](../assets/images/cursor/4.png)
 
-e. 新建会话，切换到 Agent 模式，在输入框中输入需要操作的内容，这时 AI 就会调用你的 Web 应用中定义的 MCP 工具，操作你的 Web 应用
+5. 新建会话，切换到 Agent 模式，在输入框中输入需要操作的内容，这时 AI 就会调用你的 Web 应用中定义的 MCP 工具，操作你的 Web 应用。
 
 ![](../assets/images/cursor/5.png)
 
-## Windsurf
+6. 查看是否调用 MCP 工具成功。
 
-a. 在 https://windsurf.com/ 官网下载 Windsurf 软件
+![](../assets/images/cursor/7.png)
+
+
+## Windsurf
+1. 在 [Windsurf](https://windsurf.com/) 官网下载软件。
 
 ![](../assets/images/windsurf/1.png)
 
-b. 在 Windsurf 中配置 mcp servers ，先找到windsurf对话框上方的锤子按钮 
+2. 在 Windsurf 中配置 MCP Servers。
 
 ![](../assets/images/windsurf/2.png)
 
-c. 配置mcp_config.json*文件，格式如图
+3. 配置 `mcp_config.json` 文件，格式如图。
 
 ![](../assets/images/windsurf/3.png)
 
-d. 点击Refresh会出现我们的mcp servers
+4. 点击 Refresh 会出现我们的 MCP Servers。
 
 ![](../assets/images/windsurf/4.png)
 
-
-e. 新建会话，切换到 Agent 模式，在输入框中输入需要操作的内容，这时 AI 就会调用你的 Web 应用中定义的 MCP 工具，操作你的 Web 应用
+5. 新建会话，切换到 Agent 模式，在输入框中输入需要操作的内容，这时 AI 就会调用你的 Web 应用中定义的 MCP 工具，操作你的 Web 应用。
 
 ![](../assets/images/windsurf/5.png)
 
 ## Trae
+1. 在 [Trae](https://www.trae.cn/ide/download) 官网下载软件。
 
-下载软件
-
-![](../assets/images/trae/1.png)
-
-在Trae中配置mcp servers
-
-ctrl + u 弹出AI对话框，找到AI功能管理中的AI功能管理按钮
+2. 在 Trae 使用快捷键 Ctrl + U 弹出 AI 对话框，点击设置按钮进行设置 MCP Servers。
 
 ![](../assets/images/trae/2.png)
 
-继续按照下面的步骤手动添加 mcp servers
+3. 继续按照下面的步骤手动添加 MCP Servers。
 
 ![](../assets/images/trae/3.png)
 
-手动配置格式如图
+4. 手动配置格式如图
 
 ![](../assets/images/trae/4.png)
 
-查看mcp是否配置成功并且进行验证
+5. 查看 MCP 是否配置成功并且进行验证。
 
 ![](../assets/images/trae/5.png)
 
-新建会话，选择mcp智能体
+6. 新建会话，选择 MCP 智能体。
 
 ![](../assets/images/trae/6.png)
 
@@ -124,25 +122,23 @@ ctrl + u 弹出AI对话框，找到AI功能管理中的AI功能管理按钮
 
 ![](../assets/images/trae/8.png)
 
-验证成功
+7. 查看是否调用 MCP 工具成功。
 
 ![](../assets/images/trae/9.png)
 
 ## Cherry Studio
 
-下载软件
+1.下载软件
 
 ![](../assets/images/cherry-studio/1.png)
 
-选择助手
+2. 选择助手
 
 ![](../assets/images/cherry-studio/2.png)
 
 ![](../assets/images/cherry-studio/3.png)
 
-在 Cherry Studio配置mcp servers
-
-配置mcp，格式如图
+3.在 Cherry Studio 配置 MCP Servers。
 
 ![](../assets/images/cherry-studio/4.png)
 
@@ -152,15 +148,15 @@ ctrl + u 弹出AI对话框，找到AI功能管理中的AI功能管理按钮
 
 ![](../assets/images/cherry-studio/7.png)
 
-配置模型
+4. 配置模型
 
 ![](../assets/images/cherry-studio/8.png)
 
-注册登录账号，选择一个适合自己的模型，成功后如下图
+5. 注册登录账号，选择一个适合自己的模型，成功后如下图。
 
 ![](../assets/images/cherry-studio/9.png)
 
-在对话框中进行验证
+6. 在对话框中进行验证。
 
 ![](../assets/images/cherry-studio/10.png)
 
@@ -168,35 +164,33 @@ ctrl + u 弹出AI对话框，找到AI功能管理中的AI功能管理按钮
 
 ## Cline
 
-vscode下载Cline 插件
+1. Vscode 下载 Cline 插件。
 
 ![](../assets/images/cline/1.png)
 
-用github账号进行登录
-
-在cline中配置mcp servers
+2. 用 github 账号进行登录并且在 Cline 中配置 MCP Servers。
 
 ![](../assets/images/cline/2.png)
 
-会自动生成下面的文件
+3. 会自动生成下面的文件。
 
 ![](../assets/images/cline/3.png)
 
 ![](../assets/images/cline/4.png)
 
-智能体选中agent然后进行验证
+4. 智能体选中 Agent 然后进行验证。
 
 ![](../assets/images/cline/5.png)
 
 ![](../assets/images/cline/6.png)
 
-验证成功
+5. 查看是否调用 MCP 工具成功。
 
 ![](../assets/images/cline/7.png)
 
 ## 通义灵码
 
-下载 IDE 软件
+1. 下载 通义灵码IDE 软件。
 
 ![](../assets/images/lingma/1.png)
 
@@ -204,53 +198,49 @@ vscode下载Cline 插件
 
 ![](../assets/images/lingma/3.png)
 
-在通义灵码中配置mcp servers
-
-Ctrl + Shift + L 弹出AI对话框，找到AI功能管理中的AI功能管理按钮
+2. 在通义灵码 IDE 使用快捷键 Ctrl + Shift + L  弹出 AI 对话框，点击设置按钮进行设置 MCP Server。
 
 ![](../assets/images/lingma/4.png)
 
-继续按照下面的步骤手动添加 mcp servers
+3. 继续按照下面的步骤手动添加 MCP Servers。
 
 ![](../assets/images/lingma/5.png)
 
-手动配置格式如图
+4. 手动配置格式如图。
 
 ![](../assets/images/lingma/6.png)
 
-查看mcp是否配置成功并且进行验证
+5. 查看 MCP 是否配置成功并且进行验证。
 
 ![](../assets/images/lingma/7.png)
 
-新建会话，选择智能体
+6. 新建会话，选择智能体。
 
 ![](../assets/images/lingma/8.png)
 
-验证成功
+7. 查看是否调用 MCP 工具成功。
 
 ![](../assets/images/lingma/9.png)
 
 ## Dify
 
-进入dify官网，登录后点击打开网页版并进行登录注册
+1. 进入 Dify 官网，登录后点击打开网页版并进行登录注册。
 
 ![](../assets/images/dify/1.png)
 
 ![](../assets/images/dify/2.png)
 
-在 Dify 中配置mcp servers
-
-创建Chatflow空白应用
+2.创建 Chatflow 空白应用。
 
 ![](../assets/images/dify/3.png)
 
 ![](../assets/images/dify/4.png)
 
-新建agent智能体
+3. 新建 Agent 智能体。
 
 ![](../assets/images/dify/5.png)
 
-设置 AGENT 策略
+4. 设置 Agent 策略。
 
 ![](../assets/images/dify/6.png)
 
@@ -258,7 +248,7 @@ Ctrl + Shift + L 弹出AI对话框，找到AI功能管理中的AI功能管理按
 
 ![](../assets/images/dify/8.png)
 
-设置模型
+5. 设置模型。
 
 ![](../assets/images/dify/9.png)
 
@@ -268,29 +258,29 @@ Ctrl + Shift + L 弹出AI对话框，找到AI功能管理中的AI功能管理按
 
 ![](../assets/images/dify/12.png)
 
-MCP 服务配置
+6. MCP 服务配置。
 
 ![](../assets/images/dify/13.png)
 
-查看运行是否成功
+7. 查看运行是否成功。
 
 ![](../assets/images/dify/14.png)
 
-进行发布
+8. 进行发布。
 
 ![](../assets/images/dify/15.png)
 
 ![](../assets/images/dify/16.png)
 
-运行这个编排任务
+9. 运行这个编排任务。
 
 ![](../assets/images/dify/17.png)
 
-验证这个任务
+10. 验证这个任务。
 
 ![](../assets/images/dify/18.png)
 
-验证成功
+11. 查看是否调用 MCP 工具成功。
 
 ![](../assets/images/dify/19.png)
 
@@ -298,27 +288,25 @@ MCP 服务配置
 
 ## Coze
 
-进入 coze 官网，登录后点击打开网页版
+1. 进入 [Coze](https://space.coze.cn/) 官网，登录后点击打开网页版。
 
 ![](../assets/images/coze/1.png)
 
-在 coze 中配置mcp servers
-
-添加管理工具
+2. 在 Coze 中配置 MCP Servers ，先添加管理工具。
 
 ![](../assets/images/coze/2.png)
 
-添加自定义管理工具
+3. 添加自定义管理工具。
 
 ![](../assets/images/coze/3.png)
 
 ![](../assets/images/coze/4.png)
 
-查看是否添加成功（如下图）
+4. 查看是否添加成功（如下图）。
 
 ![](../assets/images/coze/5.png)
 
-进行验证
+5. 查看是否调用 MCP 工具成功。
 
 ![](../assets/images/coze/6.png)
 

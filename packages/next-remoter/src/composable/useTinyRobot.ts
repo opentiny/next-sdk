@@ -1,9 +1,9 @@
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
-import { IconAi, IconUser } from '@opentiny/tiny-robot-svgs'
+import { IconUser } from '@opentiny/tiny-robot-svgs'
 import { h, onMounted, Ref, ref } from 'vue'
 import { CustomAgentModelProvider } from './AgentModelProvider'
 import { TrSender } from '@opentiny/tiny-robot'
-import logo from '../../public/svgs/logo-next-bg-blue-right.svg'
+import logo from '../../public/svgs/logo-next-no-bg-right.svg'
 
 interface useTinyRobotOption {
   sessionId: Ref<string>
@@ -19,7 +19,7 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
   const fullscreen = ref(false)
   const show = ref(true)
 
-  const aiAvatar = h(IconAi, { style: { fontSize: '32px' } })
+  const aiAvatar = h(logo, { style: { fontSize: '32px' } })
   const userAvatar = h(IconUser, { style: { fontSize: '32px' } })
   const welcomeIcon = h(logo, { style: { width: '48px', height: '48px' } })
 

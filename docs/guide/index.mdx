@@ -7,21 +7,22 @@ title: "快速开始"
 * **一个核心 SDK**，基于 MCP 官方 SDK 实现，简化了原生 MCP 方法，增强了 connect 方法，适用于 Web 应用
 * **一个遥控器**，集成了 TinyRobot AI 对话框，可以用对话方式操控 Web 应用，支持手机扫码遥控
 
-**NEXT SDK** 支持通过各种主流 MCP Host 对智能应用进行操控，支持主流大模型，支持主流 AI 对话框，支持[Vue](https://cn.vuejs.org/)、[React](https://react.dev/)、[Angular](https://www.angular.cn/) 主流前端框架。
+**NEXT SDK** 支持通过各种主流 MCP Host 对智能应用进行操控，支持主流大模型，支持主流 AI 对话框，支持 [ Vue ](https://cn.vuejs.org/)、[ React ](https://react.dev/)、[Angular](https://www.angular.cn/) 主流前端框架。
 
 ## 让你的应用智能化
 
 使用 OpenTiny NEXT SDK，只需要以下四步，就可以把你的 Web 应用变成智能应用。
 
-**第一步：安装 NEXT SDK：**
+**第一步：安装 NEXT SDK**
 
 ```shell
 npm i @opentiny/next-sdk
 ```
 
-**第二步：创建 WebMcpServer，并与 ServerTransport 连接**
+**第二步：创建 WebMcpServer ，并与 ServerTransport 连接**
 
 ```typescript
+
 import { WebMcpServer, createMessageChannelPairTransport, z } from '@opentiny/next-sdk'
 
 const [serverTransport, clientTransport] = createMessageChannelPairTransport()
@@ -40,7 +41,7 @@ server.registerTool('demo-tool', {
 await server.connect(serverTransport)
 ```
 
-**第三步：创建 WebMcpClient，并与 WebAgent 连接**
+**第三步：创建 WebMcpClient ，并与 WebAgent 连接**
 
 ```typescript
 import { WebMcpClient } from '@opentiny/next-sdk'
@@ -58,7 +59,7 @@ const { sessionId } = await client.connect({
 
 我们还提供了一个网页版本的 AI 对话框，这个 AI 对话框支持 PC 端和手机端，它就像一个遥控器，你可以通过这个遥控器操控你的 Web 应用。
 
-**第四步：引入并使用遥控器：**
+**第四步：引入并使用遥控器**
 
 安装遥控器：
 
@@ -88,7 +89,7 @@ import '@opentiny/next-remoter/dist/style.css'
 
 ## 浏览器直接引入
 
-你也可以直接通过浏览器 HTML 标签导入 NEXT SDK，这样就可以使用全局变量 `WebMCP` 了。
+你也可以直接通过浏览器 HTML 标签导入 NEXT SDK ，这样就可以使用全局变量 `WebMCP` 了。
 
 ```html
 <html>

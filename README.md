@@ -11,7 +11,7 @@ NEXT SDK 支持通过各种主流 MCP Host 对智能应用进行操控，支持�
 
 使用 OpenTiny NEXT SDK，只需要以下四步，就可以把你的 Web 应用变成智能应用。
 
-第一步：安装 NEXT SDK：
+第一步：安装 NEXT SDK
 
 ```shell
 npm i @opentiny/next-sdk
@@ -56,7 +56,7 @@ const { sessionId } = await client.connect({
 
 我们还提供了一个网页版本的 AI 对话框，这个 AI 对话框支持 PC 端和手机端，它就像一个遥控器，你可以通过这个遥控器操控你的 Web 应用。
 
-第四步：引入并使用遥控器：
+第四步：引入并使用遥控器
 
 安装遥控器：
 
