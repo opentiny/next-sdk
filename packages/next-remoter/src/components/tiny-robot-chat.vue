@@ -347,4 +347,9 @@ defineExpose({
   width: 48px;
   height: 48px;
 }
+
+:deep(.tr-icon-button) {
+  display: flex;
+  align-items: center;
+}
 </style>
