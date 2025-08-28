@@ -5,6 +5,7 @@
     </template>
     <template #operations>
       <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="createConversation()" />
+      <QrCodeScan @scanSuccess="handleScanSuccess" />
     </template>
     <tr-bubble-provider :content-renderers="contentRenderer">
       <slot name="welcome" v-if="messages.length === 0">
@@ -21,7 +22,7 @@
         :roles="roles"
         auto-scroll
         :loading="messageState.status === STATUS.PROCESSING"
-        :loading-role="assistant"
+        loading-role="assistant"
       >
       </tr-bubble-list>
     </tr-bubble-provider>
@@ -79,8 +80,9 @@ import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { IconNewSession } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobot } from '../composable/useTinyRobot'
-import { computed, nextTick, watch, h, CSSProperties, toRef } from 'vue'
+import { nextTick, watch, h, CSSProperties, toRef } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
+import QrCodeScan from './qr-code-scan.vue'
 
 defineOptions({
   name: 'TinyRemoter'
@@ -90,7 +92,7 @@ const props = defineProps({
   /** 必传的会话id */
   sessionId: {
     type: String,
-    required: true
+    default: ''
   },
   /** 后端的代理服务器地址 */
   agentRoot: {
@@ -121,6 +123,7 @@ const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
 const show = defineModel('show', { type: Boolean, default: false })
 
 const {
+  client,
   welcomeIcon,
   messages,
   messageState,
@@ -217,6 +220,21 @@ const pillItems = [
 ]
 const handlePillItemClick = (item: ReturnType<typeof mapMake>) => {
   inputMessage.value = item.inputMessage
+}
+
+const handleScanSuccess = (decodedText: string) => {
+  const url = new URL(decodedText)
+  const agent = client?.provider?.agent
+  const sessionId = url.searchParams.get('sessionId')
+
+  if (sessionId && agent) {
+    agent.insertMcpServers([
+      {
+        type: 'streamableHttp',
+        url: `${props.agentRoot}mcp?sessionId=${sessionId}`
+      }
+    ])
+  }
 }
 
 // 自定义消息渲染器
@@ -328,5 +346,10 @@ defineExpose({
 :deep(.tr-welcome__icon) {
   width: 48px;
   height: 48px;
+}
+
+:deep(.tr-icon-button) {
+  display: flex;
+  align-items: center;
 }
 </style>

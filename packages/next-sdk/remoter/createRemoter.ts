@@ -129,7 +129,7 @@ class FloatingBlock {
     this.floatingBlock.className = 'tiny-remoter-floating-block'
     this.floatingBlock.innerHTML = `
       <div class="tiny-remoter-floating-block__icon">
-        <img style="display: block; width: 40px;" src="https://ai.opentiny.design/next-remoter/svgs/logo-next-bg-blue-left.svg" alt="icon" />
+        <img style="display: block; width: 56px;" src="https://ai.opentiny.design/next-remoter/svgs/logo-next-no-bg-left.svg" alt="icon" />
       </div>
     `
 
@@ -230,7 +230,8 @@ class FloatingBlock {
 
   // 创建二维码弹窗
   private async showQRCode(): Promise<void> {
-    const qrCode = new QrCode(this.options.qrCodeUrl + '?sessionId=' + this.options.sessionId, {})
+    const sessionPrefix = this.options.qrCodeUrl?.includes('?') ? '&sessionId=' : '?sessionId='
+    const qrCode = new QrCode(this.options.qrCodeUrl + sessionPrefix + this.options.sessionId, {})
     const base64 = await qrCode.toDataURL()
     const modal = this.createModal(
       '扫码前往智能遥控器',
