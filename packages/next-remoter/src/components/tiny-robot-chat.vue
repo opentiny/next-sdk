@@ -59,7 +59,7 @@
           <template #footer-left>
             <div class="sender-left-icon">
               <!-- 插件开关 -->
-              <IconPlugin></IconPlugin>
+              <IconPlugin @click="pluginVisible = !pluginVisible"></IconPlugin>
             </div>
           </template>
         </tr-sender>
@@ -68,18 +68,14 @@
         <TrMcpServerPicker
           v-model:visible="pluginVisible"
           :popup-config="{ type: 'drawer' }"
+          :show-custom-add-button="false"
           :installedPlugins="installedPlugins"
           :marketPlugins="marketPlugins"
-          :installed-plugins="installedPlugins"
-          :market-plugins="marketPlugins"
           :market-category-options="marketCategoryOptions"
-          :installed-search-fn="handleInstalledSearchFn"
-          :market-search-fn="handleMarketSearchFn"
-          :loading="loading"
-          :market-loading="marketLoading"
+          :installed-search-fn="handleMcpServerPickerSearchFn"
+          :market-search-fn="handleMcpServerPickerSearchFn"
           @plugin-toggle="handlePluginToggle"
           @plugin-add="handlePluginAdd"
-          @plugin-create="handlePluginCreate"
           @plugin-delete="handlePluginDelete"
           @tool-toggle="handleToolToggle"
         >
@@ -102,7 +98,9 @@ import {
   TrIconButton,
   BubbleMarkdownContentRenderer,
   TrMcpServerPicker,
-  PluginInfo
+  PluginInfo,
+  MarketCategoryOption,
+  PluginTool
 } from '@opentiny/tiny-robot'
 import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
@@ -307,99 +305,29 @@ watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 
 // 对接 mcp server picker 组件
 const pluginVisible = ref(false)
-const installedPlugins = ref<PluginInfo[]>([])
-const marketPlugins = ref<PluginInfo[]>([])
+
 // 已安装插件数据
 const installedPlugins = ref<PluginInfo[]>([
-  {
-    id: 'plugin-1',
-    name: 'GitHub 集成',
-    icon: 'https://github.com/favicon.ico',
-    description: '与 GitHub 仓库集成，提供代码搜索、PR 管理等功能',
-    enabled: true,
-    expanded: true,
-    tools: [
-      {
-        id: 'tool-1',
-        name: '搜索代码',
-        description: '在 GitHub 仓库中搜索代码',
-        enabled: true
-      },
-      {
-        id: 'tool-2',
-        name: '创建 PR',
-        description: '创建新的 Pull Request',
-        enabled: true
-      },
-      {
-        id: 'tool-3',
-        name: '查看 Issues',
-        description: '查看和管理仓库 Issues',
-        enabled: false
-      }
-    ]
-  },
-  {
-    id: 'plugin-2',
-    name: 'Slack 通知',
-    icon: 'https://slack.com/favicon.ico',
-    description: '发送消息到 Slack 频道',
-    enabled: false,
-    expanded: true,
-    tools: [
-      {
-        id: 'tool-4',
-        name: '发送消息',
-        description: '发送消息到指定频道',
-        enabled: false
-      },
-      {
-        id: 'tool-5',
-        name: '文件上传',
-        description: '上传文件到 Slack',
-        enabled: false
-      }
-    ]
-  }
+  // {
+  //   id: 'plugin-1',
+  //   name: 'GitHub 集成',
+  //   icon: 'https://github.com/favicon.ico',
+  //   description: '与 GitHub 仓库集成，提供代码搜索、PR 管理等功能',
+  //   enabled: true,
+  //   expanded: true,
+  //   tools: [
+  //     {
+  //       id: 'tool-1',
+  //       name: '搜索代码',
+  //       description: '在 GitHub 仓库中搜索代码',
+  //       enabled: true
+  //     },
+  //   ]
+  // }
 ])
 
 // 市场插件数据
-const marketPlugins = ref<PluginInfo[]>([
-  {
-    id: 'plugin-1',
-    name: 'Jira 集成',
-    icon: 'https://ts3.tc.mm.bing.net/th/id/ODLS.2a97aa8b-50c6-4e00-af97-3b563dfa07f4',
-    description: 'Jira 任务管理',
-    enabled: true,
-    added: false,
-    tools: [
-      { id: 'tool-5', name: '创建任务', description: '创建 Jira 任务', enabled: false },
-      { id: 'tool-6', name: '查询任务', description: '查询 Jira 任务', enabled: false }
-    ]
-  },
-  {
-    id: 'plugin-2',
-    name: 'Notion 集成',
-    icon: 'https://www.notion.so/front-static/favicon.ico',
-    description: 'Notion 文档管理和协作',
-    enabled: false,
-    added: false,
-    tools: [
-      { id: 'tool-7', name: '创建页面', description: '创建 Notion 页面', enabled: false },
-      { id: 'tool-8', name: '查询数据库', description: '查询 Notion 数据库', enabled: false }
-    ]
-  },
-  {
-    id: 'plugin-3',
-    name: 'Telegram 机器人',
-    icon: 'https://telegram.org/favicon.ico',
-    description: 'Telegram 消息推送和自动化',
-    enabled: false,
-    added: false,
-    tools: [{ id: 'tool-9', name: '发送消息', description: '发送 Telegram 消息', enabled: false }],
-    category: 'ai'
-  }
-])
+const marketPlugins = ref<PluginInfo[]>([])
 
 // 市场分类选项
 const marketCategoryOptions = ref<MarketCategoryOption[]>([
@@ -410,82 +338,35 @@ const marketCategoryOptions = ref<MarketCategoryOption[]>([
   { value: 'ai', label: 'AI 助手' }
 ])
 
-const visible = ref(false)
-
-const handleVisibleToggle = () => {
-  visible.value = true
-}
-
-// 事件处理
+// 整个插件的打开或关闭
 const handlePluginToggle = (plugin: PluginInfo, enabled: boolean) => {
-  plugin.enabled = enabled
+  console.log('handlePluginToggle', plugin, enabled)
 }
 
-const handlePluginAdd = (plugin: PluginInfo, added: boolean) => {
-  const targetPlugin = marketPlugins.value.find((p) => p.id === plugin.id)!
-  targetPlugin.added = added
-
-  if (added) {
-    // 如果是添加操作，创建新的插件副本并添加到已安装列表
-    const newPlugin: PluginInfo = {
-      ...plugin,
-      id: `${plugin.id}-installed-${Date.now()}`, // 生成新的ID避免冲突
-      enabled: false, // 新添加的插件默认不启用
-      added: true
-    }
-    installedPlugins.value.push(newPlugin)
-  } else {
-    // 如果是取消添加操作，从已安装列表中移除
-    const index = installedPlugins.value.findIndex((p) => p.name === plugin.name)
-    if (index > -1) {
-      installedPlugins.value.splice(index, 1)
-    }
-  }
-}
-
-const handlePluginDelete = (plugin: PluginInfo) => {
-  const index = installedPlugins.value.findIndex((p) => p.id === plugin.id)
-  if (index > -1) {
-    installedPlugins.value.splice(index, 1)
-  }
-}
-
+// 某个tool的打开或关闭。  全部tool状态一致时，会同时触发handlePluginToggle 一下。
 const handleToolToggle = (plugin: PluginInfo, toolId: string, enabled: boolean) => {
-  const tool = plugin.tools?.find((t: PluginTool) => t.id === toolId)
-  if (tool) {
-    tool.enabled = enabled
-  }
+  console.log('handleToolToggle', plugin, toolId, enabled)
 }
 
-const createPluginByForm = (data: PluginFormData) => {
-  // 可以在这里处理表单数据，例如发送到服务器
-  const newPlugin: PluginInfo = {
-    id: `custom-${Date.now()}`,
-    name: data.name,
-    icon: '', // 如果有缩略图可以处理 data.thumbnail
-    description: data.description,
-    enabled: false,
-    tools: []
-  }
-  installedPlugins.value.push(newPlugin)
+// 插件添加。 新添加的插件默认不启用，所以不需要更新 tools
+const handlePluginAdd = (plugin: PluginInfo) => {
+  plugin.added = true
+
+  installedPlugins.value.push({
+    ...plugin,
+    id: `${plugin.id}-installed-${Date.now()}`, // 生成新的ID避免冲突
+    enabled: false, // 新添加的插件默认不启用
+    added: true
+  })
+}
+// 插件删除
+const handlePluginDelete = (plugin: PluginInfo) => {
+  installedPlugins.value = installedPlugins.value.filter((item) => item !== plugin)
 }
 
-// 新的插件创建事件处理
-const handlePluginCreate = (type: 'form' | 'code', data: PluginCreationData) => {
-  if (type === 'form') {
-    // 表单 创建插件逻辑
-    createPluginByForm(data)
-  } else {
-    // 代码 创建插件逻辑
-  }
-}
-
-const handleInstalledSearchFn = (query: string, item: PluginInfo) => {
-  return item.name.toLowerCase().includes(query.toLowerCase())
-}
-
-const handleMarketSearchFn = (query: string, item: PluginInfo) => {
-  return item.name.toLowerCase().includes(query.toLowerCase())
+// 搜索已安装或者搜索市场，两个函数一样的。
+const handleMcpServerPickerSearchFn = (query: string, item: PluginInfo) => {
+  return query.trim() === '' || item.name.toLowerCase().includes(query.toLowerCase())
 }
 
 // 定义插槽
