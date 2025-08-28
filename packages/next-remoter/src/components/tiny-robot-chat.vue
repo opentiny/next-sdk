@@ -109,6 +109,7 @@ import { useTinyRobot } from '../composable/useTinyRobot'
 import { nextTick, watch, h, CSSProperties, toRef, computed, ref } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
 import QrCodeScan from './qr-code-scan.vue'
+import { DEFAULT_SERVERS } from './default-mcps'
 
 defineOptions({
   name: 'TinyRemoter'
@@ -355,7 +356,7 @@ const installedPlugins = ref<PluginInfo[]>([
 ])
 
 // 市场插件数据
-const marketPlugins = ref<PluginInfo[]>([])
+const marketPlugins = ref<PluginInfo[]>([...DEFAULT_SERVERS])
 
 // 市场分类选项
 const marketCategoryOptions = ref<MarketCategoryOption[]>([
