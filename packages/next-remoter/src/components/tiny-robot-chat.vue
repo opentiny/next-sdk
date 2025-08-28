@@ -223,11 +223,10 @@ const handlePillItemClick = (item: ReturnType<typeof mapMake>) => {
 }
 
 const handleScanSuccess = (decodedText: string) => {
-  decodedText = 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp?sessionId=bfa6b1d0-cbb6-4a92-886a-c0bdc763b9d8'
   const url = new URL(decodedText)
   const agent = client?.provider?.agent
   const sessionId = url.searchParams.get('sessionId')
-  debugger
+
   if (sessionId && agent) {
     agent.insertMcpServers([
       {
