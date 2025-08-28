@@ -9,6 +9,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        text-align: center;
       }
       h1 {
         text-align: center;
@@ -61,6 +62,8 @@
           agent: true
         })
 
+        document.getElementById('sessionId').innerHTML = sessionId
+
         createRemoter({
           sessionId,
           qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
@@ -86,5 +89,6 @@
   </head>
   <body>
     <h1>根据用户的心情生成页面的背景颜色</h1>
+    <div id="sessionId"></div>
   </body>
 </html>

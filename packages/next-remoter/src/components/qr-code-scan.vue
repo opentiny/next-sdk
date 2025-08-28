@@ -27,12 +27,13 @@ defineOptions({
   name: 'QrCodeScan'
 })
 
+const emit = defineEmits(['scanSuccess'])
+
 const TinyIconScan = IconScan()
 
 // 响应式状态管理
 const state = reactive({
-  html5QrCode: null as Html5Qrcode | null,
-  fileList: []
+  html5QrCode: null as Html5Qrcode | null
 })
 
 const isScanning = ref(false)
@@ -51,9 +52,8 @@ const start = () => {
       fps: 1,
       qrbox: { width: 250, height: 250 }
     },
-    (decodedText, decodedResult) => {
-      console.log('decodedText', decodedText)
-      console.log('decodedResult', decodedResult)
+    (decodedText) => {
+      emit('scanSuccess', decodedText)
       stop()
     },
     () => {

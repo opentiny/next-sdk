@@ -46,6 +46,13 @@ export class AgentModelProvider {
   async updateMcpServers(mcpServers: McpServerConfig[]) {
     this.mcpServers = mcpServers
     this.isGetMcpClients = false
+    return await this.initClients()
+  }
+
+  async insertMcpServers(mcpServers: McpServerConfig[]) {
+    this.mcpServers = [...this.mcpServers, ...mcpServers]
+    this.isGetMcpClients = false
+    return await this.initClients()
   }
 
   async chat({

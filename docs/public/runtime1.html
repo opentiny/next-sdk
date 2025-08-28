@@ -9,6 +9,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        text-align: center;
       }
       h1 {
         text-align: center;
@@ -34,25 +35,87 @@
           {
             title: '生成图形',
             description:
-              '根据用户的心情或者情绪生成用canvas绘制一个图形,要求：传入的color参数格式为十六进制颜色值,比如 #000000,type参数为circle或者rect,circle表示圆形，rect表示矩形',
-            inputSchema: { color: z.string(), type: z.string() }
-          },
-          async ({ color, type }) => {
-            const canvas = document.createElement('canvas')
-            const ctx = canvas.getContext('2d')
-            if (type === 'circle') {
-              ctx.beginPath()
-              ctx.arc(50, 50, 40, 0, 2 * Math.PI)
-              ctx.fillStyle = color
-              ctx.fill()
-            } else if (type === 'rect') {
-              ctx.fillRect(0, 0, 100, 100)
-              ctx.fillStyle = color
-              ctx.fill()
+              '根据用户的心情或者情绪生成用canvas绘制一个图形。参数说明：color为十六进制颜色值(如#FF0000)，type为图形类型(circle圆形/rect矩形/triangle三角形)，x/y为绘制位置坐标，width/height为图形尺寸，radius为圆形半径。所有数值参数默认为合理的默认值。',
+            inputSchema: {
+              color: z.string().describe('十六进制颜色值，如 #FF0000'),
+              type: z.string().describe('图形类型：circle(圆形) / rect(矩形) / triangle(三角形)'),
+              x: z.number().optional().describe('绘制位置X坐标，默认50'),
+              y: z.number().optional().describe('绘制位置Y坐标，默认50'),
+              width: z.number().optional().describe('图形宽度，默认100'),
+              height: z.number().optional().describe('图形高度，默认100'),
+              radius: z.number().optional().describe('圆形半径，默认40')
             }
-            document.body.appendChild(canvas)
-            return {
-              content: [{ type: 'text', text: String(color) }]
+          },
+          async ({ color, type, x = 50, y = 50, width = 100, height = 100, radius = 40 }) => {
+            // 参数验证
+            const colorRegex = /^#[0-9A-Fa-f]{6}$/
+            if (!colorRegex.test(color)) {
+              return {
+                content: [{ type: 'text', text: `错误：颜色格式不正确，请使用十六进制格式如 #FF0000` }]
+              }
+            }
+
+            // 创建canvas元素
+            const canvas = document.createElement('canvas')
+            canvas.width = 300 // 设置画布尺寸
+            canvas.height = 200
+            canvas.style.border = '1px solid #ccc' // 添加边框便于查看
+            const ctx = canvas.getContext('2d')
+
+            try {
+              // 根据图形类型进行绘制
+              if (type === 'circle') {
+                // 绘制圆形
+                ctx.beginPath()
+                ctx.arc(x, y, radius, 0, 2 * Math.PI)
+                ctx.fillStyle = color
+                ctx.fill()
+                ctx.strokeStyle = '#333' // 添加边框
+                ctx.lineWidth = 2
+                ctx.stroke()
+              } else if (type === 'rect') {
+                // 绘制矩形
+                ctx.fillStyle = color
+                ctx.fillRect(x - width / 2, y - height / 2, width, height) // 以中心点为基准绘制
+                ctx.strokeStyle = '#333' // 添加边框
+                ctx.lineWidth = 2
+                ctx.strokeRect(x - width / 2, y - height / 2, width, height)
+              } else if (type === 'triangle') {
+                // 绘制三角形
+                ctx.beginPath()
+                ctx.moveTo(x, y - height / 2) // 顶点
+                ctx.lineTo(x - width / 2, y + height / 2) // 左下角
+                ctx.lineTo(x + width / 2, y + height / 2) // 右下角
+                ctx.closePath()
+                ctx.fillStyle = color
+                ctx.fill()
+                ctx.strokeStyle = '#333' // 添加边框
+                ctx.lineWidth = 2
+                ctx.stroke()
+              } else {
+                return {
+                  content: [
+                    { type: 'text', text: `错误：不支持的图形类型 "${type}"，支持的类型：circle、rect、triangle` }
+                  ]
+                }
+              }
+
+              // 将画布添加到页面
+              document.body.appendChild(canvas)
+
+              // 返回成功信息
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: `成功绘制${type}图形！位置：(${x}, ${y})，颜色：${color}${type === 'circle' ? `，半径：${radius}` : `，尺寸：${width}×${height}`}`
+                  }
+                ]
+              }
+            } catch (error) {
+              return {
+                content: [{ type: 'text', text: `绘制失败：${error.message}` }]
+              }
             }
           }
         )
@@ -72,6 +135,8 @@
           url: 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp',
           agent: true
         })
+
+        document.getElementById('sessionId').innerHTML = sessionId
 
         createRemoter({
           sessionId,
@@ -97,6 +162,7 @@
     </script>
   </head>
   <body>
-    <h1>根据用户的心情生成页面的背景颜色</h1>
+    <h1>根据用户的心情绘制不同的图形</h1>
+    <div id="sessionId"></div>
   </body>
 </html>

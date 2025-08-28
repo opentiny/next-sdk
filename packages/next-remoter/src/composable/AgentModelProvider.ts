@@ -3,8 +3,8 @@ import type { ChatCompletionRequest } from '@opentiny/tiny-robot-kit'
 import type { StreamHandler } from '@opentiny/tiny-robot-kit'
 import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
-import { reactive, Ref } from 'vue'
-import { AgentModelProvider } from '@opentiny/next-sdk'
+import { Ref } from 'vue'
+import { AgentModelProvider, McpServerConfig, IAgentModelProviderOption } from '@opentiny/next-sdk'
 
 const onToolCallChain = (part: any, handler: StreamHandler) => {
   if (part.type == 'tool-input-start') {
@@ -41,19 +41,29 @@ export class CustomAgentModelProvider extends BaseModelProvider {
   agent: AgentModelProvider
   constructor(config: AIModelConfig, sessionId: Ref<string>, agentRoot: Ref<string>) {
     super(config)
-    this.agent = new AgentModelProvider({
+    const options = {
       llmConfig: {
         apiKey: 'sk-trial',
         baseURL: 'https://agent.opentiny.design/api/v1/ai',
         providerType: 'deepseek'
       },
-      mcpServers: [
-        {
+      mcpServers: [] as McpServerConfig[]
+    }
+    if (sessionId.value.includes(',')) {
+      sessionId.value.split(',').forEach((id: string) => {
+        options.mcpServers.push({
           type: 'streamableHttp',
-          url: `${agentRoot.value}mcp?sessionId=${sessionId.value}`
-        }
-      ]
-    })
+          url: `${agentRoot.value}mcp?sessionId=${id}`
+        })
+      })
+    } else if (sessionId.value) {
+      options.mcpServers.push({
+        type: 'streamableHttp',
+        url: `${agentRoot.value}mcp?sessionId=${sessionId.value}`
+      })
+    }
+
+    this.agent = new AgentModelProvider(options as IAgentModelProviderOption)
   }
 
   /** 同步请求不需要实现 */

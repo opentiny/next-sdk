@@ -5,7 +5,7 @@
     </template>
     <template #operations>
       <tr-icon-button :icon="IconNewSession" size="28" svgSize="20" @click="createConversation()" />
-      <QrCodeScan />
+      <QrCodeScan @scanSuccess="handleScanSuccess" />
     </template>
     <tr-bubble-provider :content-renderers="contentRenderer">
       <slot name="welcome" v-if="messages.length === 0">
@@ -92,7 +92,7 @@ const props = defineProps({
   /** 必传的会话id */
   sessionId: {
     type: String,
-    required: true
+    default: ''
   },
   /** 后端的代理服务器地址 */
   agentRoot: {
@@ -123,6 +123,7 @@ const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
 const show = defineModel('show', { type: Boolean, default: false })
 
 const {
+  client,
   welcomeIcon,
   messages,
   messageState,
@@ -219,6 +220,22 @@ const pillItems = [
 ]
 const handlePillItemClick = (item: ReturnType<typeof mapMake>) => {
   inputMessage.value = item.inputMessage
+}
+
+const handleScanSuccess = (decodedText: string) => {
+  decodedText = 'https://agent.opentiny.design/api/v1/webmcp-trial/mcp?sessionId=bfa6b1d0-cbb6-4a92-886a-c0bdc763b9d8'
+  const url = new URL(decodedText)
+  const agent = client?.provider?.agent
+  const sessionId = url.searchParams.get('sessionId')
+  debugger
+  if (sessionId && agent) {
+    agent.insertMcpServers([
+      {
+        type: 'streamableHttp',
+        url: `${props.agentRoot}mcp?sessionId=${sessionId}`
+      }
+    ])
+  }
 }
 
 // 自定义消息渲染器
