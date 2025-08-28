@@ -323,7 +323,7 @@ const installedPlugins = ref<PluginInfo[]>([
   //       enabled: true
   //     },
   //   ]
-  // }
+  // },
 ])
 
 // 市场插件数据
@@ -347,7 +347,10 @@ const handlePluginToggle = (plugin: PluginInfo, enabled: boolean) => {
 const handleToolToggle = (plugin: PluginInfo, toolId: string, enabled: boolean) => {
   console.log('handleToolToggle', plugin, toolId, enabled)
 }
-
+// 插件删除。 删除时要判断插件中的tool有没有启用
+const handlePluginDelete = (plugin: PluginInfo) => {
+  installedPlugins.value = installedPlugins.value.filter((item) => item !== plugin)
+}
 // 插件添加。 新添加的插件默认不启用，所以不需要更新 tools
 const handlePluginAdd = (plugin: PluginInfo) => {
   plugin.added = true
@@ -358,10 +361,6 @@ const handlePluginAdd = (plugin: PluginInfo) => {
     enabled: false, // 新添加的插件默认不启用
     added: true
   })
-}
-// 插件删除
-const handlePluginDelete = (plugin: PluginInfo) => {
-  installedPlugins.value = installedPlugins.value.filter((item) => item !== plugin)
 }
 
 // 搜索已安装或者搜索市场，两个函数一样的。
