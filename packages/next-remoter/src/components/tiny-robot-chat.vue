@@ -46,18 +46,32 @@
         </slot>
         <tr-sender
           ref="senderRef"
-          mode="single"
+          mode="multiple"
           v-model="inputMessage"
-          :placeholder="
-            GeneratingStatus.includes(messageState.status) ? lang[locale].thinking : lang[locale].placeholder
-          "
+          :placeholder="senderPlaceholder"
           :clearable="!!inputMessage"
-          :loading="GeneratingStatus.includes(messageState.status)"
+          :loading="senderLoading"
           :showWordLimit="true"
           :maxLength="1000"
           @submit="handleSendMessage"
           @cancel="abortRequest"
-        ></tr-sender>
+        >
+          <template #footer-left>
+            <div class="sender-left-icon">
+              <!-- 插件开关 -->
+              <IconPlugin></IconPlugin>
+            </div>
+          </template>
+        </tr-sender>
+
+        <!-- 插件面板 -->
+        <TrMcpServerPicker
+          v-model:visible="pluginVisible"
+          :popup-config="{ type: 'drawer' }"
+          :installedPlugins="installedPlugins"
+          :marketPlugins="marketPlugins"
+        >
+        </TrMcpServerPicker>
       </div>
     </template>
   </tr-container>
@@ -74,13 +88,15 @@ import {
   TrDropdownMenu,
   TrSuggestionPillButton,
   TrIconButton,
-  BubbleMarkdownContentRenderer
+  BubbleMarkdownContentRenderer,
+  TrMcpServerPicker,
+  PluginInfo
 } from '@opentiny/tiny-robot'
 import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
-import { IconNewSession } from '@opentiny/tiny-robot-svgs'
+import { IconNewSession, IconPlugin } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobot } from '../composable/useTinyRobot'
-import { nextTick, watch, h, CSSProperties, toRef } from 'vue'
+import { nextTick, watch, h, CSSProperties, toRef, computed, ref } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
 import QrCodeScan from './qr-code-scan.vue'
 
@@ -153,6 +169,13 @@ const lang: Record<string, { title: string; description: string; placeholder: st
     thinking: 'Thinking...'
   }
 }
+
+// 自动计算的变量
+const senderPlaceholder = computed(() =>
+  GeneratingStatus.includes(messageState.status) ? lang[props.locale].thinking : lang[props.locale].placeholder
+)
+
+const senderLoading = computed(() => GeneratingStatus.includes(messageState.status))
 
 // 默认的Prompts。 仅做为介绍性文字，点击不触发事件
 const promptItems: PromptProps[] = [
@@ -270,6 +293,11 @@ const scrollToBottom = () => {
 }
 watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 
+// 对接 mcp server picker 组件
+const pluginVisible = ref(false)
+const installedPlugins = ref<PluginInfo[]>([])
+const marketPlugins = ref<PluginInfo[]>([])
+
 // 定义插槽
 defineSlots<{
   welcome(): any
@@ -346,5 +374,25 @@ defineExpose({
 :deep(.tr-welcome__icon) {
   width: 48px;
   height: 48px;
+}
+
+.sender-left-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  & svg {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background-color: #f5f5f5;
+    svg {
+      color: #1476ff;
+    }
+  }
 }
 </style>
