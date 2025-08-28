@@ -510,4 +510,9 @@ defineExpose({
     }
   }
 }
+
+:deep(.tr-icon-button) {
+  display: flex;
+  align-items: center;
+}
 </style>

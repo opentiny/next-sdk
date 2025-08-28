@@ -70,7 +70,7 @@ function handleSuggestionClick(str: string) {
   }
 
   .tr-icon-button:first-child {
-    display: block;
+    display: flex;
   }
 }
 
