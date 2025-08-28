@@ -97,7 +97,7 @@ title: "通过 MCP Host 操控 Web 应用"
 ```
 ![](../assets/images/windsurf/7.png)
 
-4. 点击 Refresh 会出现我们的 MCP Servers。
+4. 点击 Refresh 会出现我们的 MCP Servers 是否成功。
 
 ![](../assets/images/windsurf/4.png)
 
@@ -127,7 +127,7 @@ title: "通过 MCP Host 操控 Web 应用"
 ```
 ![](../assets/images/trae/3.png)
 
-4. 查看 MCP 是否配置成功。
+4. 查看 MCP Server 是否配置成功。
 
 ![](../assets/images/trae/4.png)
 
@@ -170,7 +170,7 @@ title: "通过 MCP Host 操控 Web 应用"
 ![](../assets/images/cherry-studio/6.png)
 
 
-4. 查看 MCP 是否配置成功。
+4. 查看 MCP Server 是否配置成功。
 
 ![](../assets/images/cherry-studio/7.png)
 
@@ -193,12 +193,12 @@ title: "通过 MCP Host 操控 Web 应用"
 
 ![](../assets/images/cline/2.png)
 
-3. 会自动生成下面的文件。
+3. 配置好后会自动生成下面的文件。
 
 ![](../assets/images/cline/3.png)
 
 
-4. 查看 MCP 是否配置成功
+4. 查看 MCP Server 是否配置成功。
 
 ![](../assets/images/cline/4.png)
 
@@ -229,11 +229,11 @@ title: "通过 MCP Host 操控 Web 应用"
 
 ![](../assets/images/lingma/6.png)
 
-5. 查看 MCP 是否配置成功。
+5. 查看 MCP Server 是否配置成功。
 
 ![](../assets/images/lingma/7.png)
 
-6. 新建会话，在输入框中输入需要操作的内容，选择智能体。
+6. 新建会话，选择智能体，输入需要操作的内容，点击发送按钮。
 
 ![](../assets/images/lingma/8.png)
 
@@ -276,9 +276,16 @@ title: "通过 MCP Host 操控 Web 应用"
 
 ![](../assets/images/dify/10.png)
 
+6. MCP 服务配置中输入配置信息。
 
-6. MCP 服务配置。
-
+```json
+{
+  "my-app-mcp-server": {
+    "transport": "streamable_http",
+    "url": "https://ai.opentiny.design/sse?sessionId=df8f46fd-84a2-4079-88b9-b3dfef176f15"
+  }
+}
+```
 ![](../assets/images/dify/11.png)
 
 7. 查看运行是否成功。
@@ -319,11 +326,11 @@ title: "通过 MCP Host 操控 Web 应用"
 
 ![](../assets/images/coze/4.png)
 
-4. 查看 MCP 是否配置成功。
+4. 查看 MCP Server 是否配置成功。
 
 ![](../assets/images/coze/5.png)
 
-5. 新建会话，选择智能体。
+5. 新建会话，选择智能体，输入需要操作的内容，点击发送按钮。
 
 ![](../assets/images/coze/6.png)
 
