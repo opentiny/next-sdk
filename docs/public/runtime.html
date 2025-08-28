@@ -9,6 +9,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        text-align: center;
       }
       h1 {
         text-align: center;
@@ -61,9 +62,12 @@
           agent: true
         })
 
+        document.getElementById('sessionId').innerHTML = sessionId
+
         createRemoter({
           sessionId,
-          qrCodeUrl: 'https://ai.opentiny.design/next-remoter',
+          qrCodeUrl:
+            'https://ai.opentiny.design/next-remoter?title=遥控器&welcome-title=背景变变变&welcome-desc=请说一句能表达情绪的话，页面会自动更新一个适合的颜色&suggestion=很高兴&suggestion=有点兴奋&suggestion=风和日丽',
           menuItems: [
             {
               action: 'ai-chat',
@@ -86,5 +90,6 @@
   </head>
   <body>
     <h1>根据用户的心情生成页面的背景颜色</h1>
+    <div id="sessionId"></div>
   </body>
 </html>

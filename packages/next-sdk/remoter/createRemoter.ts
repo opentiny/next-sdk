@@ -230,7 +230,8 @@ class FloatingBlock {
 
   // 创建二维码弹窗
   private async showQRCode(): Promise<void> {
-    const qrCode = new QrCode(this.options.qrCodeUrl + '?sessionId=' + this.options.sessionId, {})
+    const sessionPrefix = this.options.qrCodeUrl?.includes('?') ? '&sessionId=' : '?sessionId='
+    const qrCode = new QrCode(this.options.qrCodeUrl + sessionPrefix + this.options.sessionId, {})
     const base64 = await qrCode.toDataURL()
     const modal = this.createModal(
       '扫码前往智能遥控器',
