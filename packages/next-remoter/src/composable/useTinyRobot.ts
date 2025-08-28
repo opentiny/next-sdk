@@ -40,7 +40,6 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
           }
 
           messages.value.push(message)
-
           lastMessage = message
         }
 
@@ -53,7 +52,9 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
             toolContent.status = data.status
           }
         } else if (data.type === 'markdown') {
-          const markdownContent = lastMessage.uiContent.find((item) => item.type === 'markdown')
+          const markdownContent = lastMessage.uiContent.find(
+            (item) => item.type === data.type && item.textId === data.textId
+          )
           if (!markdownContent) {
             lastMessage.uiContent.push(data)
           } else {
