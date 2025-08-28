@@ -68,14 +68,20 @@ export class CustomAgentModelProvider extends BaseModelProvider {
       abortSignal: request.options?.signal
     })
 
+    // 标识每一个markdown块
+    let textId = 1
     for await (const part of result.fullStream) {
       // console.log(part, part.type)
 
       // 节点开始
       if (part.type === 'text-start') {
+        textId++
+
         handler.onData({
           type: 'markdown',
-          content: ''
+          content: '',
+          delta: '',
+          textId
         })
       }
 
@@ -86,14 +92,16 @@ export class CustomAgentModelProvider extends BaseModelProvider {
       if (part.type === 'text-delta') {
         handler.onData({
           type: 'markdown',
-          delta: part.text
+          delta: part.text,
+          textId
         })
       }
 
       if (part.type === 'text-end') {
         handler.onData({
           type: 'markdown',
-          delta: '\n\n '
+          delta: '\n\n ',
+          textId
         })
       }
     }
