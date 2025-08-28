@@ -54,6 +54,7 @@ const start = () => {
       },
       (decodedText) => {
         emit('scanSuccess', decodedText)
+        showToast('添加工具完成')
         stop()
       }
     )
