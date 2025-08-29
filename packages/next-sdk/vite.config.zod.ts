@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     lib: {
-      entry: ['Zod.ts'],
+      entry: 'Zod.ts',
       name: 'Zod',
       formats: ['es', 'cjs', 'umd'],
       fileName: (format) => {

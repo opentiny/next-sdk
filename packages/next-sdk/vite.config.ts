@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   build: {
     lib: {
-      entry: ['index.ts'],
+      entry: 'index.ts',
       name: 'WebMCP',
       formats: ['es', 'cjs', 'umd'],
       fileName: (format) => `index.${format}.js`

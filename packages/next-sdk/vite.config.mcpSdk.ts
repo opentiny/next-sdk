@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     lib: {
-      entry: ['McpSdk.ts'],
+      entry: 'McpSdk.ts',
       name: 'MCPSDK',
       formats: ['es', 'cjs', 'umd'],
       fileName: (format) => {

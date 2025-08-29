@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     lib: {
-      entry: ['WebMcp.ts'],
+      entry: 'WebMcp.ts',
       name: 'WebMCP',
       formats: ['es', 'cjs', 'umd'],
       fileName: (format) => `webmcp.${format}.js`
