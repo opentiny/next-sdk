@@ -7,8 +7,8 @@ export default defineConfig({
     lib: {
       entry: 'WebMcp.ts',
       name: 'WebMCP',
-      formats: ['es', 'cjs', 'umd'],
-      fileName: (format) => `webmcp-full.${format}.js`
+      formats: ['es', 'umd'],
+      fileName: (format) => `webmcp-full${format === 'es' ? '.es' : ''}.js`
     }
   }
 })

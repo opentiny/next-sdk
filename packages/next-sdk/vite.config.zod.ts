@@ -8,10 +8,10 @@ export default defineConfig({
     lib: {
       entry: 'Zod.ts',
       name: 'Zod',
-      formats: ['es', 'cjs', 'umd'],
+      formats: ['es', 'umd'],
       fileName: (format) => {
         const version = getPackageVersion('zod')
-        return `zod@${version}.${format}.js`
+        return `zod@${version}${format === 'es' ? '.es' : ''}.js`
       }
     }
   }

@@ -7,8 +7,8 @@ export default defineConfig({
     lib: {
       entry: 'WebAgent.ts',
       name: 'WebAgent',
-      formats: ['es', 'cjs', 'umd'],
-      fileName: (format) => `webagent.${format}.js`
+      formats: ['es', 'umd'],
+      fileName: (format) => `webagent${format === 'es' ? '.es' : ''}.js`
     }
   }
 })

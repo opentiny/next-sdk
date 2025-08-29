@@ -6,7 +6,7 @@ export default defineConfig({
     lib: {
       entry: 'index.ts',
       name: 'WebMCP',
-      formats: ['es', 'cjs', 'umd'],
+      formats: ['es', 'umd'],
       fileName: (format) => `index.${format}.js`
     }
   }

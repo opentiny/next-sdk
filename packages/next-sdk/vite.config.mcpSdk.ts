@@ -8,10 +8,10 @@ export default defineConfig({
     lib: {
       entry: 'McpSdk.ts',
       name: 'MCPSDK',
-      formats: ['es', 'cjs', 'umd'],
+      formats: ['es', 'umd'],
       fileName: (format) => {
         const version = getPackageVersion('@modelcontextprotocol/sdk')
-        return `mcpsdk@${version}.${format}.js`
+        return `mcpsdk@${version}${format === 'es' ? '.es' : ''}.js`
       }
     }
   }
