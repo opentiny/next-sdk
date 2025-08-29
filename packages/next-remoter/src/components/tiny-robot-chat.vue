@@ -98,15 +98,16 @@ import {
   TrIconButton,
   BubbleMarkdownContentRenderer,
   TrMcpServerPicker,
-  PluginInfo,
-  MarketCategoryOption
+  type PluginInfo,
+  type MarketCategoryOption,
+  type PluginTool
 } from '@opentiny/tiny-robot'
 import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { IconNewSession, IconPlugin } from '@opentiny/tiny-robot-svgs'
 import { useTinyRobotChat } from '../composable/useTinyRobotChat'
-import { nextTick, watch, h, CSSProperties, toRef, computed, ref } from 'vue'
-import { createRemoter } from '@opentiny/next-sdk'
+import { nextTick, watch, h, CSSProperties, toRef, computed, ref, onMounted } from 'vue'
+import { createRemoter, McpServerConfig } from '@opentiny/next-sdk'
 import QrCodeScan from './qr-code-scan.vue'
 import { DEFAULT_SERVERS } from './default-mcps'
 import { defaultPluginSrc } from './default-plugin-svg'
@@ -263,41 +264,62 @@ const handleScanSuccess = async (decodedText: string) => {
   const sessionId = url.searchParams.get('sessionId')
 
   if (sessionId) {
-    const mcpConfig = {
+    const mcpServer = {
       type: 'streamableHttp',
       url: `${props.agentRoot}mcp?sessionId=${sessionId}`
     } as const
-    // 1、 插入McpServers, 此时内部会判断重复。  不重复则 initClients()
-    const inserted = await agent.insertMcpServer(mcpConfig)
+    // 1、 插入McpServers, 此时内部会判断重复。  不重复则插入，并连接和查询tools到agent上。
+    const inserted = await agent.insertMcpServer(mcpServer)
 
     if (inserted) {
-      // 2、 插入Plugin
-      const lastClient = agent.mcpClients.slice(-1)[0] //
-      const clientTools = (await lastClient.tools()) || {}
-
-      const plugin: PluginInfo = {
-        id: `plugin-${sessionId}`,
-        name: url.origin,
-        icon: defaultPluginSrc,
-        description: sessionId,
-        enabled: true,
-        expanded: true,
-        tools: Object.keys(clientTools).map((key) => {
-          return {
-            id: key,
-            name: key,
-            description: clientTools[key].description as string,
-            enabled: true
-          }
-        }),
-        // @ts-ignore
-        originMcpConfig: mcpConfig // 缓存对应的mcpServers中的一个值
-      }
-
-      installedPlugins.value.push(plugin)
+      loadMcpServerToPlugin(mcpServer)
     }
   }
 }
+
+function loadMcpServerToPlugin(mcpServer: McpServerConfig) {
+  // 先查找 index, 由它可以找到相应的 client, tool
+  const index = agent.mcpServers.findIndex((svc) => svc.url === mcpServer.url)
+  // 解析url, 获得sessionId
+  const url = new URL(mcpServer.url)
+  const sessionId = url.searchParams.get('sessionId')
+  // 查询 tools
+  const currTool = agent.mcpTools[index]
+  let pluginTools: PluginTool[] = []
+  if (currTool) {
+    pluginTools = Object.keys(currTool).map((key) => {
+      return {
+        id: key,
+        name: key,
+        description: currTool[key].description as string,
+        enabled: true
+      }
+    })
+  }
+  const plugin: PluginInfo = {
+    id: `plugin-${sessionId}`,
+    name: url.origin,
+    icon: defaultPluginSrc,
+    description: sessionId,
+    enabled: true,
+    expanded: true,
+    tools: pluginTools,
+    // @ts-ignore
+    originMcpConfig: mcpServer // 缓存对应的mcpServers中的一个值
+  }
+
+  installedPlugins.value.push(plugin)
+}
+// 页面加载时，要判断 agent上，初始就加载的 agent.mcpServer，加载后记录在 agent.mcpTools下
+onMounted(() => {
+  setTimeout(() => {
+    console.log(agent)
+
+    agent.mcpServers.forEach((mcpServer) => {
+      loadMcpServerToPlugin(mcpServer)
+    })
+  }, 1000)
+})
 
 // 自定义消息渲染器
 const contentRenderer = { markdown: new BubbleMarkdownContentRenderer() }
@@ -379,7 +401,7 @@ const handlePluginDelete = (plugin: PluginInfo) => {
     agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== tool.name)
   })
 }
-// 插件市场中，点击“添加” 和“已添加”。
+// 插件市场中，点击“添加” 和 “已添加”。
 const handlePluginAdd = (plugin: PluginInfo, isAdd: boolean) => {
   if (isAdd) {
     plugin.added = true

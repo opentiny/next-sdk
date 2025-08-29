@@ -21,7 +21,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
       },
       mcpServers: [] as McpServerConfig[]
     }
-    if (sessionId.value.includes(',')) {
+    if (sessionId.value && sessionId.value.includes(',')) {
       sessionId.value.split(',').forEach((id) => {
         options.mcpServers.push({
           type: 'streamableHttp',

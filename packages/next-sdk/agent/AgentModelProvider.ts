@@ -27,7 +27,7 @@ export class AgentModelProvider {
   /**  ai-sdk的 mcpClient */
   mcpClients: any[] = []
   /** 所有的tools */
-  mcpTools: Record<string, any> = {}
+  mcpTools: Array<Record<string, any>> = []
   /**  需要实时过滤掉的tools name*/
   ignoreToolnames: string[] = []
 
@@ -78,11 +78,24 @@ export class AgentModelProvider {
   /** 创建 ai-sdk的 mcpClient */
   async _createMpcClients() {
     // 使用 Promise.all 并行处理所有 mcpServer 项
-    this.mcpClients = await Promise.all(this.mcpServers.map(async (server) => this._createOneClient(server)))
+    this.mcpClients = await Promise.all(
+      this.mcpServers.map(async (server) => {
+        const client = await this._createOneClient(server)
+        return client
+      })
+    )
   }
   /** 创建所有 mcpClients 的 tools */
   async _createMpcTools() {
-    this.mcpTools = await Promise.all(this.mcpClients.map((client) => client?.tools?.()))
+    this.mcpTools = await Promise.all(
+      this.mcpClients.map(async (client) => {
+        console.log('开始查询tool：', client)
+        const tool = client ? await client?.tools?.() : null
+        console.log('查询tool的结果：', tool, client)
+
+        return tool
+      })
+    )
   }
 
   async closeAll() {
