@@ -1,6 +1,5 @@
+// 从相关包中，导出一些常用变量，方便用户导入
 import Ajv from 'ajv'
-export * from './WebMcpServer'
-export * from './WebMcpClient'
 export { Ajv }
 export { z } from 'zod'
 export { AuthClientProvider } from '@opentiny/next'
@@ -16,8 +15,20 @@ export type * from '@modelcontextprotocol/sdk/shared/transport.js'
 export type * from '@modelcontextprotocol/sdk/client/sse.js'
 export type * from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 export type * from '@modelcontextprotocol/sdk/server/mcp.js'
-export { AgentModelProvider } from './agent/AgentModelProvider'
+
+// 2大核心模块
+export * from './WebMcpServer'
+export * from './WebMcpClient'
+
+// 快速创建一个悬浮图标和菜单，是扫码和聊天框的入口
 export { createRemoter } from './remoter/createRemoter'
-export { getAISDKTools } from './agent/utils'
+
+// 一个通用的ai-sdk的agent封装
+export { AgentModelProvider } from './agent/AgentModelProvider'
+
+// 快速 从官方 mcp 或 WebMcpClient 这2种client中， 抽取成 ai-sdk 所需要的 tool的对象
+export { getAISDKTools } from './agent/utils/getAISDKTools'
+
+// 方便的二维码类
 export { QrCode, type QrCodeOption } from './remoter/QrCode'
 export type * from './agent/type'

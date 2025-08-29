@@ -1,7 +1,7 @@
 import { AIClient, useConversation } from '@opentiny/tiny-robot-kit'
 import { IconUser } from '@opentiny/tiny-robot-svgs'
-import { h, onMounted, Ref, ref } from 'vue'
-import { CustomAgentModelProvider } from './AgentModelProvider'
+import { h, onMounted, onUnmounted, Ref, ref } from 'vue'
+import { CustomAgentModelProvider } from './CustomAgentModelProvider'
 import { TrSender } from '@opentiny/tiny-robot'
 import logo from '../../public/svgs/logo-next-no-bg-right.svg'
 
@@ -10,9 +10,10 @@ interface useTinyRobotOption {
   agentRoot: Ref<string>
 }
 
-export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
+export const useTinyRobotChat = ({ sessionId, agentRoot }: useTinyRobotOption) => {
+  const customAgentProvider = new CustomAgentModelProvider({ provider: 'custom' }, sessionId, agentRoot)
   const client = new AIClient({
-    providerImplementation: new CustomAgentModelProvider({ provider: 'custom' }, sessionId, agentRoot),
+    providerImplementation: customAgentProvider,
     provider: 'custom'
   })
 
@@ -95,7 +96,13 @@ export const useTinyRobot = ({ sessionId, agentRoot }: useTinyRobotOption) => {
     }, 500)
   })
 
+  onUnmounted(() => {
+    customAgentProvider.agent.closeAll()
+  })
+
   return {
+    /**  一个 ai-sdk agent 封装,详见： next-sdk/AgentModelProvider 类 */
+    agent: customAgentProvider.agent,
     client,
     fullscreen,
     show,

@@ -46,18 +46,40 @@
         </slot>
         <tr-sender
           ref="senderRef"
-          mode="single"
+          mode="multiple"
           v-model="inputMessage"
-          :placeholder="
-            GeneratingStatus.includes(messageState.status) ? lang[locale].thinking : lang[locale].placeholder
-          "
+          :placeholder="senderPlaceholder"
           :clearable="!!inputMessage"
-          :loading="GeneratingStatus.includes(messageState.status)"
+          :loading="senderLoading"
           :showWordLimit="true"
           :maxLength="1000"
           @submit="handleSendMessage"
           @cancel="abortRequest"
-        ></tr-sender>
+        >
+          <template #footer-left>
+            <div class="sender-left-icon">
+              <!-- 插件开关 -->
+              <IconPlugin @click="pluginVisible = !pluginVisible"></IconPlugin>
+            </div>
+          </template>
+        </tr-sender>
+
+        <!-- 插件面板 -->
+        <TrMcpServerPicker
+          v-model:visible="pluginVisible"
+          :popup-config="{ type: 'drawer' }"
+          :show-custom-add-button="false"
+          :installedPlugins="installedPlugins"
+          :marketPlugins="marketPlugins"
+          :market-category-options="marketCategoryOptions"
+          :installed-search-fn="handleMcpServerPickerSearchFn"
+          :market-search-fn="handleMcpServerPickerSearchFn"
+          @plugin-toggle="handlePluginToggle"
+          @plugin-add="handlePluginAdd"
+          @plugin-delete="handlePluginDelete"
+          @tool-toggle="handleToolToggle"
+        >
+        </TrMcpServerPicker>
       </div>
     </template>
   </tr-container>
@@ -74,15 +96,21 @@ import {
   TrDropdownMenu,
   TrSuggestionPillButton,
   TrIconButton,
-  BubbleMarkdownContentRenderer
+  BubbleMarkdownContentRenderer,
+  TrMcpServerPicker,
+  type PluginInfo,
+  type MarketCategoryOption,
+  type PluginTool
 } from '@opentiny/tiny-robot'
 import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
-import { IconNewSession } from '@opentiny/tiny-robot-svgs'
-import { useTinyRobot } from '../composable/useTinyRobot'
-import { nextTick, watch, h, CSSProperties, toRef } from 'vue'
-import { createRemoter } from '@opentiny/next-sdk'
+import { IconNewSession, IconPlugin } from '@opentiny/tiny-robot-svgs'
+import { useTinyRobotChat } from '../composable/useTinyRobotChat'
+import { nextTick, watch, h, CSSProperties, toRef, computed, ref, onMounted } from 'vue'
+import { createRemoter, McpServerConfig } from '@opentiny/next-sdk'
 import QrCodeScan from './qr-code-scan.vue'
+import { DEFAULT_SERVERS } from './default-mcps'
+import { defaultPluginSrc } from './default-plugin-svg'
 
 defineOptions({
   name: 'TinyRemoter'
@@ -123,6 +151,7 @@ const fullscreen = defineModel('fullscreen', { type: Boolean, default: false })
 const show = defineModel('show', { type: Boolean, default: false })
 
 const {
+  agent, // ai-sdk的自定义代理，client通过它和llm 对话。 agent.ignoreToolnames=[] 是记录需要过滤掉的tools
   client,
   welcomeIcon,
   messages,
@@ -134,7 +163,7 @@ const {
   sendMessage,
   handleSendMessage,
   createConversation
-} = useTinyRobot({
+} = useTinyRobotChat({
   sessionId: toRef(props, 'sessionId'),
   agentRoot: toRef(props, 'agentRoot')
 })
@@ -153,6 +182,13 @@ const lang: Record<string, { title: string; description: string; placeholder: st
     thinking: 'Thinking...'
   }
 }
+
+// 自动计算的变量
+const senderPlaceholder = computed(() =>
+  GeneratingStatus.includes(messageState.status) ? lang[props.locale].thinking : lang[props.locale].placeholder
+)
+
+const senderLoading = computed(() => GeneratingStatus.includes(messageState.status))
 
 // 默认的Prompts。 仅做为介绍性文字，点击不触发事件
 const promptItems: PromptProps[] = [
@@ -222,20 +258,68 @@ const handlePillItemClick = (item: ReturnType<typeof mapMake>) => {
   inputMessage.value = item.inputMessage
 }
 
-const handleScanSuccess = (decodedText: string) => {
+// 处理扫码结果。 把结果添加到 agent.mcpServers， 以及 插入McpServerPicker的一个Plugin
+const handleScanSuccess = async (decodedText: string) => {
   const url = new URL(decodedText)
-  const agent = client?.provider?.agent
   const sessionId = url.searchParams.get('sessionId')
 
-  if (sessionId && agent) {
-    agent.insertMcpServers([
-      {
-        type: 'streamableHttp',
-        url: `${props.agentRoot}mcp?sessionId=${sessionId}`
-      }
-    ])
+  if (sessionId) {
+    const mcpServer = {
+      type: 'streamableHttp',
+      url: `${props.agentRoot}mcp?sessionId=${sessionId}`
+    } as const
+    // 1、 插入McpServers, 此时内部会判断重复。  不重复则插入，并连接和查询tools到agent上。
+    const inserted = await agent.insertMcpServer(mcpServer)
+
+    if (inserted) {
+      loadMcpServerToPlugin(mcpServer)
+    }
   }
 }
+
+function loadMcpServerToPlugin(mcpServer: McpServerConfig) {
+  // 先查找 index, 由它可以找到相应的 client, tool
+  const index = agent.mcpServers.findIndex((svc) => svc.url === mcpServer.url)
+  // 解析url, 获得sessionId
+  const url = new URL(mcpServer.url)
+  const sessionId = url.searchParams.get('sessionId')
+  // 查询 tools
+  const currTool = agent.mcpTools[index]
+  let pluginTools: PluginTool[] = []
+  if (currTool) {
+    pluginTools = Object.keys(currTool).map((key) => {
+      return {
+        id: key,
+        name: key,
+        description: currTool[key].description as string,
+        enabled: true
+      }
+    })
+  }
+  const plugin: PluginInfo = {
+    id: `plugin-${sessionId}`,
+    name: url.origin,
+    icon: defaultPluginSrc,
+    description: sessionId,
+    enabled: true,
+    expanded: true,
+    tools: pluginTools,
+    // @ts-ignore
+    originMcpConfig: mcpServer // 缓存对应的mcpServers中的一个值
+  }
+
+  installedPlugins.value.push(plugin)
+}
+// 页面加载时，要判断 agent上，初始就加载的 agent.mcpServer，加载后记录在 agent.mcpTools下
+onMounted(() => {
+  setTimeout(() => {
+    console.log(agent)
+
+    agent.mcpServers.forEach((mcpServer) => {
+      loadMcpServerToPlugin(mcpServer)
+    })
+  }, 1000)
+})
 
 // 自定义消息渲染器
 const contentRenderer = { markdown: new BubbleMarkdownContentRenderer() }
@@ -269,6 +353,108 @@ const scrollToBottom = () => {
   }
 }
 watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
+
+// 对接 mcp server picker 组件
+const pluginVisible = ref(false)
+
+// 已安装插件数据
+const installedPlugins = ref<PluginInfo[]>([])
+
+// 市场插件数据
+const marketPlugins = ref<PluginInfo[]>([...DEFAULT_SERVERS])
+
+// 市场分类选项
+const marketCategoryOptions = ref<MarketCategoryOption[]>([
+  { value: '', label: '全部分类' },
+  { value: 'productivity', label: '生产力工具' },
+  { value: 'communication', label: '沟通协作' },
+  { value: 'development', label: '开发工具' },
+  { value: 'ai', label: 'AI 助手' }
+])
+
+// 整个插件的打开或关闭
+const handlePluginToggle = (plugin: PluginInfo, enabled: boolean) => {
+  // Keep empty!
+}
+
+// 某个tool的打开或关闭。  全部tool状态一致时，会同时触发handlePluginToggle 一下。
+const handleToolToggle = (plugin: PluginInfo, toolId: string, enabled: boolean) => {
+  if (enabled) {
+    agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== toolId)
+  } else {
+    agent.ignoreToolnames.push(toolId)
+  }
+}
+// 点垃圾桶图标的插件删除
+const handlePluginDelete = (plugin: PluginInfo) => {
+  // 从安装插件删除， 市场插件还原状态。
+  const delPlugin = installedPlugins.value.find((item) => item.id === plugin.id)
+  if (delPlugin) {
+    installedPlugins.value = installedPlugins.value.filter((item) => item.id !== delPlugin.id)
+    const findInMarket = marketPlugins.value.find((item) => item.id === delPlugin.id)
+    if (findInMarket) {
+      findInMarket.added = false
+    }
+
+    // 移除mcpServers，mcpTools，mcpClients，ignoreToolnames
+    const mcpServer = delPlugin.originMcpConfig
+    const index = agent.mcpServers.findIndex((server) => server === mcpServer)
+    agent.mcpServers.splice(index, 1)
+    agent.mcpTools.splice(index, 1)
+
+    const delClient = agent.mcpClients[index]
+    try {
+      delClient?.close()
+    } catch (error) {}
+    agent.mcpClients.splice(index, 1)
+
+    // 移除 ignoreToolnames
+    delPlugin.tools.forEach((tool) => {
+      agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== tool.name)
+    })
+  }
+}
+// 插件市场中，点击“添加” 和 “已添加”。
+const handlePluginAdd = async (plugin: PluginInfo, isAdd: boolean) => {
+  if (isAdd) {
+    plugin.added = true
+
+    const newPlugin = {
+      ...plugin,
+      id: plugin.id,
+      enabled: true,
+      added: true
+    }
+    installedPlugins.value.push(newPlugin)
+
+    // 立即注册服务，查询工具
+    const mcpServer = { type: plugin.type, url: plugin.url }
+    const inserted = await agent.insertMcpServer(mcpServer)
+
+    if (inserted) {
+      const index = agent.mcpServers.findIndex((svc) => svc.url === mcpServer.url)
+      // 查询 tools
+      const currTool = agent.mcpTools[index]
+      if (currTool) {
+        newPlugin.tools = Object.keys(currTool).map((key) => {
+          return {
+            id: key,
+            name: key,
+            description: currTool[key].description as string,
+            enabled: true
+          }
+        })
+      }
+    }
+  } else {
+    handlePluginDelete(plugin)
+  }
+}
+
+// 搜索已安装或者搜索市场，两个函数一样的。
+const handleMcpServerPickerSearchFn = (query: string, item: PluginInfo) => {
+  return query.trim() === '' || item.name.toLowerCase().includes(query.toLowerCase())
+}
 
 // 定义插槽
 defineSlots<{
@@ -346,6 +532,26 @@ defineExpose({
 :deep(.tr-welcome__icon) {
   width: 48px;
   height: 48px;
+}
+
+.sender-left-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  & svg {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background-color: #f5f5f5;
+    svg {
+      color: #1476ff;
+    }
+  }
 }
 
 :deep(.tr-icon-button) {
