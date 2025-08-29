@@ -13,6 +13,5 @@ declare module 'vue' {
     TinyGrid: typeof import('@opentiny/vue-grid')['default']
     TinyGridColumn: typeof import('@opentiny/vue-grid-column')['default']
     TinyTag: typeof import('@opentiny/vue-tag')['default']
-    VanIcon: typeof import('vant/es')['Icon']
   }
 }

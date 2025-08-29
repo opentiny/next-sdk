@@ -110,6 +110,7 @@ import { nextTick, watch, h, CSSProperties, toRef, computed, ref } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
 import QrCodeScan from './qr-code-scan.vue'
 import { DEFAULT_SERVERS } from './default-mcps'
+import { defaultPluginSrc } from './default-plugin-svg'
 
 defineOptions({
   name: 'TinyRemoter'
@@ -278,7 +279,7 @@ const handleScanSuccess = async (decodedText: string) => {
       const plugin: PluginInfo = {
         id: `plugin-${sessionId}`,
         name: url.origin,
-        icon: 'https://res.hc-cdn.com/tinyui-design/3.25.0.20250721191929/home/favicon.ico',
+        icon: defaultPluginSrc,
         description: sessionId,
         enabled: true,
         expanded: true,
@@ -363,7 +364,7 @@ const handleToolToggle = (plugin: PluginInfo, toolId: string, enabled: boolean) 
     agent.ignoreToolnames.push(toolId)
   }
 }
-// 插件删除
+// 点垃圾桶图标的插件删除
 const handlePluginDelete = (plugin: PluginInfo) => {
   // 从安装插件删除， 市场插件还原状态。
   installedPlugins.value = installedPlugins.value.filter((item) => item !== plugin)
@@ -379,16 +380,20 @@ const handlePluginDelete = (plugin: PluginInfo) => {
     agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== tool.name)
   })
 }
-// 插件添加。 新添加的插件默认不启用，所以不需要更新 tools
-const handlePluginAdd = (plugin: PluginInfo) => {
-  plugin.added = true
+// 插件市场中，点击“添加” 和“已添加”。
+const handlePluginAdd = (plugin: PluginInfo, isAdd: boolean) => {
+  if (isAdd) {
+    plugin.added = true
 
-  installedPlugins.value.push({
-    ...plugin,
-    id: plugin.id,
-    enabled: false, // 新添加的插件默认不启用
-    added: true
-  })
+    installedPlugins.value.push({
+      ...plugin,
+      id: plugin.id,
+      enabled: false, // 新添加的插件默认不启用？？？
+      added: true
+    })
+  } else {
+    handlePluginDelete(plugin)
+  }
 }
 
 // 搜索已安装或者搜索市场，两个函数一样的。
