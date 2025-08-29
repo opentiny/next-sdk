@@ -2,9 +2,9 @@
   <head>
     <!-- 导入 NEXT SDK -->
     <script src="./dist/mcpsdk@1.17.0.umd.js"></script>
-    <script src="./dist/webmcp.umd.js"></script>
-    <script src="./dist/webAgent.umd.js"></script>
     <script src="./dist/zod@3.25.76.umd.js"></script>
+    <script src="./dist/webmcp.umd.js"></script>
+    <script src="./dist/webagent.umd.js"></script>
     <meta charset="UTF-8" />
     <title>WebMCP 示例</title>
     <style>
@@ -20,9 +20,7 @@
       }
     </style>
     <script>
-      const { ResourceTemplate } = MCPSDK
-      const { z } = Zod
-      const { createMessageChannelPairTransport, WebMcpServer, WebMcpClient } = WebMCP
+      const { createMessageChannelPairTransport, WebMcpServer, WebMcpClient, ResourceTemplate, z } = WebMCP
       const { createRemoter } = WebAgent
 
       async function connect() {
