@@ -63,7 +63,7 @@ export class AgentModelProvider {
     try {
       let transport: MCPClientConfig['transport']
       // transport 一定是 streamableHttp 或者就是： ai-sdk允许的 transport
-      if ('type' in serverConfig && serverConfig.type === 'streamableHttp') {
+      if ('type' in serverConfig && serverConfig.type.toLocaleLowerCase() === 'streamablehttp') {
         transport = new StreamableHTTPClientTransport(new URL(serverConfig.url))
       } else {
         transport = serverConfig as MCPClientConfig['transport']
@@ -89,11 +89,15 @@ export class AgentModelProvider {
   async _createMpcTools() {
     this.mcpTools = await Promise.all(
       this.mcpClients.map(async (client) => {
-        console.log('开始查询tool：', client)
-        const tool = client ? await client?.tools?.() : null
-        console.log('查询tool的结果：', tool, client)
+        try {
+          console.log('开始查询tool：', client)
+          const tool = client ? await client?.tools?.() : null
+          console.log('查询tool的结果：', tool, client)
 
-        return tool
+          return tool
+        } catch (error) {
+          return null
+        }
       })
     )
   }

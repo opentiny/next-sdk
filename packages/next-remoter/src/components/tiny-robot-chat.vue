@@ -402,16 +402,37 @@ const handlePluginDelete = (plugin: PluginInfo) => {
   })
 }
 // 插件市场中，点击“添加” 和 “已添加”。
-const handlePluginAdd = (plugin: PluginInfo, isAdd: boolean) => {
+const handlePluginAdd = async (plugin: PluginInfo, isAdd: boolean) => {
   if (isAdd) {
     plugin.added = true
 
-    installedPlugins.value.push({
+    const newPlugin = {
       ...plugin,
       id: plugin.id,
-      enabled: false, // 新添加的插件默认不启用？？？
+      enabled: true,
       added: true
-    })
+    }
+    installedPlugins.value.push(newPlugin)
+
+    // 立即注册服务，查询工具
+    const mcpServer = { type: plugin.type, url: plugin.url }
+    const inserted = await agent.insertMcpServer(mcpServer)
+
+    if (inserted) {
+      const index = agent.mcpServers.findIndex((svc) => svc.url === mcpServer.url)
+      // 查询 tools
+      const currTool = agent.mcpTools[index]
+      if (currTool) {
+        newPlugin.tools = Object.keys(currTool).map((key) => {
+          return {
+            id: key,
+            name: key,
+            description: currTool[key].description as string,
+            enabled: true
+          }
+        })
+      }
+    }
   } else {
     handlePluginDelete(plugin)
   }

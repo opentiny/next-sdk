@@ -1,6 +1,7 @@
 import { PluginInfo } from '@opentiny/tiny-robot'
 
-const mcpHost = 'https://agent.opentiny.design'
+// const mcpHost = 'https://agent.opentiny.design'
+const mcpHost = 'http://localhost:8089'
 export const DEFAULT_SERVERS: PluginInfo[] = [
   // {
   //   id: 'base-tools',
