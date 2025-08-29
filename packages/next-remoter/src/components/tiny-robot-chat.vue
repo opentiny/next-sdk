@@ -99,13 +99,12 @@ import {
   BubbleMarkdownContentRenderer,
   TrMcpServerPicker,
   PluginInfo,
-  MarketCategoryOption,
-  PluginTool
+  MarketCategoryOption
 } from '@opentiny/tiny-robot'
 import { PromptProps } from '@opentiny/tiny-robot'
 import { GeneratingStatus, STATUS } from '@opentiny/tiny-robot-kit'
 import { IconNewSession, IconPlugin } from '@opentiny/tiny-robot-svgs'
-import { useTinyRobot } from '../composable/useTinyRobot'
+import { useTinyRobotChat } from '../composable/useTinyRobotChat'
 import { nextTick, watch, h, CSSProperties, toRef, computed, ref } from 'vue'
 import { createRemoter } from '@opentiny/next-sdk'
 import QrCodeScan from './qr-code-scan.vue'
@@ -163,7 +162,7 @@ const {
   sendMessage,
   handleSendMessage,
   createConversation
-} = useTinyRobot({
+} = useTinyRobotChat({
   sessionId: toRef(props, 'sessionId'),
   agentRoot: toRef(props, 'agentRoot')
 })
