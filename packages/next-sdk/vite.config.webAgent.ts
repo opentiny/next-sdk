@@ -3,11 +3,12 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    emptyOutDir: false,
     lib: {
-      entry: ['index.ts'],
-      name: 'WebMCP',
+      entry: ['WebAgent.ts'],
+      name: 'WebAgent',
       formats: ['es', 'cjs', 'umd'],
-      fileName: (format) => `index.${format}.js`
+      fileName: (format) => `webagent.${format}.js`
     }
   }
 })

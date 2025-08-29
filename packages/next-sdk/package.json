@@ -1,6 +1,6 @@
 {
   "name": "@opentiny/next-sdk",
-  "version": "0.1.3-alpha.2",
+  "version": "0.1.3-alpha.3",
   "type": "module",
   "license": "MIT",
   "author": "Chunhui Mo",
@@ -9,9 +9,14 @@
   "types": "index.ts",
   "description": "OpenTiny NEXT SDK",
   "scripts": {
-    "build:all": "rm -rf dist && tsc && vite build",
+    "build:all": "pnpm build:cdn && pnpm build",
     "build": "tsc",
-    "build:cdn": "vite build"
+    "build:cdn": "vite build && pnpm build:webAgent && pnpm build:webMcp && pnpm build:mcpSdk && pnpm build:zod && pnpm build:webMcpFull",
+    "build:webAgent": "vite build --config vite.config.webAgent.ts",
+    "build:webMcp": "vite build --config vite.config.webMcp.ts",
+    "build:mcpSdk": "vite build --config vite.config.mcpSdk.ts",
+    "build:zod": "vite build --config vite.config.zod.ts",
+    "build:webMcpFull": "vite build --config vite.config.webMcpFull.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.16.0",
