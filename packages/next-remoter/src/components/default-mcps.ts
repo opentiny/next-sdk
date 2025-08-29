@@ -3,17 +3,6 @@ import { PluginInfo } from '@opentiny/tiny-robot'
 const mcpHost = 'https://agent.opentiny.design'
 // const mcpHost = 'http://localhost:8089'
 export const DEFAULT_SERVERS: PluginInfo[] = [
-  // {
-  //   id: 'base-tools',
-  //   name: 'MCP测试工具箱',
-  //   description: '基础工具服务器，可以查询当前日期、查询天气',
-  //   icon: 'https://res.hc-cdn.com/tinyui-design/3.25.0.20250721191929/home/images/tiny-ng.svg',
-  //   url: mcpHost + '/api/v1/mcp-server/base-tools/mcp',
-  //   type: 'StreamableHTTP',
-  //   enabled: false,
-  //   added: false,
-  //   tools: []
-  // },
   {
     id: '12306-mcp',
     name: '12306服务器',
