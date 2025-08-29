@@ -388,18 +388,31 @@ const handleToolToggle = (plugin: PluginInfo, toolId: string, enabled: boolean) 
 // 点垃圾桶图标的插件删除
 const handlePluginDelete = (plugin: PluginInfo) => {
   // 从安装插件删除， 市场插件还原状态。
-  installedPlugins.value = installedPlugins.value.filter((item) => item !== plugin)
-  const findInMarket = marketPlugins.value.find((item) => item.id === plugin.id)
-  if (findInMarket) {
-    findInMarket.added = false
-  }
+  const delPlugin = installedPlugins.value.find((item) => item.id === plugin.id)
+  if (delPlugin) {
+    installedPlugins.value = installedPlugins.value.filter((item) => item.id !== delPlugin.id)
+    const findInMarket = marketPlugins.value.find((item) => item.id === delPlugin.id)
+    if (findInMarket) {
+      findInMarket.added = false
+    }
 
-  // 移除mcpServers
-  agent.mcpServers = agent.mcpClients.filter((item) => item !== plugin.originMcpConfig)
-  // 移除 ignoreToolnames
-  plugin.tools.forEach((tool) => {
-    agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== tool.name)
-  })
+    // 移除mcpServers，mcpTools，mcpClients，ignoreToolnames
+    const mcpServer = delPlugin.originMcpConfig
+    const index = agent.mcpServers.findIndex((server) => server === mcpServer)
+    agent.mcpServers.splice(index, 1)
+    agent.mcpTools.splice(index, 1)
+
+    const delClient = agent.mcpClients[index]
+    try {
+      delClient?.close()
+    } catch (error) {}
+    agent.mcpClients.splice(index, 1)
+
+    // 移除 ignoreToolnames
+    delPlugin.tools.forEach((tool) => {
+      agent.ignoreToolnames = agent.ignoreToolnames.filter((name) => name !== tool.name)
+    })
+  }
 }
 // 插件市场中，点击“添加” 和 “已添加”。
 const handlePluginAdd = async (plugin: PluginInfo, isAdd: boolean) => {
