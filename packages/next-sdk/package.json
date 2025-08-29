@@ -1,6 +1,6 @@
 {
   "name": "@opentiny/next-sdk",
-  "version": "0.1.3-alpha.4",
+  "version": "0.1.3-alpha.5",
   "type": "module",
   "license": "MIT",
   "author": "Chunhui Mo",
@@ -9,14 +9,20 @@
   "types": "index.ts",
   "description": "OpenTiny NEXT SDK",
   "scripts": {
-    "build:all": "pnpm build:cdn && pnpm build",
+    "build:all": "pnpm build:cdn && pnpm build:cdn:dev && pnpm build",
     "build": "tsc",
     "build:cdn": "vite build && pnpm build:webAgent && pnpm build:webMcp && pnpm build:mcpSdk && pnpm build:zod && pnpm build:webMcpFull",
+    "build:cdn:dev": "vite build --mode dev && pnpm build:webAgent:dev && pnpm build:webMcp:dev && pnpm build:mcpSdk:dev && pnpm build:zod:dev && pnpm build:webMcpFull:dev",
     "build:webAgent": "vite build --config vite.config.webAgent.ts",
+    "build:webAgent:dev": "vite build --config vite.config.webAgent.ts --mode dev",
     "build:webMcp": "vite build --config vite.config.webMcp.ts",
+    "build:webMcp:dev": "vite build --config vite.config.webMcp.ts --mode dev",
     "build:mcpSdk": "vite build --config vite.config.mcpSdk.ts",
+    "build:mcpSdk:dev": "vite build --config vite.config.mcpSdk.ts --mode dev",
     "build:zod": "vite build --config vite.config.zod.ts",
-    "build:webMcpFull": "vite build --config vite.config.webMcpFull.ts"
+    "build:zod:dev": "vite build --config vite.config.zod.ts --mode dev",
+    "build:webMcpFull": "vite build --config vite.config.webMcpFull.ts",
+    "build:webMcpFull:dev": "vite build --config vite.config.webMcpFull.ts --mode dev"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.16.0",
