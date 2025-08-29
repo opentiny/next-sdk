@@ -6,13 +6,13 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      emptyOutDir: shouldMinify,
+      emptyOutDir: false,
       minify: shouldMinify,
       lib: {
-        entry: 'index.ts',
+        entry: 'WebMcp.ts',
         name: 'WebMCP',
         formats: ['es', 'umd'],
-        fileName: (format) => `index.${format}${shouldMinify ? '' : '.dev'}.js`
+        fileName: (format) => `webmcp-full${format === 'es' ? '.es' : ''}${shouldMinify ? '' : '.dev'}.js`
       }
     }
   }

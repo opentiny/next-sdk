@@ -6,13 +6,13 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      emptyOutDir: shouldMinify,
+      emptyOutDir: false,
       minify: shouldMinify,
       lib: {
-        entry: 'index.ts',
-        name: 'WebMCP',
+        entry: 'WebAgent.ts',
+        name: 'WebAgent',
         formats: ['es', 'umd'],
-        fileName: (format) => `index.${format}${shouldMinify ? '' : '.dev'}.js`
+        fileName: (format) => `webagent${format === 'es' ? '.es' : ''}${shouldMinify ? '' : '.dev'}.js`
       }
     }
   }
