@@ -336,24 +336,7 @@ watch(() => messages.value[messages.value.length - 1]?.content, scrollToBottom)
 const pluginVisible = ref(false)
 
 // 已安装插件数据
-const installedPlugins = ref<PluginInfo[]>([
-  // {
-  //   id: 'plugin-1',
-  //   name: 'GitHub 集成',
-  //   icon: 'https://github.com/favicon.ico',
-  //   description: '与 GitHub 仓库集成，提供代码搜索、PR 管理等功能',
-  //   enabled: true,
-  //   expanded: true,
-  //   tools: [
-  //     {
-  //       id: 'tool-1',
-  //       name: '搜索代码',
-  //       description: '在 GitHub 仓库中搜索代码',
-  //       enabled: true
-  //     },
-  //   ]
-  // },
-])
+const installedPlugins = ref<PluginInfo[]>([])
 
 // 市场插件数据
 const marketPlugins = ref<PluginInfo[]>([...DEFAULT_SERVERS])

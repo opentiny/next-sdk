@@ -2,9 +2,15 @@ import { streamText, stepCountIs, generateText } from 'ai'
 import type { ToolSet } from 'ai'
 import { getMcpClients, getMcpTools } from './utils'
 import type { IAgentModelProviderOption, McpServerConfig } from './type'
-import { AIProviderFactories } from './utils/aiProviderFactories'
 import { ProviderV2 } from '@ai-sdk/provider'
 import { OpenAIProvider } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
+import { createDeepSeek } from '@ai-sdk/deepseek'
+
+export const AIProviderFactories = {
+  ['openai']: createOpenAI,
+  ['deepseek']: createDeepSeek
+}
 
 export class AgentModelProvider {
   llm: ProviderV2 | OpenAIProvider
