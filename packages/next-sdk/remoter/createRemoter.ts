@@ -35,14 +35,14 @@ const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
     show: true,
     text: '弹出二维码',
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 9H6V21H3C2.45 21 2 20.55 2 20V10C2 9.45 2.45 9 3 9Z" fill="currentColor"/>
-      <path d="M12 2H20C21.1 2 22 2.9 22 4V20C22 21.1 21.1 22 20 22H12C10.9 22 10 21.1 10 20V4C10 2.9 10.9 2 12 2ZM12 20H20V4H12V20Z" fill="currentColor"/>
-      <path d="M15 7H17V9H15V7Z" fill="currentColor"/>
-      <path d="M15 11H17V13H15V11Z" fill="currentColor"/>
-      <path d="M15 15H17V17H15V15Z" fill="currentColor"/>
-      <path d="M19 7H21V9H19V7Z" fill="currentColor"/>
-      <path d="M19 11H21V13H19V11Z" fill="currentColor"/>
-      <path d="M19 15H21V17H19V15Z" fill="currentColor"/>
+      <rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+      <rect x="15" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+      <rect x="3" y="15" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+      <line x1="9" y1="6" x2="9" y2="18" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="15" y1="6" x2="15" y2="18" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="6" y1="9" x2="18" y2="9" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="6" y1="15" x2="18" y2="15" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="12" cy="12" r="1" fill="currentColor"/>
     </svg>`
   },
   {
@@ -236,11 +236,85 @@ class FloatingBlock {
     const modal = this.createModal(
       '扫码前往智能遥控器',
       `
-      <div style="text-align: center; padding: 20px;">
-        <div style="width: 200px; height: 200px; background: #f0f0f0; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-          <img src="${base64}" alt="二维码" style="width: 100%; height: 100%; object-fit: contain;">
+      <div style="text-align: center; padding: 32px;">
+        <!-- 二维码容器 - 添加渐变背景和阴影效果 -->
+        <div style="
+          width: 240px; 
+          height: 240px; 
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          margin: 0 auto 24px; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center; 
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+          position: relative;
+          overflow: hidden;
+        ">
+          <!-- 装饰性背景元素 -->
+          <div style="
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+          "></div>
+          
+          <!-- 二维码图片容器 -->
+          <div style="
+            width: 200px;
+            height: 200px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+          ">
+            <img src="${base64}" alt="二维码" style="
+              width: 100%; 
+              height: 100%; 
+              object-fit: contain;
+              border-radius: 8px;
+            ">
+          </div>
         </div>
-        <p style="color: #666; margin: 0;">请使用手机微信或者浏览器扫描二维码跳转到智能遥控器</p>
+        
+        <!-- 标题文字 -->
+        <h3 style="
+          color: #333;
+          margin: 0 0 12px 0;
+          font-size: 20px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+        ">扫描二维码</h3>
+        
+        <!-- 描述文字 -->
+        <p style="
+          color: #666; 
+          margin: 0 auto;
+          margin-bottom: 20px;
+          font-size: 14px;
+          line-height: 1.6;
+          max-width: 280px;
+        ">请使用手机微信或者浏览器扫描二维码跳转到智能遥控器</p>
+        
+        <!-- 提示图标和文字 -->
+        <div style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          color: #999;
+          font-size: 12px;
+        ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.7;">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+          </svg>
+          <span>支持微信、浏览器等多种方式</span>
+        </div>
       </div>
     `
     )
@@ -477,6 +551,16 @@ class FloatingBlock {
 
       .tiny-remoter-modal-body {
         padding: 24px;
+      }
+
+      /* 二维码弹窗动画 */
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       /* 响应式设计 */
