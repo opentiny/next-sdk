@@ -27,6 +27,8 @@ export interface IAgentModelProviderOption {
   llmConfig?: IAgentModelProviderLlmConfig
   /** Mcp Server的配置对象的集合 */
   mcpServers?: McpServerConfig[]
+  /** 是否强制使用ReAct模式，默认false */
+  isReActModel?: boolean
 }
 
 

@@ -8,7 +8,6 @@ import { OpenAIProvider } from '@ai-sdk/openai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createDeepSeek } from '@ai-sdk/deepseek'
 import { getSystemPromptMessages, organizeToolCalls } from './react'
-import { ReActEngine } from './react/ReAct'
 
 export const AIProviderFactories = {
   ['openai']: createOpenAI,
