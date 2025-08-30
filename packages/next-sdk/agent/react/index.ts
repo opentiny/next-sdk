@@ -92,7 +92,7 @@ export const organizeToolCalls = async (
 }
 
 export const runReActLoop = async ({
-  text,
+  step,
   tools,
   vm,
   chatMethod,
@@ -100,7 +100,7 @@ export const runReActLoop = async ({
   system,
   llm
 }: {
-  text: string
+  step: any
   tools: Tool[]
   vm: any
   chatMethod: any
@@ -109,7 +109,7 @@ export const runReActLoop = async ({
   llm: any
 }) => {
   const toolCallsResult = []
-  const { toolCalls, thought, finalAnswer } = await organizeToolCalls(text)
+  const { toolCalls, thought, finalAnswer } = await organizeToolCalls(step.content[0].text)
 
   for (const toolCall of toolCalls) {
     const tool = tools[toolCall.function.name]
@@ -118,28 +118,24 @@ export const runReActLoop = async ({
       toolCallsResult.push(result)
     }
   }
- 
+
   if (toolCallsResult.length > 0) {
-    const lastmessage = options.messages[options.messages.length - 1]
-    const message = JSON.parse(JSON.stringify(lastmessage))
-    message.role = 'user'
-    message.content =
-      message.content +
+    const lastmessage = step.content[0]
+    lastmessage.text =
+      lastmessage.text +
       `\n Observation: ${toolCallsResult.map((item: any) => item.content.map((item: any) => item.text).join('\n')).join('\n')}`
-  
-    options.messages.push(message)
-    debugger
+
     const { text } = await generateText({
       system: system,
       model: llm,
-      tools: tools,
+      tools: tools as ToolSet,
       stopWhen: stepCountIs(options.maxSteps),
-      onStepFinish: async (step) => {
-        debugger
-        await runReActLoop({ text: step.content[0].text, tools, vm, chatMethod, options, system: system, llm: llm })
+      onStepFinish: async (stepCopy) => {
+        await runReActLoop({ step: stepCopy, tools, vm, chatMethod, options, system: system, llm: llm })
       },
-      ...options
+      prompt: lastmessage.text,
     })
+    step.content[0].text += text
 
     return text
   } else {

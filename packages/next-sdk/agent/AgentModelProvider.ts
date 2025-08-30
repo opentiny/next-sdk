@@ -173,7 +173,7 @@ export class AgentModelProvider {
       onStepFinish: async (step) => {
         if(this.isReActModel){
           await runReActLoop({
-            text: step.content[0].text,
+            step,
             tools,
             vm: this,
             chatMethod,
