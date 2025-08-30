@@ -45,7 +45,8 @@ export class CustomAgentModelProvider extends BaseModelProvider {
     const result = await this.agent.chatStream({
       messages: request.messages,
       model: builtInAI(),
-      abortSignal: request.options?.signal
+      abortSignal: request.options?.signal,
+      handler
     })
 
     // 标识每一个markdown块

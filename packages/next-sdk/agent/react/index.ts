@@ -125,7 +125,7 @@ export const runReActLoop = async ({
       lastmessage.text +
       `\n Observation: ${toolCallsResult.map((item: any) => item.content.map((item: any) => item.text).join('\n')).join('\n')}`
 
-    const { text } = await generateText({
+    const result =  chatMethod({
       system: system,
       model: llm,
       tools: tools as ToolSet,
@@ -135,9 +135,14 @@ export const runReActLoop = async ({
       },
       prompt: lastmessage.text,
     })
-    step.content[0].text += text
 
-    return text
+    for await (const part of result.fullStream) {
+      part.text &&  options.handler.onData({
+        type: 'markdown',
+        delta: part.text,
+      })
+    }
+
   } else {
     return finalAnswer
   }
