@@ -1,5 +1,6 @@
 import { Tool, ToolCall } from '../type'
 import { PREFIX, FORMAT_INSTRUCTIONS, SUFFIX } from './systemPrompt'
+import { generateText, stepCountIs } from 'ai'
 
 const FINAL_ANSWER_TAG = 'Final Answer:'
 const ACTION_TAG = '"action":'
@@ -90,4 +91,58 @@ export const organizeToolCalls = async (
   }
 }
 
+export const runReActLoop = async ({
+  text,
+  tools,
+  vm,
+  chatMethod,
+  options,
+  system,
+  llm
+}: {
+  text: string
+  tools: Tool[]
+  vm: any
+  chatMethod: any
+  options: any
+  system: string
+  llm: any
+}) => {
+  const toolCallsResult = []
+  const { toolCalls, thought, finalAnswer } = await organizeToolCalls(text)
 
+  for (const toolCall of toolCalls) {
+    const tool = tools[toolCall.function.name]
+    if (tool) {
+      const result = await tool.execute(JSON.parse(toolCall.function.arguments))
+      toolCallsResult.push(result)
+    }
+  }
+ 
+  if (toolCallsResult.length > 0) {
+    const lastmessage = options.messages[options.messages.length - 1]
+    const message = JSON.parse(JSON.stringify(lastmessage))
+    message.role = 'user'
+    message.content =
+      message.content +
+      `\n Observation: ${toolCallsResult.map((item: any) => item.content.map((item: any) => item.text).join('\n')).join('\n')}`
+  
+    options.messages.push(message)
+    debugger
+    const { text } = await generateText({
+      system: system,
+      model: llm,
+      tools: tools,
+      stopWhen: stepCountIs(options.maxSteps),
+      onStepFinish: async (step) => {
+        debugger
+        await runReActLoop({ text: step.content[0].text, tools, vm, chatMethod, options, system: system, llm: llm })
+      },
+      ...options
+    })
+
+    return text
+  } else {
+    return finalAnswer
+  }
+}

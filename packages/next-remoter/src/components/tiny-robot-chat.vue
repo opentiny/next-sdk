@@ -229,7 +229,7 @@ const pillItems = [
     id: 'office',
     text: props.locale === 'zh-CN' ? '办公助手' : 'Office Assistant',
     menus: [
-      '接收邮件#帮我选择最贵的手机商品。',
+      '接收邮件#帮我勾选中最贵的手机商品。',
       '编写邮件#请新建一个邮件，收件人为 opentiny-next@meeting.com, 内容为举办一个临时会议。',
       '安排会议#创建一个临时的在线会议，主题为讨论问题，时长为1小时。',
       '整理文档#请分析附件中的销售情况，把销售额绘制成折线图。'

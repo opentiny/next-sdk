@@ -7,7 +7,7 @@ import { ProviderV2 } from '@ai-sdk/provider'
 import { OpenAIProvider } from '@ai-sdk/openai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createDeepSeek } from '@ai-sdk/deepseek'
-import { getSystemPromptMessages, organizeToolCalls } from './react'
+import { getSystemPromptMessages, organizeToolCalls, runReActLoop } from './react'
 
 export const AIProviderFactories = {
   ['openai']: createOpenAI,
@@ -34,9 +34,11 @@ export class AgentModelProvider {
   /** 是否是 ReAct 模型 */
   isReActModel: boolean = false
 
-  constructor({ llmConfig, mcpServers, llm }: IAgentModelProviderOption) {
+  constructor({ llmConfig, mcpServers, llm, isReActModel }: IAgentModelProviderOption) {
     // 1、保存 mcpServer
     this.mcpServers = mcpServers || []
+
+    this.isReActModel = isReActModel || false
 
     // 2、保存 llm
     if (llm) {
@@ -159,33 +161,27 @@ export class AgentModelProvider {
       throw new Error('LLM is not initialized')
     }
 
-    const tools = await this.tempMergeTools(options.tools) as ToolSet
+    const tools = (await this.tempMergeTools(options.tools)) as ToolSet
     const systemPrompt = await getSystemPromptMessages(tools)
-  
-    const stopFunction=(args)=>{
-      debugger
-    }
-
+    const llm = this.llm(model)
     return chatMethod({
       // @ts-ignore  ProviderV2 是所有llm的父类， 在每一个具体的llm 类都有一个选择model的函数用法
-      model: this.llm(model),
+      model: llm,
       system: systemPrompt,
       tools,
-      stopWhen:this.isReActModel? stopFunction: stepCountIs(maxSteps),
+      stopWhen: stepCountIs(maxSteps),
       onStepFinish: async (step) => {
-        const text=step.content[0].text
-        const toolCallsResult = []
-        const { toolCalls, thought, finalAnswer } = await organizeToolCalls(text)
-        
-        for (const toolCall of toolCalls) { 
-          const tool = tools[toolCall.function.name]
-          if (tool) {
-           const result = await tool.execute(JSON.parse(toolCall.function.arguments))
-           toolCallsResult.push(result)
-          }
+        if(this.isReActModel){
+          await runReActLoop({
+            text: step.content[0].text,
+            tools,
+            vm: this,
+            chatMethod,
+            llm,
+            options,
+            system: systemPrompt
+          })
         }
-        console.log('toolCallsResult', toolCallsResult)
-        
       },
       ...options
     })
