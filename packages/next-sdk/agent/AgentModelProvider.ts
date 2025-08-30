@@ -168,10 +168,10 @@ export class AgentModelProvider {
       // @ts-ignore  ProviderV2 是所有llm的父类， 在每一个具体的llm 类都有一个选择model的函数用法
       model: llm,
       system: systemPrompt,
-      tools,
+      tools: this.isReActModel ? (tools as ToolSet) : undefined,
       stopWhen: stepCountIs(maxSteps),
       onStepFinish: async (step) => {
-        if(this.isReActModel){
+        if (this.isReActModel) {
           await runReActLoop({
             step,
             tools,
