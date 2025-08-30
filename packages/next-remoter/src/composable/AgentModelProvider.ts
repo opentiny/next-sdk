@@ -8,6 +8,7 @@ import { AGENT_ROOT } from '../const'
 import { globalConversation } from './utils'
 import { AgentModelProvider } from '@opentiny/next-sdk'
 import { createOllama } from 'ollama-ai-provider-v2'
+import { builtInAI } from '@built-in-ai/core';
 
 const onToolCallChain = (part: any, handler: StreamHandler, lastToolCall: any, isFirstToolCall: boolean) => {
   if (part.type == 'tool-input-start') {
@@ -43,11 +44,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
   constructor(config: AIModelConfig) {
     super(config)
     this.agent = new AgentModelProvider({
-      llmConfig: {
-        baseURL: 'http://localhost:11434/api',
-        providerType: createOllama,
-        isReActModel: true
-      },
+      llm: builtInAI,
       mcpServers: [
         {
           type: 'streamableHttp',
@@ -76,7 +73,7 @@ export class CustomAgentModelProvider extends BaseModelProvider {
 
     const result = await this.agent.chatStream({
       messages: request.messages,
-      model: 'deepseek-r1:1.5b',
+      model: builtInAI(),
       abortSignal: request.options?.signal
     })
 
