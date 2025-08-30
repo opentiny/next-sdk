@@ -5,6 +5,7 @@ import { BaseModelProvider } from '@opentiny/tiny-robot-kit'
 import type { AIModelConfig } from '@opentiny/tiny-robot-kit'
 import { type Ref } from 'vue'
 import { AgentModelProvider, McpServerConfig, IAgentModelProviderOption } from '@opentiny/next-sdk'
+import { builtInAI } from '@built-in-ai/core';
 
 /** Tiny-robot 所需要的自定义大语言的Provider */
 export class CustomAgentModelProvider extends BaseModelProvider {
@@ -14,11 +15,8 @@ export class CustomAgentModelProvider extends BaseModelProvider {
   constructor(config: AIModelConfig, sessionId: Ref<string>, agentRoot: Ref<string>) {
     super(config)
     const options = {
-      llmConfig: {
-        apiKey: 'sk-trial',
-        baseURL: 'https://agent.opentiny.design/api/v1/ai',
-        providerType: 'deepseek'
-      },
+      llm: builtInAI,
+      isReActModel: true,
       mcpServers: [] as McpServerConfig[]
     }
     if (sessionId.value && sessionId.value.includes(',')) {
@@ -46,14 +44,14 @@ export class CustomAgentModelProvider extends BaseModelProvider {
   async chatStream(request: ChatCompletionRequest, handler: StreamHandler): Promise<void> {
     const result = await this.agent.chatStream({
       messages: request.messages,
-      model: 'deepseek-ai/DeepSeek-V3',
+      model: builtInAI(),
       abortSignal: request.options?.signal
     })
 
     // 标识每一个markdown块
     let textId = 1
     for await (const part of result.fullStream) {
-      // console.log(part, part.type)
+      console.log(part, part.type)
 
       // 文本节点处理。 每个文本块拥有自己的textId
       if (part.type === 'text-start') {

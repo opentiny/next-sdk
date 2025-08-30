@@ -25,6 +25,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@opentiny/vue": "^3.25.0",
     "@opentiny/vue-icon": "^3.25.0",
+    "@built-in-ai/core": "^2.0.0",
     "html5-qrcode": "^2.3.8",
     "vant": "^4.9.21",
     "vue": "^3.3.11"

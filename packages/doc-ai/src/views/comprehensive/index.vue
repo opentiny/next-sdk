@@ -101,6 +101,7 @@ server.registerTool(
     }
   },
   async ({ city }: { city: string }) => {
+    debugger
     return {
       content: [{ type: 'text', text: `天气信息：${city}晴天` }]
     }

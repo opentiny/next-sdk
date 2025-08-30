@@ -5,10 +5,10 @@ Specifically, this $JSON_BLOB should have a "action" key (with the name of the t
 The $JSON_BLOB should only contain a SINGLE action, do NOT return a list of multiple actions. Here is an example of a valid $JSON_BLOB:
 
 \`\`\`
-{{
+{
   "action": $TOOL_NAME,
   "action_input": $ACTION_INPUT
-}}
+}
 \`\`\`
 
 ALWAYS use the following format:

@@ -28,3 +28,51 @@ export interface IAgentModelProviderOption {
   /** Mcp Server的配置对象的集合 */
   mcpServers?: McpServerConfig[]
 }
+
+
+export type FunctionDescription = {
+  description?: string
+  name: string
+  parameters: object // JSON Schema object
+}
+
+export type Tool = {
+  type: 'function'
+  function: FunctionDescription
+}
+
+export type FunctionCall = {
+  name: string
+  arguments: string
+}
+
+export type ToolCall = {
+  id: string
+  type: 'function'
+  function: FunctionCall
+}
+
+// types/react.ts
+export interface ReActStep {
+  thought: string;
+  action: string;
+  actionInput: Record<string, any>;
+  observation: string;
+  finalAnswer?: string;
+}
+
+export interface ReActResult {
+  finalAnswer: string;
+  steps: ReActStep[];
+  usage?: {
+    totalSteps: number;
+    totalTokens?: number;
+  };
+}
+
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  parameters: Record<string, any>;
+  execute: (input: any) => Promise<string>;
+}

@@ -29,7 +29,7 @@ export const useTinyRobotChat = ({ sessionId, agentRoot }: useTinyRobotOption) =
     events: {
       onReceiveData(data, messages, preventDefault) {
         preventDefault()
-        console.log('onReceiveData=', data)
+        // console.log('onReceiveData=', data)
 
         let lastMessage = messages.value[messages.value.length - 1]
 
