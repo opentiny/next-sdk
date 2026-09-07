@@ -228,6 +228,48 @@ describe('resolveA11yStates - 标准 ARIA 零配置检测', () => {
     expect(resolveA11yStates(el('<a target="_self"></a>'))).toContain('target=_self')
     expect(resolveA11yStates(el('<a></a>'))).not.toContain('target=_blank')
   })
+
+  it('contenteditable 编辑宿主输出 contenteditable token 与 value', () => {
+    const editor = el('<div contenteditable="true">已有正文</div>')
+    const tokens = resolveA11yStates(editor)
+    expect(tokens).toContain('contenteditable')
+    expect(tokens).toContain('value="已有正文"')
+  })
+
+  it('contenteditable=plaintext-only 输出专用 token', () => {
+    expect(resolveA11yStates(el('<div contenteditable="plaintext-only">纯文本</div>'))).toContain(
+      'contenteditable=plaintext-only',
+    )
+  })
+
+  it('复现：编辑宿主 innerText 为空时不得回退 textContent 暴露隐藏文案 —— 前置仅 display:none 子孙；步骤 resolveA11yStates；期望无 value token', () => {
+    const editor = el('<div contenteditable="true"><span style="display:none">secret</span></div>') as HTMLElement
+    // jsdom 的 innerText 为 undefined，这里模拟浏览器：可见文本为空字符串
+    Object.defineProperty(editor, 'innerText', { configurable: true, get: () => '' })
+    const tokens = resolveA11yStates(editor)
+    expect(tokens).toContain('contenteditable')
+    expect(tokens.some((t) => t.startsWith('value='))).toBe(false)
+  })
+})
+
+describe('resolveA11yRole - contenteditable 编辑宿主', () => {
+  it('无显式 role 的编辑宿主隐式为 textbox', () => {
+    expect(resolveA11yRole(el('<div contenteditable="true"></div>'))).toBe('textbox')
+    expect(resolveA11yRole(el('<div contenteditable></div>'))).toBe('textbox')
+    expect(resolveA11yRole(el('<p contenteditable="true">段</p>'))).toBe('textbox')
+  })
+
+  it('contenteditable=false 不视为编辑宿主', () => {
+    expect(resolveA11yRole(el('<div contenteditable="false">x</div>'))).toBe('generic')
+  })
+
+  it('显式 role 优先于 contenteditable 隐式 textbox', () => {
+    expect(resolveA11yRole(el('<div role="combobox" contenteditable="true"></div>'))).toBe('combobox')
+  })
+
+  it('input[type] 优先于 contenteditable', () => {
+    expect(resolveA11yRole(el('<input type="checkbox" contenteditable="true" />'))).toBe('checkbox')
+  })
 })
 
 describe('resolveA11yStates - 自定义规则', () => {
