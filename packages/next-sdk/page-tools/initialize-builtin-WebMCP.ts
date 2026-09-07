@@ -116,12 +116,40 @@ function revealPolyfillOnDocument(): void {
   }
 }
 
+/**
+ * 摘除 navigator（及 Navigator.prototype）上的 modelContext getter。
+ *
+ * WebMCP 2026-05-27 草案将 modelContext 从 Navigator 迁移到了 Document。
+ * @mcp-b/webmcp-polyfill@5.1.0 为兼容旧版在 navigator 上挂载了带 warn 的 getter；
+ * 但其 initializeWebMCPPolyfill() 内部直接访问了 `nav.modelContext` 探测旧规范原生实现。
+ * 若环境中已挂有该 getter，此属性访问会触发自身警告且误走分支。
+ * 在安装前先清除该 getter，由 polyfill 在初始化末尾重新建立旧版兼容 alias。
+ */
+function neutralizeDeprecatedNavigatorModelContext(): void {
+  const nav = typeof navigator !== 'undefined' ? (navigator as Navigator & ModelContextHost) : null
+  if (!nav) return
+
+  const targets = [nav, Object.getPrototypeOf(nav)].filter(Boolean)
+  for (const target of targets) {
+    const desc = Object.getOwnPropertyDescriptor(target, 'modelContext')
+    if (desc?.get && desc.configurable) {
+      Reflect.deleteProperty(target, 'modelContext')
+    }
+  }
+}
+
 export const initializeBuiltinWebMCP = (options?: InitializeBuiltinWebMCPOptions) => {
   if (!isBrowser()) return
+
+  // 若 document 上已存在合格的 JS polyfill，直接幂等返回，无需重复执行安装
+  const currentCtx = readModelContext(document as Document & ModelContextHost)
+  if (isWebMCPPolyfill(currentCtx)) return
 
   const forcePolyfill = options?.forcePolyfill !== false
 
   try {
+    neutralizeDeprecatedNavigatorModelContext()
+
     if (!forcePolyfill) {
       initializeWebMCPPolyfill()
       return
@@ -141,3 +169,4 @@ export const initializeBuiltinWebMCP = (options?: InitializeBuiltinWebMCPOptions
     console.warn('[next-sdk] 自动注入 modelContext polyfill 失败:', err)
   }
 }
+
