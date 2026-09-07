@@ -469,7 +469,7 @@ function computeStates(el: Element, resolved: ResolvedA11yConfig): string[] {
     const ce = (el as HTMLElement).contentEditable
     const rawCe = (el.getAttribute('contenteditable') ?? '').trim().toLowerCase()
     tokens.push(ce === 'plaintext-only' || rawCe === 'plaintext-only' ? 'contenteditable=plaintext-only' : 'contenteditable')
-    const text = ((el as HTMLElement).innerText || el.textContent || '').replace(/\s+/g, ' ').trim()
+    const text = ((el as HTMLElement).innerText ?? el.textContent ?? '').replace(/\s+/g, ' ').trim()
     if (text) tokens.push(`value="${text}"`)
   }
   const valuenow = aria('aria-valuenow')

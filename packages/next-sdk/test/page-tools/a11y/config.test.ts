@@ -241,6 +241,15 @@ describe('resolveA11yStates - 标准 ARIA 零配置检测', () => {
       'contenteditable=plaintext-only',
     )
   })
+
+  it('复现：编辑宿主 innerText 为空时不得回退 textContent 暴露隐藏文案 —— 前置仅 display:none 子孙；步骤 resolveA11yStates；期望无 value token', () => {
+    const editor = el('<div contenteditable="true"><span style="display:none">secret</span></div>') as HTMLElement
+    // jsdom 的 innerText 为 undefined，这里模拟浏览器：可见文本为空字符串
+    Object.defineProperty(editor, 'innerText', { configurable: true, get: () => '' })
+    const tokens = resolveA11yStates(editor)
+    expect(tokens).toContain('contenteditable')
+    expect(tokens.some((t) => t.startsWith('value='))).toBe(false)
+  })
 })
 
 describe('resolveA11yRole - contenteditable 编辑宿主', () => {

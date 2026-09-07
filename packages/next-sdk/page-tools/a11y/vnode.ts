@@ -188,8 +188,9 @@ export function buildVNode(
     // 无需再要求 role≠generic 或 name≠''——否则无文本的图标按钮（tp-icon.common-icon 等）
     // 虽是真正的可点击边界，仍会因 generic+空名被漏判。
     (!isDisabled && hasClickableCursor) ||
-    // 有 tooltip 的元素分配 ref，使 AI 能 hover 触发动态 tip
-    hasTooltip ||
+    // 有 tooltip 的元素分配 ref，使 AI 能 hover 触发动态 tip。
+    // 禁用编辑宿主不得借 title/tooltip 拿到 ref，否则 fill 可定位 aria-disabled 编辑区。
+    (hasTooltip && !(isDisabled && isEditingHost(el))) ||
     // 编辑宿主可 fill，即使显式 role 不是 textbox（如 combobox）也要暴露 ref
     (!isDisabled && isEditingHost(el))
 

@@ -757,6 +757,15 @@ describe('buildA11yTree - contenteditable 编辑宿主分配 ref', () => {
     const { refMap } = buildA11yTree(root)
     expect(Array.from(refMap.values())).not.toContain(off)
   })
+
+  it('复现：aria-disabled 编辑宿主带 title 时仍被 tooltip 分支分配 ref —— 前置 contenteditable + aria-disabled + title；步骤 buildA11yTree；期望不进 refMap', () => {
+    const root = setupRoot(
+      `<div id="locked-tip" contenteditable="true" aria-disabled="true" title="已锁定">禁用编辑</div>`,
+    )
+    const locked = root.querySelector('#locked-tip') as HTMLElement
+    const { refMap } = buildA11yTree(root)
+    expect(Array.from(refMap.values())).not.toContain(locked)
+  })
 })
 
 /** 统计某 accessible name 是否在多行 YAML 中重复出现（父子同名的典型信号） */
